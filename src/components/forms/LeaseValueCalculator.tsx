@@ -6,17 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-// Removed Select imports as they are unused
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Calculator, Car, Mail, User, /* MapPin removed */ Gauge, Calendar, TrendingUp, TrendingDown, AlertCircle, CheckCircle } from "lucide-react";
+import { Calculator, Car, Mail, User, MapPin, Gauge, Calendar, TrendingUp, TrendingDown, AlertCircle, CheckCircle } from "lucide-react";
 import { leaseInquiryService, type LeaseInquiry } from "@/services/leaseInquiryService";
 import { openaiService } from "@/services/openaiService";
-// import { emailService } from "@/services/emailService"; // Removed unused import
 import { useToast } from "@/hooks/use-toast";
 import { contactService } from "@/services/contactService";
-
-// Removed US_STATES constant as it's unused
 
 const leaseValueSchema = z.object({
   email: z.string().min(1, "Required").email("Please enter a valid email address"),
@@ -38,6 +34,10 @@ const leaseValueSchema = z.object({
     }),
   licensePlate: z.string().min(1, "Required"),
   state: z.string().min(1, "Required"),
+  zipCode: z.string().min(1, "Required").refine((val) => {
+    const zipRegex = /^\d{5}(-\d{4})?$/;
+    return zipRegex.test(val);
+  }, "Please enter a valid zip code (e.g., 12345 or 12345-6789)"),
   currentMileage: z.string().min(1, "Required").transform((val) => {
     const num = parseInt(val.replace(/,/g, ""));
     if (isNaN(num)) return 0;
@@ -77,6 +77,49 @@ interface LeaseValueResult {
   nextSteps: string[];
 }
 
+// Local storage keys
+const STORAGE_KEYS = {
+  FORM_DATA: "overleased_form_data",
+  CALCULATION_RESULT: "overleased_calculation_result",
+  CALCULATOR_STATE: "overleased_calculator_state",
+  MILEAGE_DISPLAY: "overleased_mileage_display"
+};
+
+// Helper functions for local storage
+function saveToStorage<T>(key: string, data: T) {
+  try {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+  } catch (error) {
+    console.warn("Failed to save to localStorage:", error);
+  }
+}
+
+function loadFromStorage<T>(key: string): T | null {
+  try {
+    if (typeof window !== "undefined") {
+      const item = localStorage.getItem(key);
+      return item ? (JSON.parse(item) as T) : null;
+    }
+  } catch (error) {
+    console.warn("Failed to load from localStorage:", error);
+  }
+  return null;
+}
+
+const clearStorage = () => {
+  try {
+    if (typeof window !== "undefined") {
+      Object.values(STORAGE_KEYS).forEach(key => {
+        localStorage.removeItem(key);
+      });
+    }
+  } catch (error) {
+    console.warn('Failed to clear localStorage:', error);
+  }
+};
+
 export default function LeaseValueCalculator() {
   const [calculationResult, setCalculationResult] = React.useState<LeaseValueResult | null>(null);
   const [isCalculated, setIsCalculated] = React.useState(false);
@@ -86,6 +129,8 @@ export default function LeaseValueCalculator() {
   const [currentMileageDisplay, setCurrentMileageDisplay] = React.useState("");
   const [annualMileageDisplay, setAnnualMileageDisplay] = React.useState("");
   const [isContactConfirmed, setIsContactConfirmed] = React.useState(false);
+  const [isContactSubmitting, setIsContactSubmitting] = React.useState(false);
+  const [isRestoredFromStorage, setIsRestoredFromStorage] = React.useState(false);
   const { toast } = useToast();
   
   const {
@@ -94,11 +139,98 @@ export default function LeaseValueCalculator() {
     formState: { errors },
     reset,
     watch,
+    setValue,
   } = useForm<LeaseValueData>({
     resolver: zodResolver(leaseValueSchema),
   });
 
   const watchedValues = watch();
+
+  // Load saved data on component mount
+  React.useEffect(() => {
+    const savedFormData = loadFromStorage<LeaseValueData>(STORAGE_KEYS.FORM_DATA);
+    const savedResult = loadFromStorage<LeaseValueResult>(STORAGE_KEYS.CALCULATION_RESULT);
+    const savedState = loadFromStorage<{ isCalculated: boolean, isContactConfirmed: boolean }>(STORAGE_KEYS.CALCULATOR_STATE);
+    const savedMileageDisplay = loadFromStorage<{ currentMileage: string, annualMileage: string }>(STORAGE_KEYS.MILEAGE_DISPLAY);
+
+    let dataRestored = false;
+    if (savedFormData) {
+      // Restore form data
+      Object.keys(savedFormData).forEach(key => {
+        if (savedFormData[key as keyof LeaseValueData] !== undefined && savedFormData[key as keyof LeaseValueData] !== null) {
+          setValue(key as keyof LeaseValueData, savedFormData[key as keyof LeaseValueData]);
+        }
+      });
+      dataRestored = true;
+    }
+
+    if (savedMileageDisplay) {
+      setCurrentMileageDisplay(savedMileageDisplay.currentMileage || "");
+      setAnnualMileageDisplay(savedMileageDisplay.annualMileage || "");
+    }
+
+    if (savedResult) {
+      setCalculationResult(savedResult);
+      dataRestored = true;
+    }
+
+    if (savedState) {
+      setIsCalculated(savedState.isCalculated || false);
+      setIsContactConfirmed(savedState.isContactConfirmed || false);
+    }
+
+    // Signal that restoration process is complete, so saving can begin.
+    setIsRestoredFromStorage(true);
+
+    // Show restoration message only if data was actually restored
+    if (dataRestored) {
+      toast({
+        title: "Data Restored",
+        description: "Your previous calculation has been restored from your last session.",
+        variant: "default",
+      });
+    }
+  }, [setValue, toast]);
+
+  // Save form data whenever it changes
+  React.useEffect(() => {
+    if (isRestoredFromStorage) {
+      const formData = { ...watchedValues };
+      // Only save if there's actual data
+      const hasData = Object.values(formData).some(value => 
+        value !== undefined && value !== null && value !== ""
+      );
+      
+      if (hasData) {
+        saveToStorage(STORAGE_KEYS.FORM_DATA, formData);
+      }
+    }
+  }, [watchedValues, isRestoredFromStorage]);
+
+  // Save mileage display values
+  React.useEffect(() => {
+    if (currentMileageDisplay || annualMileageDisplay) {
+      saveToStorage(STORAGE_KEYS.MILEAGE_DISPLAY, {
+        currentMileage: currentMileageDisplay,
+        annualMileage: annualMileageDisplay
+      });
+    }
+  }, [currentMileageDisplay, annualMileageDisplay]);
+
+  // Save calculation result
+  React.useEffect(() => {
+    if (calculationResult) {
+      saveToStorage(STORAGE_KEYS.CALCULATION_RESULT, calculationResult);
+    }
+  }, [calculationResult]);
+
+  // Save calculator state
+  React.useEffect(() => {
+    saveToStorage(STORAGE_KEYS.CALCULATOR_STATE, {
+      isCalculated,
+      isContactConfirmed
+    });
+  }, [isCalculated, isContactConfirmed]);
 
   // Helper function to determine if field should have blue background
   const getFieldClassName = (fieldName: keyof LeaseValueData, baseClassName: string = "") => {
@@ -127,25 +259,16 @@ export default function LeaseValueCalculator() {
     return number.toLocaleString();
   };
 
-  // Helper function to parse formatted number back to number - REMOVED as unused
-  // const parseFormattedNumber = (value: string): number => {
-  //   const numericValue = value.replace(/,/g, "");
-  //   const parsed = parseInt(numericValue);
-  //   return isNaN(parsed) ? 0 : parsed;
-  // };
-
   // Handle current mileage input
   const handleCurrentMileageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatNumberWithCommas(e.target.value);
     setCurrentMileageDisplay(formatted);
-    // Don't use setValue here, let the register handle it
   };
 
   // Handle annual mileage input
   const handleAnnualMileageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatNumberWithCommas(e.target.value);
     setAnnualMileageDisplay(formatted);
-    // Don't use setValue here, let the register handle it
   };
 
   const calculateLeaseValue = async (data: LeaseValueData): Promise<LeaseValueResult> => {
@@ -160,6 +283,7 @@ export default function LeaseValueCalculator() {
         trim: data.trim,
         licensePlate: data.licensePlate,
         state: data.state,
+        zipCode: data.zipCode,
         currentMileage: data.currentMileage,
         annualMileageAllowance: data.annualMileageAllowance,
         monthsRemaining: data.monthsRemaining,
@@ -246,7 +370,7 @@ export default function LeaseValueCalculator() {
   const onSubmit = async (data: LeaseValueData) => {
     setIsSubmitting(true);
     setSubmitError(null);
-    setIsContactConfirmed(false); // Reset contact confirmation when new submission starts
+    setIsContactConfirmed(false);
     
     try {
       const inquiryData: LeaseInquiry = {
@@ -254,6 +378,7 @@ export default function LeaseValueCalculator() {
         first_name: data.firstName,
         license_plate: data.licensePlate,
         vehicle_state: data.state,
+        zip_code: data.zipCode,
         current_mileage: data.currentMileage,
         annual_mileage_allowance: data.annualMileageAllowance,
         months_remaining: data.monthsRemaining,
@@ -277,8 +402,6 @@ export default function LeaseValueCalculator() {
       }
 
       setIsCalculated(true);
-
-      // Enhanced scroll behavior that doesn't cause refresh
       scrollToResults();
 
     } catch (error) {
@@ -289,15 +412,11 @@ export default function LeaseValueCalculator() {
     }
   };
 
-  // Add explicit form submit handler to prevent page refresh
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Explicitly prevent default form submission
-    e.stopPropagation(); // Add this to ensure the event doesn't bubble up
-    handleSubmit(onSubmit)(e);
-  };
-
   const resetCalculator = () => {
-    // Prevent any potential page refresh during reset
+    // Clear all stored data
+    clearStorage();
+    
+    // Reset all state
     setCalculationResult(null);
     setIsCalculated(false);
     setSavedInquiry(null);
@@ -305,7 +424,15 @@ export default function LeaseValueCalculator() {
     setCurrentMileageDisplay("");
     setAnnualMileageDisplay("");
     setIsContactConfirmed(false);
-    reset(); // This only resets form fields, no page refresh
+    setIsContactSubmitting(false);
+    setIsRestoredFromStorage(false);
+    reset();
+
+    toast({
+      title: "Calculator Reset",
+      description: "All data has been cleared and the calculator has been reset.",
+      variant: "default",
+    });
   };
 
   // Enhanced scroll behavior that doesn't cause page refresh
@@ -323,43 +450,44 @@ export default function LeaseValueCalculator() {
   };
 
   return (
-    <section id="calculator" className="py-20 px-4 bg-gray-50">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <Badge variant="secondary" className="mb-4 bg-blue-100 text-blue-800">
+    <section id="calculator" className="py-16 md:py-20 px-4 bg-gray-50">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-10 md:mb-12">
+          <Badge variant="secondary" className="mb-4 md:mb-6 bg-blue-100 text-blue-800">
             Free Instant Analysis
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6 px-2">
             Check Your Lease Value
           </h2>
           
           {/* FREE CALLOUT - Near calculator */}
-          <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border-2 border-green-200 max-w-3xl mx-auto">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="text-xl">🎯</span>
-              <h3 className="text-lg font-bold text-green-800">Completely Free Service</h3>
+          <div className="mb-6 p-4 md:p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border-2 border-green-200 max-w-4xl mx-auto">
+            <div className="flex items-center justify-center gap-2 mb-2 md:mb-3">
+              <span className="text-xl md:text-2xl">🎯</span>
+              <h3 className="text-lg md:text-xl font-bold text-green-800">Completely Free Service</h3>
             </div>
-            <p className="text-sm text-green-700 font-medium whitespace-nowrap">
-              There are no out-of-pocket costs for our service. You could potentially make thousands of dollars with zero risk.
+            <p className="text-xs sm:text-sm md:text-base text-green-700 font-medium leading-relaxed text-center px-2 break-words overflow-wrap-anywhere">
+              <span className="block sm:hidden">No costs. Make thousands with zero risk.</span>
+              <span className="hidden sm:block">There are no out-of-pocket costs for our service. You could potentially make thousands of dollars with zero risk.</span>
             </p>
           </div>
           
-          <p className="text-sm text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-gray-600 max-w-3xl mx-auto px-2 leading-relaxed">
             Get an instant estimate of your lease equity and connect with dealers ready to make offers.
           </p>
         </div>
 
         <Card className="shadow-xl border-0">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Calculator className="h-6 w-6" />
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg p-6 md:p-10">
+            <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+              <Calculator className="h-5 w-5 md:h-6 md:w-6" />
               Lease Value Calculator
             </CardTitle>
-            <CardDescription className="text-blue-100">
-              Enter your lease details below to get started.
+            <CardDescription className="text-blue-100 text-sm md:text-base">
+              Enter your lease details below to get started. Your data is automatically saved as you type.
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-8">
+          <CardContent className="p-6 md:p-10">
             {submitError && (
               <Alert className="mb-6 border-red-200 bg-red-50">
                 <AlertCircle className="h-4 w-4 text-red-600" />
@@ -378,165 +506,181 @@ export default function LeaseValueCalculator() {
               </Alert>
             )}
 
-            <form onSubmit={handleFormSubmit} className="space-y-8" noValidate>
-              <div className="space-y-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <User className="h-5 w-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">Contact Information</h3>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 md:space-y-10" noValidate>
+              <div className="space-y-6 md:space-y-8">
+                <div className="flex items-center gap-2 mb-4 md:mb-6">
+                  <User className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
+                  <h3 className="text-base md:text-lg font-semibold text-gray-900">Contact Information</h3>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                    <Label htmlFor="firstName" className="text-sm md:text-base font-medium text-gray-700">
                       First Name *
                     </Label>
                     <Input
                       id="firstName"
                       placeholder="John"
-                      className={getFieldClassName("firstName", "placeholder:text-gray-300")}
+                      className={getFieldClassName("firstName", "placeholder:text-gray-300 h-12 md:h-14 text-sm md:text-base")}
                       {...register("firstName")}
                     />
                     {errors.firstName && (
-                      <p className="text-sm text-red-500">{errors.firstName.message}</p>
+                      <p className="text-xs md:text-sm text-red-500">{errors.firstName.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                    <Label htmlFor="email" className="text-sm md:text-base font-medium text-gray-700">
                       Email Address *
                     </Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Mail className="absolute left-3 top-4 md:top-4.5 h-4 w-4 text-gray-400" />
                       <Input
                         id="email"
                         type="email"
                         placeholder="your.email@example.com"
-                        className={getFieldClassName("email", "pl-10 placeholder:text-gray-300")}
+                        className={getFieldClassName("email", "pl-10 placeholder:text-gray-300 h-12 md:h-14 text-sm md:text-base")}
                         {...register("email")}
                       />
                     </div>
                     {errors.email && (
-                      <p className="text-sm text-red-500">{errors.email.message}</p>
+                      <p className="text-xs md:text-sm text-red-500">{errors.email.message}</p>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Car className="h-5 w-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">Vehicle Information</h3>
+              <div className="space-y-6 md:space-y-8">
+                <div className="flex items-center gap-2 mb-4 md:mb-6">
+                  <Car className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
+                  <h3 className="text-base md:text-lg font-semibold text-gray-900">Vehicle Information</h3>
                 </div>
                 
-                <div className="space-y-6">
-                  {/* Top row: Make, Model, Trim */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-6 md:space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                     <div className="space-y-2">
-                      <Label htmlFor="make" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="make" className="text-sm md:text-base font-medium text-gray-700">
                         Make *
                       </Label>
                       <Input
                         id="make"
                         placeholder="Toyota"
-                        className={getFieldClassName("make", "placeholder:text-gray-300")}
+                        className={getFieldClassName("make", "placeholder:text-gray-300 h-12 md:h-14 text-sm md:text-base")}
                         {...register("make")}
                       />
                       {errors.make && (
-                        <p className="text-sm text-red-500">{errors.make.message}</p>
+                        <p className="text-xs md:text-sm text-red-500">{errors.make.message}</p>
                       )}
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="model" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="model" className="text-sm md:text-base font-medium text-gray-700">
                         Model *
                       </Label>
                       <Input
                         id="model"
                         placeholder="Camry"
-                        className={getFieldClassName("model", "placeholder:text-gray-300")}
+                        className={getFieldClassName("model", "placeholder:text-gray-300 h-12 md:h-14 text-sm md:text-base")}
                         {...register("model")}
                       />
                       {errors.model && (
-                        <p className="text-sm text-red-500">{errors.model.message}</p>
+                        <p className="text-xs md:text-sm text-red-500">{errors.model.message}</p>
                       )}
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="trim" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="trim" className="text-sm md:text-base font-medium text-gray-700">
                         Trim
                       </Label>
                       <Input
                         id="trim"
                         placeholder="SE"
-                        className={getFieldClassName("trim", "placeholder:text-gray-300")}
+                        className={getFieldClassName("trim", "placeholder:text-gray-300 h-12 md:h-14 text-sm md:text-base")}
                         {...register("trim")}
                       />
                       {errors.trim && (
-                        <p className="text-sm text-red-500">{errors.trim.message}</p>
+                        <p className="text-xs md:text-sm text-red-500">{errors.trim.message}</p>
                       )}
                     </div>
                   </div>
 
-                  {/* Bottom row: License Plate Number, Vehicle State, Year */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
                     <div className="space-y-2">
-                      <Label htmlFor="licensePlate" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="licensePlate" className="text-sm md:text-base font-medium text-gray-700">
                         License Plate Number *
                       </Label>
                       <Input
                         id="licensePlate"
                         placeholder="ABC123"
-                        className={getFieldClassName("licensePlate", "placeholder:text-gray-300")}
+                        className={getFieldClassName("licensePlate", "placeholder:text-gray-300 h-12 md:h-14 text-sm md:text-base")}
                         {...register("licensePlate")}
                       />
                       {errors.licensePlate && (
-                        <p className="text-sm text-red-500">{errors.licensePlate.message}</p>
+                        <p className="text-xs md:text-sm text-red-500">{errors.licensePlate.message}</p>
                       )}
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="state" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="state" className="text-sm md:text-base font-medium text-gray-700">
                         Vehicle State *
                       </Label>
                       <Input
                         id="state"
                         placeholder="PA"
-                        className={getFieldClassName("state", "placeholder:text-gray-300")}
+                        className={getFieldClassName("state", "placeholder:text-gray-300 h-12 md:h-14 text-sm md:text-base")}
                         {...register("state")}
                       />
                       {errors.state && (
-                        <p className="text-sm text-red-500">{errors.state.message}</p>
+                        <p className="text-xs md:text-sm text-red-500">{errors.state.message}</p>
                       )}
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="year" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="zipCode" className="text-sm md:text-base font-medium text-gray-700">
+                        Zip Code *
+                      </Label>
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-4 md:top-4.5 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="zipCode"
+                          placeholder="12345"
+                          className={getFieldClassName("zipCode", "pl-10 placeholder:text-gray-300 h-12 md:h-14 text-sm md:text-base")}
+                          {...register("zipCode")}
+                        />
+                      </div>
+                      {errors.zipCode && (
+                        <p className="text-xs md:text-sm text-red-500">{errors.zipCode.message}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="year" className="text-sm md:text-base font-medium text-gray-700">
                         Year *
                       </Label>
                       <Input
                         id="year"
                         type="text"
                         placeholder="2022"
-                        className={getFieldClassName("year")}
+                        className={getFieldClassName("year", "h-12 md:h-14 text-sm md:text-base")}
                         {...register("year")}
                       />
                       {errors.year && (
-                        <p className="text-sm text-red-500">{errors.year.message}</p>
+                        <p className="text-xs md:text-sm text-red-500">{errors.year.message}</p>
                       )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Gauge className="h-5 w-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">Lease Details</h3>
+              <div className="space-y-6 md:space-y-8">
+                <div className="flex items-center gap-2 mb-4 md:mb-6">
+                  <Gauge className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
+                  <h3 className="text-base md:text-lg font-semibold text-gray-900">Lease Details</h3>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                   <div className="space-y-2">
-                    <Label htmlFor="currentMileage" className="text-sm font-medium text-gray-700">
+                    <Label htmlFor="currentMileage" className="text-sm md:text-base font-medium text-gray-700">
                       Current Mileage *
                     </Label>
                     <Input
@@ -545,7 +689,7 @@ export default function LeaseValueCalculator() {
                       placeholder="25,000"
                       value={currentMileageDisplay}
                       onChange={handleCurrentMileageChange}
-                      className={getMileageFieldClassName(currentMileageDisplay, "placeholder:text-gray-300")}
+                      className={getMileageFieldClassName(currentMileageDisplay, "placeholder:text-gray-300 h-12 md:h-14 text-sm md:text-base")}
                       {...register("currentMileage", {
                         onChange: (e) => {
                           const formatted = formatNumberWithCommas(e.target.value);
@@ -554,12 +698,12 @@ export default function LeaseValueCalculator() {
                       })}
                     />
                     {errors.currentMileage && (
-                      <p className="text-sm text-red-500">{errors.currentMileage.message}</p>
+                      <p className="text-xs md:text-sm text-red-500">{errors.currentMileage.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="annualMileageAllowance" className="text-sm font-medium text-gray-700">
+                    <Label htmlFor="annualMileageAllowance" className="text-sm md:text-base font-medium text-gray-700">
                       Annual Mileage Allowance *
                     </Label>
                     <Input
@@ -568,7 +712,7 @@ export default function LeaseValueCalculator() {
                       placeholder="12,000"
                       value={annualMileageDisplay}
                       onChange={handleAnnualMileageChange}
-                      className={getMileageFieldClassName(annualMileageDisplay, "placeholder:text-gray-300")}
+                      className={getMileageFieldClassName(annualMileageDisplay, "placeholder:text-gray-300 h-12 md:h-14 text-sm md:text-base")}
                       {...register("annualMileageAllowance", {
                         onChange: (e) => {
                           const formatted = formatNumberWithCommas(e.target.value);
@@ -577,12 +721,12 @@ export default function LeaseValueCalculator() {
                       })}
                     />
                     {errors.annualMileageAllowance && (
-                      <p className="text-sm text-red-500">{errors.annualMileageAllowance.message}</p>
+                      <p className="text-xs md:text-sm text-red-500">{errors.annualMileageAllowance.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="leaseTerm" className="text-sm font-medium text-gray-700">
+                    <Label htmlFor="leaseTerm" className="text-sm md:text-base font-medium text-gray-700">
                       Lease Term (Months) *
                     </Label>
                     <Input
@@ -590,56 +734,50 @@ export default function LeaseValueCalculator() {
                       type="text"
                       placeholder="36"
                       min="1"
-                      className={getFieldClassName("leaseTerm")}
+                      className={getFieldClassName("leaseTerm", "h-12 md:h-14 text-sm md:text-base")}
                       {...register("leaseTerm")}
                     />
                     {errors.leaseTerm && (
-                      <p className="text-sm text-red-500">{errors.leaseTerm.message}</p>
+                      <p className="text-xs md:text-sm text-red-500">{errors.leaseTerm.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="monthsRemaining" className="text-sm font-medium text-gray-700">
+                    <Label htmlFor="monthsRemaining" className="text-sm md:text-base font-medium text-gray-700">
                       Months Remaining on Lease *
                     </Label>
                     <div className="relative">
-                      <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Calendar className="absolute left-3 top-4 md:top-4.5 h-4 w-4 text-gray-400" />
                       <Input
                         id="monthsRemaining"
                         type="text"
                         placeholder="18"
                         min="1"
-                        className={getFieldClassName("monthsRemaining", "pl-10")}
+                        className={getFieldClassName("monthsRemaining", "pl-10 h-12 md:h-14 text-sm md:text-base")}
                         {...register("monthsRemaining")}
                       />
                     </div>
                     {errors.monthsRemaining && (
-                      <p className="text-sm text-red-500">{errors.monthsRemaining.message}</p>
+                      <p className="text-xs md:text-sm text-red-500">{errors.monthsRemaining.message}</p>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-6">
+              <div className="flex gap-4 pt-6 md:pt-8">
                 <Button 
                   type="submit" 
                   disabled={isSubmitting} 
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-lg py-6"
-                  onClick={(e) => {
-                    // Additional prevention of page refresh
-                    e.preventDefault();
-                    handleFormSubmit(e);
-                  }}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-lg md:text-xl lg:text-2xl py-5 md:py-7 h-auto font-semibold"
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 md:h-6 md:w-6 border-b-2 border-white mr-2"></div>
                       {savedInquiry ? "Calculating Your Equity..." : "Saving Your Information..."}
                     </>
                   ) : (
                     <>
                       Check Your Lease Value
-                      <Calculator className="ml-2 h-5 w-5" />
                     </>
                   )}
                 </Button>
@@ -648,19 +786,18 @@ export default function LeaseValueCalculator() {
                     type="button" 
                     variant="outline" 
                     onClick={(e) => {
-                      e.preventDefault(); // Prevent any potential page refresh
+                      e.preventDefault();
                       resetCalculator();
                     }} 
-                    className="px-6"
+                    className="px-6 md:px-8 text-sm md:text-base py-5 md:py-7 h-auto"
                   >
                     Reset
                   </Button>
                 )}
               </div>
               
-              {/* Disclaimer text */}
-              <div className="text-center mt-4">
-                <p className="text-xs text-gray-500 italic max-w-[600px] mx-auto leading-tight">
+              <div className="text-center mt-4 md:mt-6">
+                <p className="text-xs md:text-sm text-gray-500 italic max-w-[700px] mx-auto leading-tight px-2">
                   By clicking "Check Your Lease Value", I give OverLeased permission to share my information with trusted third parties, which may include the sale of data as described in the Privacy Policy.
                 </p>
               </div>
@@ -669,18 +806,18 @@ export default function LeaseValueCalculator() {
         </Card>
 
         {calculationResult && (
-          <Card className="mt-8 shadow-xl border-0">
-            <CardHeader id="analysis-title" className={`${calculationResult.isPositiveEquity ? 'bg-gradient-to-r from-emerald-600 to-emerald-700' : 'bg-gradient-to-r from-orange-600 to-orange-700'} text-white rounded-t-lg`}>
-              <CardTitle className="flex items-center gap-2 text-2xl">
+          <Card className="mt-10 shadow-xl border-0">
+            <CardHeader id="analysis-title" className={`${calculationResult.isPositiveEquity ? 'bg-gradient-to-r from-emerald-600 to-emerald-700' : 'bg-gradient-to-r from-orange-600 to-orange-700'} text-white rounded-t-lg p-6 md:p-10`}>
+              <CardTitle className="flex items-center gap-2 text-2xl md:text-3xl">
                 {calculationResult.isPositiveEquity ? (
-                  <TrendingUp className="h-6 w-6" />
+                  <TrendingUp className="h-6 w-6 md:h-7 md:w-7" />
                 ) : (
-                  <TrendingDown className="h-6 w-6" />
+                  <TrendingDown className="h-6 w-6 md:h-7 md:w-7" />
                 )}
                 Your Lease Equity Analysis
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-8">
+            <CardContent className="p-8 md:p-10">
               <Alert className={`mb-8 ${calculationResult.isPositiveEquity ? 'border-emerald-200 bg-emerald-50' : 'border-orange-200 bg-orange-50'}`}>
                 <AlertCircle className={`h-4 w-4 ${calculationResult.isPositiveEquity ? 'text-emerald-600' : 'text-orange-600'}`} />
                 <AlertDescription className={`${calculationResult.isPositiveEquity ? 'text-emerald-800' : 'text-orange-800'} font-medium`}>
@@ -693,29 +830,28 @@ export default function LeaseValueCalculator() {
               </Alert>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="text-center p-6 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">
+                <div className="text-center p-4 md:p-6 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="text-2xl md:text-3xl font-bold text-blue-600 mb-2">
                     ${calculationResult.marketValue.toLocaleString()}
                   </div>
-                  <div className="text-sm text-blue-800 font-medium">Estimated Market Value</div>
+                  <div className="text-xs md:text-sm text-blue-800 font-medium">Estimated Market Value</div>
                 </div>
-                <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="text-3xl font-bold text-gray-600 mb-2">
+                <div className="text-center p-4 md:p-6 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="text-2xl md:text-3xl font-bold text-gray-600 mb-2">
                     ${calculationResult.payoffAmount.toLocaleString()}
                   </div>
-                  <div className="text-sm text-gray-800 font-medium">Estimated Payoff Amount</div>
+                  <div className="text-xs md:text-sm text-gray-800 font-medium">Estimated Payoff Amount</div>
                 </div>
-                <div className={`text-center p-6 rounded-lg border-2 ${calculationResult.isPositiveEquity ? 'bg-emerald-50 border-emerald-200' : 'bg-orange-50 border-orange-200'}`}>
-                  <div className={`text-3xl font-bold mb-2 ${calculationResult.isPositiveEquity ? 'text-emerald-600' : 'text-orange-600'}`}>
+                <div className={`text-center p-4 md:p-6 rounded-lg border-2 ${calculationResult.isPositiveEquity ? 'bg-emerald-50 border-emerald-200' : 'bg-orange-50 border-orange-200'}`}>
+                  <div className={`text-2xl md:text-3xl font-bold mb-2 ${calculationResult.isPositiveEquity ? 'text-emerald-600' : 'text-orange-600'}`}>
                     {calculationResult.isPositiveEquity ? '+' : '-'}${Math.abs(calculationResult.estimatedEquity).toLocaleString()}
                   </div>
-                  <div className={`text-sm font-medium ${calculationResult.isPositiveEquity ? 'text-emerald-800' : 'text-orange-800'}`}>
+                  <div className={`text-xs md:text-sm font-medium ${calculationResult.isPositiveEquity ? 'text-emerald-800' : 'text-orange-800'}`}>
                     Your Lease Equity
                   </div>
                 </div>
               </div>
 
-              {/* Detailed Calculation Breakdown */}
               <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Calculation Breakdown</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -760,7 +896,6 @@ export default function LeaseValueCalculator() {
                   </div>
                 </div>
                 
-                {/* Disclaimer moved inside the gray area */}
                 <div className="mt-4 text-center">
                   <p className="text-xs text-gray-500">
                     * Results may slightly vary due to market data updates.
@@ -789,7 +924,6 @@ export default function LeaseValueCalculator() {
                 </p>
               </div>
 
-              {/* Contact Us Section - Different messages based on dealer interest */}
               <div className={`mt-8 p-6 rounded-lg text-white text-center ${
                 calculationResult.dealerInterest === 'Low' 
                   ? 'bg-gradient-to-r from-blue-600 to-blue-700' 
@@ -811,19 +945,22 @@ export default function LeaseValueCalculator() {
                   className={`${
                     isContactConfirmed 
                       ? "bg-green-500 text-white cursor-not-allowed opacity-75 hover:bg-green-500" 
+                      : isContactSubmitting
+                      ? "bg-blue-400 text-white cursor-wait opacity-75"
                       : "bg-white text-blue-600 hover:bg-blue-50"
-                  }`}
-                  disabled={isContactConfirmed}
+                  } transition-all duration-200`}
+                  disabled={isContactConfirmed || isContactSubmitting}
                   onClick={async (e) => {
-                    e.preventDefault(); // Prevent page refresh
-                    e.stopPropagation(); // Stop event bubbling
+                    e.preventDefault();
+                    e.stopPropagation();
                     
-                    if (isContactConfirmed) return; // Prevent action if already confirmed
+                    if (isContactConfirmed || isContactSubmitting) return;
+                    
+                    setIsContactSubmitting(true);
                     
                     try {
                       console.log('Contact Me button clicked - starting backend flow');
                       
-                      // Check if we have the required data
                       if (!watchedValues.firstName || !watchedValues.email) {
                         console.error('Missing required contact information');
                         toast({
@@ -836,13 +973,13 @@ export default function LeaseValueCalculator() {
 
                       console.log('Sending contact request via contactService...');
                       
-                      // Prepare formatted data for HTML email template
                       const formData = {
                         name: watchedValues.firstName,
                         email: watchedValues.email,
                         vehicle: `${watchedValues.year} ${watchedValues.make} ${watchedValues.model} ${watchedValues.trim || ''}`.trim(),
                         licensePlate: watchedValues.licensePlate || '',
                         state: watchedValues.state || '',
+                        zipCode: watchedValues.zipCode || '',
                         currentMileage: watchedValues.currentMileage?.toLocaleString() || '',
                         annualMileage: watchedValues.annualMileageAllowance?.toLocaleString() || '',
                         leaseTerm: `${watchedValues.leaseTerm} months`,
@@ -853,11 +990,10 @@ export default function LeaseValueCalculator() {
                         dealerInterest: calculationResult.dealerInterest
                       };
                       
-                      // Use the new lease calculation email method
                       await contactService.submitLeaseCalculationRequest(formData);
 
                       console.log('Contact request sent successfully');
-                      setIsContactConfirmed(true); // Set button to confirmed state
+                      setIsContactConfirmed(true);
                       toast({
                         title: "Thanks! Your message was sent.",
                         description: "We'll be in touch with you shortly.",
@@ -870,14 +1006,26 @@ export default function LeaseValueCalculator() {
                         description: "There was a problem sending your request. Please try again.",
                         variant: "destructive",
                       });
+                    } finally {
+                      setIsContactSubmitting(false);
                     }
                   }}
                 >
-                  {isContactConfirmed ? "Confirmed" : "Contact Me"}
+                  {isContactConfirmed ? (
+                    <>
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Confirmed
+                    </>
+                  ) : isContactSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Sending...
+                    </>
+                  ) : (
+                    "Contact Me"
+                  )}
                 </Button>
               </div>
-
-              {/* Remove the inquiry saved message section entirely */}
             </CardContent>
           </Card>
         )}

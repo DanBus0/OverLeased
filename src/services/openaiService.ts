@@ -5,6 +5,7 @@ interface LeaseCalculationData {
   trim?: string;
   licensePlate?: string;
   state?: string;
+  zipCode?: string;
   currentMileage: number;
   annualMileageAllowance: number;
   monthsRemaining: number;

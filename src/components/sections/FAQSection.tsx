@@ -49,35 +49,35 @@ export default function FAQSection() {
   ];
 
   return (
-    <section className="py-20 px-4 bg-gray-50">
+    <section className="py-16 md:py-20 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4 bg-blue-100 text-blue-800">
+        <div className="text-center mb-10 md:mb-16">
+          <Badge variant="secondary" className="mb-4 md:mb-6 bg-blue-100 text-blue-800">
             <HelpCircle className="h-4 w-4 mr-2" />
             Frequently Asked Questions
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6 px-2">
             Everything You Need to Know About Lease Equity
           </h2>
-          <p className="text-2xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto px-2 leading-relaxed">
             Get answers to the most common questions about selling your car lease and working with our platform.
           </p>
         </div>
 
         <Card className="shadow-lg border-0">
-          <CardHeader className="bg-white border-b border-gray-100">
-            <CardTitle className="text-3xl text-center text-gray-900">
+          <CardHeader className="bg-white border-b border-gray-100 p-4 md:p-6">
+            <CardTitle className="text-xl md:text-2xl lg:text-3xl text-center text-gray-900 px-2">
               Common Questions About Lease Equity
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-8">
-            <Accordion type="single" collapsible className="space-y-4">
+          <CardContent className="p-4 md:p-8">
+            <Accordion type="single" collapsible className="space-y-3 md:space-y-4">
               {faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`} className="border border-gray-200 rounded-lg px-6">
-                  <AccordionTrigger className="text-left font-semibold text-lg text-gray-900 hover:text-blue-600 py-4">
+                <AccordionItem key={index} value={`item-${index}`} className="border border-gray-200 rounded-lg px-3 md:px-6">
+                  <AccordionTrigger className="text-left font-semibold text-base md:text-lg text-gray-900 hover:text-blue-600 py-3 md:py-4 leading-tight">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-base text-gray-600 leading-relaxed pb-4">
+                  <AccordionContent className="text-sm md:text-base text-gray-600 leading-relaxed pb-3 md:pb-4 break-words">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -86,21 +86,21 @@ export default function FAQSection() {
           </CardContent>
         </Card>
 
-        <div className="mt-12 bg-blue-50 rounded-2xl p-8 text-center border border-blue-200">
-          <h3 className="text-3xl font-bold text-gray-900 mb-4">
+        <div className="mt-8 md:mt-12 bg-blue-50 rounded-2xl p-6 md:p-8 text-center border border-blue-200">
+          <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 md:mb-4 px-2">
             Still Have Questions?
           </h3>
-          <p className="text-sm text-gray-600 mb-6 max-w-2xl mx-auto">
+          <p className="text-xs md:text-sm text-gray-600 mb-4 md:mb-6 max-w-2xl mx-auto px-2 leading-relaxed">
             Our lease equity specialists are here to help. Get personalized answers about your specific situation.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <div className="text-center">
-              <div className="text-xl font-semibold text-gray-900">📞 Call Us</div>
-              <div className="text-blue-600 font-medium text-lg">(484) 702-9539</div>
+          <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center">
+            <div className="text-center p-3 md:p-0">
+              <div className="text-base md:text-lg lg:text-xl font-semibold text-gray-900">📞 Call Us</div>
+              <div className="text-blue-600 font-medium text-sm md:text-base lg:text-lg">(484) 702-9539</div>
             </div>
-            <div className="text-center">
-              <div className="text-xl font-semibold text-gray-900">✉️ Email</div>
-              <div className="text-blue-600 font-medium text-lg">support@overleased.com</div>
+            <div className="text-center p-3 md:p-0">
+              <div className="text-base md:text-lg lg:text-xl font-semibold text-gray-900">✉️ Email</div>
+              <div className="text-blue-600 font-medium text-sm md:text-base lg:text-lg break-words">support@overleased.com</div>
             </div>
           </div>
         </div>

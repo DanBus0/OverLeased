@@ -1,4 +1,5 @@
 // /services/contactService.ts
+import { emailService } from './emailService';
 
 // Function to generate HTML email in table format
 function generateHtmlEmail(data: {
@@ -7,6 +8,7 @@ function generateHtmlEmail(data: {
   vehicle: string;
   licensePlate: string;
   state: string;
+  zipCode: string;
   currentMileage: string;
   annualMileage: string;
   leaseTerm: string;
@@ -27,6 +29,7 @@ function generateHtmlEmail(data: {
       <tr><td>Vehicle</td><td>${data.vehicle}</td></tr>
       <tr><td>License Plate</td><td>${data.licensePlate}</td></tr>
       <tr><td>State</td><td>${data.state}</td></tr>
+      <tr><td>Zip Code</td><td>${data.zipCode}</td></tr>
 
       <tr><th colspan="2" style="text-align:left; background:#f2f2f2;">Lease Details</th></tr>
       <tr><td>Current Mileage</td><td>${data.currentMileage}</td></tr>
@@ -43,29 +46,50 @@ function generateHtmlEmail(data: {
   `;
 }
 
+// Function to generate customer auto-reply email
+function generateAutoReplyEmail(customerName: string) {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #2563eb; margin: 0;">OverLeased</h1>
+        <p style="color: #64748b; margin: 5px 0 0 0;">Your Lease Equity Experts</p>
+      </div>
+      
+      <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border-left: 4px solid #2563eb;">
+        <h2 style="color: #1e293b; margin-top: 0;">Thank you for contacting OverLeased!</h2>
+        <p style="color: #475569; line-height: 1.6;">
+          Hi ${customerName},
+        </p>
+        <p style="color: #475569; line-height: 1.6;">
+          Thank you for submitting your lease information through our calculator. We've received your request and a team member will be in touch with you shortly to discuss your lease options.
+        </p>
+        <p style="color: #475569; line-height: 1.6;">
+          In the meantime, if you have any urgent questions, feel free to reply to this email.
+        </p>
+        <p style="color: #475569; line-height: 1.6;">
+          Best regards,<br>
+          <strong>The OverLeased Team</strong>
+        </p>
+      </div>
+    </div>
+  `;
+}
+
 export const contactService = {
   async submitContactRequest({ name, email, message }: { name: string; email: string; message: string; }) {
     try {
-      const response = await fetch("https://nbxdfscgwnpqxigocgck.supabase.co/functions/v1/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({
-          to: "dan@overleased.com",
-          subject: `New Contact Request from ${name}`,
-          html: `
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Message:</strong><br/>${message}</p>
-          `
-        })
+      const result = await emailService.sendEmail({
+        to: "dan@overleased.com",
+        subject: `New Contact Request from ${name}`,
+        body: `
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Message:</strong><br/>${message}</p>
+        `
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(`Email send failed: ${error.message || response.statusText}`);
+      if (!result.success) {
+        throw new Error(`Email send failed: ${result.message || 'Unknown error'}`);
       }
 
       return { success: true };
@@ -82,6 +106,7 @@ export const contactService = {
     vehicle: string;
     licensePlate: string;
     state: string;
+    zipCode: string;
     currentMileage: string;
     annualMileage: string;
     leaseTerm: string;
@@ -94,22 +119,36 @@ export const contactService = {
     try {
       const emailHtml = generateHtmlEmail(formData);
 
-      const response = await fetch("https://nbxdfscgwnpqxigocgck.supabase.co/functions/v1/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({
-          to: "dan@overleased.com",
-          subject: `New Contact Request from ${formData.name}`,
-          html: emailHtml
-        })
+      // Send notification email to Dan
+      console.log("Sending notification email to dan@overleased.com");
+      const notificationResult = await emailService.sendEmail({
+        to: "dan@overleased.com",
+        subject: `New Contact Request from ${formData.name}`,
+        body: emailHtml
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(`Email send failed: ${error.message || response.statusText}`);
+      if (!notificationResult.success) {
+        throw new Error(`Notification email send failed: ${notificationResult.message || 'Unknown error'}`);
+      }
+
+      // Send auto-reply email to customer from support@overleased.com
+      const autoReplyHtml = generateAutoReplyEmail(formData.name);
+      
+      console.log("Sending auto-reply email from support@overleased.com to:", formData.email);
+      
+      const autoReplyResult = await emailService.sendEmail({
+        to: formData.email,
+        subject: "Thank you for contacting OverLeased",
+        body: autoReplyHtml,
+        from: "support@overleased.com"
+      });
+
+      // Note: We don't throw an error if auto-reply fails, as the main notification is more important
+      if (!autoReplyResult.success) {
+        console.error("Auto-reply email failed to send:", autoReplyResult.message);
+        console.warn("Auto-reply email failed to send, but notification was successful");
+      } else {
+        console.log("Auto-reply email sent successfully to customer from support@overleased.com");
       }
 
       return { success: true };

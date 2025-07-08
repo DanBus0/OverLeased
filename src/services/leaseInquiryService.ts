@@ -6,6 +6,7 @@ export interface LeaseInquiry {
   first_name: string;
   license_plate: string;
   vehicle_state: string;
+  zip_code?: string;
   current_mileage: number; // Reverted to number
   annual_mileage_allowance: number; // Reverted to number
   months_remaining: number; // Reverted to number

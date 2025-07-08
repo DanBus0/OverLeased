@@ -4,6 +4,7 @@ interface EmailData {
   to: string;
   subject: string;
   body: string;
+  from?: string;
 }
 
 // Define a more specific type for the expected data from a successful function call
@@ -28,7 +29,7 @@ export const emailService = {
     try {
       // Add more detailed logging for debugging
       console.log('Attempting to send email via Supabase function...');
-      console.log('Email data:', { to: data.to, subject: data.subject });
+      console.log('Email data:', { to: data.to, subject: data.subject, from: data.from });
       
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => reject(new Error('Request to send-email function timed out after 15 seconds.')), 15000);
@@ -37,11 +38,20 @@ export const emailService = {
       const payload = {
         to: data.to,
         subject: data.subject,
-        html: data.body
+        html: data.body,
+        ...(data.from && { from: data.from })
       };
 
+      // Explicit logging for the from field
+      if (data.from) {
+        console.log('IMPORTANT: Sending email FROM:', data.from);
+        console.log('IMPORTANT: This should be support@overleased.com for auto-replies');
+      } else {
+        console.log('IMPORTANT: No from field specified, will use default sender');
+      }
+
       console.log('Calling function URL directly:', 'https://nbxdfscgwnpqxigocgck.supabase.co/functions/v1/send-email');
-      console.log('Payload:', payload);
+      console.log('Full payload being sent:', JSON.stringify(payload, null, 2));
 
       const fetchPromise = fetch('https://nbxdfscgwnpqxigocgck.supabase.co/functions/v1/send-email', {
         method: 'POST',

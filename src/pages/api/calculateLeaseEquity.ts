@@ -1,4 +1,3 @@
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 interface LeaseCalculationData {
@@ -8,6 +7,7 @@ interface LeaseCalculationData {
   trim?: string;
   licensePlate?: string;
   state?: string;
+  zipCode?: string;
   currentMileage: number;
   annualMileageAllowance: number;
   monthsRemaining: number;
@@ -44,13 +44,13 @@ async function getRealTimeMarketData(vehicle: LeaseCalculationData) {
     
     Vehicle: ${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim || 'Base'}
     Current Mileage: ${vehicle.currentMileage}
-    Location: ${vehicle.state}
+    Location: ${vehicle.state}, ${vehicle.zipCode}
     
     Use the most recent market data available to you and provide realistic pricing based on:
     1. Current KBB trade-in values for this exact vehicle
     2. Recent Edmunds pricing data
     3. Current CarGurus and Autotrader listings
-    4. Regional market conditions in ${vehicle.state}
+    4. Regional market conditions in ${vehicle.state} (${vehicle.zipCode})
     
     Return ONLY a JSON object with current market pricing:
     {
@@ -124,7 +124,7 @@ export default async function handler(
     const data: LeaseCalculationData = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
     // Validate required fields
-    const requiredFields = ['make', 'model', 'year', 'currentMileage', 'annualMileageAllowance', 'monthsRemaining', 'leaseTerm'];
+    const requiredFields = ['make', 'model', 'year', 'zipCode', 'currentMileage', 'annualMileageAllowance', 'monthsRemaining', 'leaseTerm'];
     for (const field of requiredFields) {
       if (!data[field as keyof LeaseCalculationData]) {
         return res.status(400).json({ error: `Missing required field: ${field}` });
@@ -143,7 +143,7 @@ export default async function handler(
     // Step 2: Create enhanced prompt with real-time data
     const prompt = `You are a professional automotive lease equity analyst. Use the following inputs to calculate lease equity. Respond only with a well-formatted JSON object (no explanations, no text outside the JSON).
 
-Input: { "make": "${data.make}", "model": "${data.model}", "year": ${data.year}, "trim": "${data.trim || 'Base'}", "state": "${data.state || 'N/A'}", "currentMileage": ${data.currentMileage}, "annualMileageAllowance": ${data.annualMileageAllowance}, "monthsRemaining": ${data.monthsRemaining}, "leaseTerm": ${data.leaseTerm} }
+Input: { "make": "${data.make}", "model": "${data.model}", "year": ${data.year}, "trim": "${data.trim || 'Base'}", "state": "${data.state || 'N/A'}", "zipCode": "${data.zipCode || 'N/A'}", "currentMileage": ${data.currentMileage}, "annualMileageAllowance": ${data.annualMileageAllowance}, "monthsRemaining": ${data.monthsRemaining}, "leaseTerm": ${data.leaseTerm} }
 
 ${marketData ? `REAL-TIME MARKET DATA (Use this for accurate calculations):
 - Current Market Value: $${marketData.currentMarketValue}
@@ -165,7 +165,7 @@ Step-by-Step Instructions:
    - Output: estimatedResidualValue
 
 3. Current Market Value
-   - ${marketData ? `Use the provided real-time market value: $${marketData.currentMarketValue} (adjusted for current mileage and condition)` : 'Use recent listings and price data scraped from Autotrader, CarGurus, and Cars.com for similar vehicles in ' + (data.state || 'N/A') + '.'}
+   - ${marketData ? `Use the provided real-time market value: $${marketData.currentMarketValue} (adjusted for current mileage and condition)` : 'Use recent listings and price data scraped from Autotrader, CarGurus, and Cars.com for similar vehicles in ' + (data.state || 'N/A') + ` (${data.zipCode || ''})` + '.'}
    - Adjust prices based on current mileage (or close to current mileage).
    - Calculate average dealer trade-in equivalent price from these sources.
    - Output: estimatedMarketValue
