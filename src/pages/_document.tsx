@@ -20,6 +20,38 @@ export default function Document() {
           }}
         />
         
+        {/* Structured Data - Organization Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "OverLeased",
+              "url": "https://www.overleased.com",
+              "logo": "https://www.overleased.com/favicon.ico"
+            })
+          }}
+        />
+        
+        {/* Structured Data - Website Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "url": "https://www.overleased.com",
+              "name": "OverLeased",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://www.overleased.com/search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
+        
         {/* 
           CRITICAL: DO NOT REMOVE THIS SCRIPT
           The Softgen AI monitoring script is essential for core app functionality.
