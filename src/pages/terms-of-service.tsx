@@ -1,10 +1,40 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter } from "next/router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Car, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function TermsOfServicePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Multiple approaches to ensure scroll to top
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    // Immediate scroll
+    scrollToTop();
+
+    // Scroll after a short delay to handle any layout shifts
+    const timeoutId = setTimeout(scrollToTop, 100);
+
+    // Listen for route changes
+    const handleRouteChange = () => {
+      scrollToTop();
+    };
+
+    router.events.on('routeChangeComplete', handleRouteChange);
+
+    return () => {
+      clearTimeout(timeoutId);
+      router.events.off('routeChangeComplete', handleRouteChange);
+    };
+  }, [router.events]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
