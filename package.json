@@ -45,6 +45,7 @@
     "@supabase/supabase-js": "^2.50.0",
     "@t3-oss/env-nextjs": "^0.12.0",
     "@types/three": "^0.174.0",
+    "@vercel/analytics": "^1.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
@@ -75,8 +76,7 @@
     "ts-node": "^10.9.2",
     "vaul": "^1.1.2",
     "vercel": "^41.7.8",
-    "zod": "^3.24.1",
-    "@vercel/analytics": "^1.1.0"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/node": "^20",

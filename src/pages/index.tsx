@@ -12,9 +12,34 @@ export default function HomePage() {
   return (
     <>
       <Head>
+        {/* Basic Meta Tags */}
+        <title>OverLeased | Sell Your Car Lease for Cash</title>
+        <meta name="description" content="Find out if your leased car has equity and get a real buyout offer. OverLeased helps you get paid for your leased car." />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta name="format-detection" content="telephone=no" />
-        <title>OverLeased - Turn Your Car Lease Into Cash Today</title>
+        
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.ico" />
+        
+        {/* Open Graph Tags */}
+        <meta property="og:title" content="OverLeased | Sell Your Car Lease for Cash" />
+        <meta property="og:description" content="Find out if your leased car has equity and get a real buyout offer. OverLeased helps you get paid for your leased car." />
+        <meta property="og:image" content="https://3000-3369f10f-4f06-4395-8c4e-9d07a02fce3d.h1100.daytona.work/social-preview.jpg" />
+        <meta property="og:url" content="https://3000-3369f10f-4f06-4395-8c4e-9d07a02fce3d.h1100.daytona.work" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="OverLeased" />
+        
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="OverLeased | Sell Your Car Lease for Cash" />
+        <meta name="twitter:description" content="Find out if your leased car has equity and get a real buyout offer. OverLeased helps you get paid for your leased car." />
+        <meta name="twitter:image" content="https://3000-3369f10f-4f06-4395-8c4e-9d07a02fce3d.h1100.daytona.work/social-preview.jpg" />
+        
+        {/* Additional SEO Tags */}
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="OverLeased" />
+        <meta name="keywords" content="car lease, lease equity, sell lease, car buyout, lease transfer, automotive finance" />
+        <link rel="canonical" href="https://3000-3369f10f-4f06-4395-8c4e-9d07a02fce3d.h1100.daytona.work" />
       </Head>
       <div className="min-h-screen bg-white w-full max-w-full overflow-x-hidden">
         <Header />
