@@ -75,7 +75,8 @@
     "ts-node": "^10.9.2",
     "vaul": "^1.1.2",
     "vercel": "^41.7.8",
-    "zod": "^3.24.1"
+    "zod": "^3.24.1",
+    "@vercel/analytics": "^1.1.0"
   },
   "devDependencies": {
     "@types/node": "^20",
