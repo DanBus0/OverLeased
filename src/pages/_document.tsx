@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="en">
       <Head>
         {/* Favicon */}
-        <link rel="icon" href="/favicon-mcwh4t8y.ico" type="image/x-icon" />
+        <link rel="icon" href="/favicon-mcwhe1an.ico" type="image/x-icon" />
         
         {/* Google Analytics 4 */}
         <script 
@@ -32,7 +32,7 @@ export default function Document() {
               "@type": "Organization",
               "name": "OverLeased",
               "url": "https://www.overleased.com",
-              "logo": "https://www.overleased.com/favicon-mcwh4t8y.ico"
+              "logo": "https://www.overleased.com/favicon-mcwhe1an.ico"
             })
           }}
         />
