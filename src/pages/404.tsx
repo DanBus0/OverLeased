@@ -7,8 +7,9 @@ export default function NotFound() {
   return (
     <>
       <Head>
-        <title>404 - Page Not Found</title>
-        <meta name="description" content="Page not found" />
+        <title>404 - Page Not Found | OverLeased</title>
+        <meta name="description" content="Sorry, the page you're looking for doesn't exist. Return to OverLeased to check your car lease equity and get cash offers from verified dealers." />
+        <meta name="robots" content="noindex, nofollow" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
