@@ -43,7 +43,7 @@ export default function PrivacyPolicyPage() {
         <meta name="description" content="Learn how OverLeased collects, uses, and protects your personal information when you use our car lease equity calculator and dealer matching service." />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.overleased.com/privacy-policy" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
       </Head>
       
       <div className="min-h-screen bg-gray-50">

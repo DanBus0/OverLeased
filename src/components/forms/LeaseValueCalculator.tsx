@@ -798,7 +798,15 @@ export default function LeaseValueCalculator() {
               
               <div className="text-center mt-4 md:mt-6">
                 <p className="text-xs md:text-sm text-gray-500 italic max-w-[700px] mx-auto leading-tight px-2">
-                  By clicking "Check Your Lease Value", I give OverLeased permission to share my information with trusted third parties, which may include the sale of data as described in the Privacy Policy.
+                  By clicking "Check Your Lease Value", I give OverLeased permission to share my information with trusted third parties, which may include the sale of data as described in the{" "}
+                  <a 
+                    href="/privacy-policy" 
+                    className="text-blue-600 hover:text-blue-800 underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Privacy Policy
+                  </a>. You may opt out at any time.
                 </p>
               </div>
             </form>
