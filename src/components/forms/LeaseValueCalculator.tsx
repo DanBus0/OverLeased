@@ -484,7 +484,7 @@ export default function LeaseValueCalculator() {
               Lease Value Calculator
             </CardTitle>
             <CardDescription className="text-blue-100 text-sm md:text-base">
-              Enter your lease details below to get started. Your data is automatically saved as you type.
+              Enter your lease details below to get started.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6 md:p-10">
