@@ -32,7 +32,43 @@ export default function Document() {
               "@type": "Organization",
               "name": "OverLeased",
               "url": "https://www.overleased.com",
-              "logo": "https://www.overleased.com/favicon-mcwi6wvl.ico"
+              "logo": "https://www.overleased.com/favicon-mcwi6wvl.ico",
+              "description": "OverLeased helps car lessees discover lease equity and get cash offers from dealers. Professional automotive lease equity evaluation service.",
+              "sameAs": [
+                "https://www.overleased.com"
+              ],
+              "serviceType": "Automotive Lease Services",
+              "areaServed": "United States",
+              "hasOfferCatalog": {
+                "@type": "OfferCatalog",
+                "name": "Lease Equity Services",
+                "itemListElement": [
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "Lease Equity Calculator",
+                      "description": "Calculate your car lease equity and get real dealer offers"
+                    }
+                  },
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "Lease Buyout Service",
+                      "description": "Get cash offers from dealers for your leased vehicle"
+                    }
+                  },
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "Lease Transfer Alternative",
+                      "description": "Professional alternative to lease transfer and lease assumption services"
+                    }
+                  }
+                ]
+              }
             })
           }}
         />
@@ -46,10 +82,54 @@ export default function Document() {
               "@type": "WebSite",
               "url": "https://www.overleased.com",
               "name": "OverLeased",
+              "alternateName": ["Over Leased", "OverLeased.com"],
+              "description": "Discover lease equity and get cash for your leased car. Professional automotive lease equity evaluation and dealer cash offer service.",
               "potentialAction": {
                 "@type": "SearchAction",
                 "target": "https://www.overleased.com/search?q={search_term_string}",
                 "query-input": "required name=search_term_string"
+              },
+              "mainEntity": {
+                "@type": "WebApplication",
+                "name": "Lease Equity Calculator",
+                "applicationCategory": "FinanceApplication",
+                "operatingSystem": "Web Browser",
+                "description": "Calculate your car lease equity and get real dealer offers instantly"
+              }
+            })
+          }}
+        />
+        
+        {/* Structured Data - Service Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Service",
+              "name": "Car Lease Equity Evaluation",
+              "provider": {
+                "@type": "Organization",
+                "name": "OverLeased"
+              },
+              "description": "Professional car lease equity evaluation service. Get cash from your leased vehicle with expert dealer network and instant equity calculations.",
+              "serviceType": "Automotive Finance Service",
+              "areaServed": "United States",
+              "hasOfferCatalog": {
+                "@type": "OfferCatalog",
+                "name": "Lease Services",
+                "itemListElement": [
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "Lease Equity Calculator",
+                      "description": "Free lease equity calculation tool"
+                    },
+                    "price": "0",
+                    "priceCurrency": "USD"
+                  }
+                ]
               }
             })
           }}

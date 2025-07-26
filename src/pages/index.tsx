@@ -13,8 +13,8 @@ export default function HomePage() {
     <>
       <Head>
         {/* Basic Meta Tags */}
-        <title>OverLeased | Sell Your Car Lease for Cash</title>
-        <meta name="description" content="Find out if your leased car has equity and get a real buyout offer. OverLeased helps you get paid for your leased car." />
+        <title>OverLeased | Sell Your Car Lease for Cash - Get Instant Equity Offers</title>
+        <meta name="description" content="Get cash for your leased car with OverLeased. Discover your lease equity, get real dealer offers, and sell your car lease today. Free lease equity calculator and instant cash offers." />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta name="format-detection" content="telephone=no" />
         
@@ -22,8 +22,8 @@ export default function HomePage() {
         <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
         
         {/* Open Graph Tags */}
-        <meta property="og:title" content="OverLeased | Sell Your Car Lease for Cash" />
-        <meta property="og:description" content="Find out if your leased car has equity and get a real buyout offer. OverLeased helps you get paid for your leased car." />
+        <meta property="og:title" content="OverLeased | Sell Your Car Lease for Cash - Get Instant Equity Offers" />
+        <meta property="og:description" content="Get cash for your leased car with OverLeased. Discover your lease equity, get real dealer offers, and sell your car lease today. Free lease equity calculator and instant cash offers." />
         <meta property="og:image" content="https://www.overleased.com/social-preview.jpg" />
         <meta property="og:url" content="https://www.overleased.com" />
         <meta property="og:type" content="website" />
@@ -31,14 +31,14 @@ export default function HomePage() {
         
         {/* Twitter Card Tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="OverLeased | Sell Your Car Lease for Cash" />
-        <meta name="twitter:description" content="Find out if your leased car has equity and get a real buyout offer. OverLeased helps you get paid for your leased car." />
+        <meta name="twitter:title" content="OverLeased | Sell Your Car Lease for Cash - Get Instant Equity Offers" />
+        <meta name="twitter:description" content="Get cash for your leased car with OverLeased. Discover your lease equity, get real dealer offers, and sell your car lease today. Free lease equity calculator and instant cash offers." />
         <meta name="twitter:image" content="https://www.overleased.com/social-preview.jpg" />
         
         {/* Additional SEO Tags */}
         <meta name="robots" content="index, follow" />
         <meta name="author" content="OverLeased" />
-        <meta name="keywords" content="car lease, lease equity, sell lease, car buyout, lease transfer, automotive finance" />
+        <meta name="keywords" content="car lease, lease equity, sell lease, car buyout, lease transfer, automotive finance, LeaseEnd, Lease End, LeaseEnd.com, Swapalease, Swap a lease, Swapalease.com, LeaseTrader, Lease Trader, LeaseTrader.com, Leasehackr, Lease Hackr, Leasehackr.com, lease assumption, lease takeover, early lease termination, lease exit, lease return, lease buyout calculator, car lease deals, lease marketplace, lease trading, lease swapping, lease equity calculator, lease value, lease payoff, lease end options, lease termination, auto lease transfer, vehicle lease equity, lease assumption marketplace, lease trading platform, lease exit strategy, lease return alternatives, car lease equity check, lease buyout quotes, lease transfer service, lease assumption service, lease marketplace platform, lease equity evaluation, lease value assessment, lease buyout assistance, lease termination help, lease exit solutions, car lease calculator, lease equity finder, lease value checker, lease buyout estimator, lease transfer marketplace, lease assumption platform, lease trading service, lease swap service, lease exit platform, lease return service, lease buyout service, lease equity service, lease value service, lease calculator tool, lease equity tool, lease buyout tool, lease transfer tool, lease assumption tool, lease trading tool, lease swap tool, lease exit tool, lease return tool, lease value tool, car lease equity cash, lease equity cash out, lease buyout cash, sell car lease cash, lease equity money, lease cash offers, dealer lease offers, lease equity dealers, car lease selling, lease vehicle selling, automotive lease equity, vehicle lease cash, lease equity evaluation, lease equity assessment, lease equity check, lease equity finder, lease equity service, lease equity platform, lease equity marketplace, lease equity calculator free, lease equity tool free, lease buyout calculator free, lease value calculator free, lease payoff calculator, lease termination calculator, lease exit calculator, lease return calculator, lease assumption calculator, lease transfer calculator, lease swap calculator, lease trading calculator, lease marketplace calculator, lease platform calculator" />
         <link rel="canonical" href="https://www.overleased.com" />
         
         {/* FAQ Schema - JSON-LD */}
