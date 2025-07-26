@@ -19,13 +19,13 @@ export default function HomePage() {
         <meta name="format-detection" content="telephone=no" />
         
         {/* Favicon */}
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
         
         {/* Open Graph Tags */}
         <meta property="og:title" content="OverLeased | Sell Your Car Lease for Cash" />
         <meta property="og:description" content="Find out if your leased car has equity and get a real buyout offer. OverLeased helps you get paid for your leased car." />
-        <meta property="og:image" content="https://overleased.com/social-preview.jpg" />
-        <meta property="og:url" content="https://overleased.com" />
+        <meta property="og:image" content="https://www.overleased.com/social-preview.jpg" />
+        <meta property="og:url" content="https://www.overleased.com" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="OverLeased" />
         
@@ -33,13 +33,13 @@ export default function HomePage() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="OverLeased | Sell Your Car Lease for Cash" />
         <meta name="twitter:description" content="Find out if your leased car has equity and get a real buyout offer. OverLeased helps you get paid for your leased car." />
-        <meta name="twitter:image" content="https://overleased.com/social-preview.jpg" />
+        <meta name="twitter:image" content="https://www.overleased.com/social-preview.jpg" />
         
         {/* Additional SEO Tags */}
         <meta name="robots" content="index, follow" />
         <meta name="author" content="OverLeased" />
         <meta name="keywords" content="car lease, lease equity, sell lease, car buyout, lease transfer, automotive finance" />
-        <link rel="canonical" href="https://overleased.com" />
+        <link rel="canonical" href="https://www.overleased.com" />
         
         {/* FAQ Schema - JSON-LD */}
         <script

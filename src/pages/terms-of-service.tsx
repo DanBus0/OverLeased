@@ -43,7 +43,19 @@ export default function TermsOfServicePage() {
         <meta name="description" content="Read OverLeased's terms of service to understand your rights and responsibilities when using our car lease equity platform and dealer network." />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.overleased.com/terms-of-service" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
+        
+        {/* Open Graph Tags */}
+        <meta property="og:title" content="Terms of Service | OverLeased" />
+        <meta property="og:description" content="Read OverLeased's terms of service to understand your rights and responsibilities when using our car lease equity platform and dealer network." />
+        <meta property="og:url" content="https://www.overleased.com/terms-of-service" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="OverLeased" />
+        
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Terms of Service | OverLeased" />
+        <meta name="twitter:description" content="Read OverLeased's terms of service to understand your rights and responsibilities when using our car lease equity platform and dealer network." />
       </Head>
       
       <div className="min-h-screen bg-gray-50">

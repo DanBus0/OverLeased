@@ -43,7 +43,19 @@ export default function CookiePolicyPage() {
         <meta name="description" content="Learn about how OverLeased uses cookies to enhance your experience, analyze website traffic, and provide personalized services on our platform." />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.overleased.com/cookie-policy" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
+        
+        {/* Open Graph Tags */}
+        <meta property="og:title" content="Cookie Policy | OverLeased" />
+        <meta property="og:description" content="Learn about how OverLeased uses cookies to enhance your experience, analyze website traffic, and provide personalized services on our platform." />
+        <meta property="og:url" content="https://www.overleased.com/cookie-policy" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="OverLeased" />
+        
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Cookie Policy | OverLeased" />
+        <meta name="twitter:description" content="Learn about how OverLeased uses cookies to enhance your experience, analyze website traffic, and provide personalized services on our platform." />
       </Head>
       
       <div className="min-h-screen bg-gray-50">

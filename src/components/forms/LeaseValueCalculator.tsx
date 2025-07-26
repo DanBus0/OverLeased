@@ -13,6 +13,7 @@ import { leaseInquiryService, type LeaseInquiry } from "@/services/leaseInquiryS
 import { openaiService } from "@/services/openaiService";
 import { useToast } from "@/hooks/use-toast";
 import { contactService } from "@/services/contactService";
+import { brevoService } from "@/services/brevoService";
 
 const leaseValueSchema = z.object({
   email: z.string().min(1, "Required").email("Please enter a valid email address"),
@@ -376,6 +377,10 @@ export default function LeaseValueCalculator() {
       const inquiryData: LeaseInquiry = {
         email: data.email,
         first_name: data.firstName,
+        vehicle_make: data.make,
+        vehicle_model: data.model,
+        vehicle_trim: data.trim,
+        vehicle_year: data.year,
         license_plate: data.licensePlate,
         vehicle_state: data.state,
         zip_code: data.zipCode,
@@ -399,6 +404,28 @@ export default function LeaseValueCalculator() {
           is_positive_equity: result.isPositiveEquity,
           dealer_interest: result.dealerInterest,
         });
+      }
+
+      // Add contact to Brevo after successful Supabase operations
+      try {
+        console.log('Adding contact to Brevo...');
+        const brevoResponse = await brevoService.addContactToBrevo({
+          email: data.email,
+          first_name: data.firstName,
+          vehicle_make: data.make,
+          vehicle_model: data.model,
+          vehicle_year: data.year
+        });
+
+        if (brevoResponse.success) {
+          console.log('Successfully added contact to Brevo:', brevoResponse.message);
+        } else {
+          console.warn('Failed to add contact to Brevo:', brevoResponse.error);
+          // Don't fail the entire form submission if Brevo fails
+        }
+      } catch (brevoError) {
+        console.error('Error adding contact to Brevo:', brevoError);
+        // Don't fail the entire form submission if Brevo fails
       }
 
       setIsCalculated(true);

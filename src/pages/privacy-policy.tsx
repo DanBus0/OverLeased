@@ -44,6 +44,18 @@ export default function PrivacyPolicyPage() {
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.overleased.com/privacy-policy" />
         <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
+        
+        {/* Open Graph Tags */}
+        <meta property="og:title" content="Privacy Policy | OverLeased" />
+        <meta property="og:description" content="Privacy Policy for OverLeased - Learn how we collect, use, and protect your personal information when using our lease equity evaluation services." />
+        <meta property="og:url" content="https://www.overleased.com/privacy-policy" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="OverLeased" />
+        
+        {/* Twitter Card Tags */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Privacy Policy | OverLeased" />
+        <meta name="twitter:description" content="Privacy Policy for OverLeased - Learn how we collect, use, and protect your personal information when using our lease equity evaluation services." />
       </Head>
       
       <div className="min-h-screen bg-gray-50">
