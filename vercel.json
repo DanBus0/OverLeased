@@ -22,6 +22,19 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "overleased.com"
+        }
+      ],
+      "destination": "https://www.overleased.com/$1",
+      "permanent": true
+    }
+  ],
   "cleanUrls": true,
   "trailingSlash": false
 }
