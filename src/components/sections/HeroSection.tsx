@@ -35,19 +35,19 @@ export default function HeroSection() {
             </span>
           </h1>
           
-          <p className="text-sm md:text-lg lg:text-xl text-blue-100 max-w-4xl mx-auto mb-6 md:mb-8 leading-relaxed px-2">
+          <p className="text-sm md:text-lg lg:text-xl text-blue-100 max-w-5xl mx-auto mb-6 md:mb-8 leading-relaxed px-2">
             <span className="block md:hidden">
-              Discover if you have positive equity in your car lease and sell it back to dealerships.
+              Don't return your leased car without checking for equity — you could be giving away thousands of dollars.
               <br />
-              Get an instant valuation and we'll connect with verified dealers ready to buy your lease.
+              See if the dealership owes you money. Use our free lease equity calculator.
             </span>
             <span className="hidden md:block lg:hidden">
-              Discover if you have positive equity in your car lease and sell it back to dealerships. Get an instant valuation and we'll connect with verified dealers ready to buy your lease.
+              Don't return your leased car without checking for equity — you could be giving away thousands of dollars. See if the dealership owes you money. Use our free lease equity calculator.
             </span>
             <span className="hidden lg:block">
-              Discover if you have positive equity in your car lease and sell it back to dealerships.
+              Don't return your leased car without checking for equity — you could be giving away thousands of dollars.
               <br className="hidden sm:block" />
-              Get an instant valuation and we'll connect with verified dealers ready to buy your lease.
+              See if the dealership owes you money. Use our free lease equity calculator.
             </span>
           </p>
           
