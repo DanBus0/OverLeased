@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import Head from "next/head";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -25,14 +25,41 @@ export default function GetStartedPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
 
+  // Pre-paint scroll to top to avoid any initial offset
+  useLayoutEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+  }, []);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       if ("scrollRestoration" in window.history) {
         window.history.scrollRestoration = "manual";
       }
-      requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-      });
+
+      const scrollNow = () => window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      const hasFlag = (() => {
+        try {
+          return sessionStorage.getItem("forceScrollTopOnGetStarted") === "1";
+        } catch {
+          return false;
+        }
+      })();
+
+      requestAnimationFrame(scrollNow);
+      setTimeout(scrollNow, 0);
+      setTimeout(scrollNow, 50);
+      setTimeout(scrollNow, 150);
+      setTimeout(scrollNow, 300);
+
+      if (hasFlag) {
+        setTimeout(scrollNow, 600);
+        setTimeout(scrollNow, 1000);
+        try {
+          sessionStorage.removeItem("forceScrollTopOnGetStarted");
+        } catch {}
+      }
     }
   }, []);
 
