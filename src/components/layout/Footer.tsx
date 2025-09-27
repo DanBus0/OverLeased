@@ -22,7 +22,7 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-3">
-              <li><Link href="/get-started" className="text-gray-300 hover:text-white transition-colors text-sm md:text-base block">Check My Lease Options</Link></li>
+              <li><Link href="/get-started" scroll className="text-gray-300 hover:text-white transition-colors text-sm md:text-base block">Check My Lease Options</Link></li>
               <li><a href="#how-it-works" className="text-gray-300 hover:text-white transition-colors text-sm md:text-base block">How It Works</a></li>
               <li><a href="#faq" className="text-gray-300 hover:text-white transition-colors text-sm md:text-base block">FAQ</a></li>
               <li><Link href="/payoff-lookup" className="text-gray-300 hover:text-white transition-colors text-sm md:text-base block">Payoff Lookup</Link></li>

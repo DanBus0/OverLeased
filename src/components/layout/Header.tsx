@@ -36,14 +36,14 @@ export default function Header() {
                 </a>
               </div>
             </div>
-            <Link href="/get-started">
+            <Link href="/get-started" scroll>
               <Button className="bg-blue-600 hover:bg-blue-700">Check My Lease Options</Button>
             </Link>
           </div>
 
           {/* Mobile CTA - No hamburger menu */}
           <div className="md:hidden">
-            <Link href="/get-started">
+            <Link href="/get-started" scroll>
               <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-sm px-3 py-2">
                 Get Started
               </Button>

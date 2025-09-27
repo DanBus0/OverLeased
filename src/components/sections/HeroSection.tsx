@@ -50,7 +50,7 @@ export default function HeroSection() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8 md:mb-12 px-2">
-            <Link href="/get-started">
+            <Link href="/get-started" scroll>
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm sm:text-base md:text-lg px-6 md:px-8 py-4 md:py-6 h-auto w-full sm:w-auto"

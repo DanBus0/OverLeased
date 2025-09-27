@@ -169,7 +169,7 @@ export default function HowItWorksSection() {
                     OverLeased partners exclusively with manufacturer-authorized dealerships for your car's brand. For example, if you drive a Toyota, we'll only work with official Toyota dealerships to end your lease early. This guarantees a seamless, legitimate process handled by the same car brand that issued your lease.
                   </p>
                   <div className="mt-6 md:mt-8 flex justify-center">
-                    <Link href="/get-started">
+                    <Link href="/get-started" scroll>
                       <Button 
                         className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm md:text-base px-4 md:px-6 py-3 md:py-4 h-auto"
                       >

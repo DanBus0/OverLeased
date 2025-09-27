@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,12 @@ export default function GetStartedPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, []);
 
   const formatNumberWithCommas = (value: string) => {
     // Remove all non-digits
