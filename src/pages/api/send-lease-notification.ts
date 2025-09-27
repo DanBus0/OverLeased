@@ -1,5 +1,9 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
+
+function toTitleCase(value: unknown): string {
+  const s = typeof value === "string" ? value : String(value || "");
+  return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Only allow POST requests
@@ -9,6 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const inquiryData = req.body;
+    const vehicleConditionDisplay = toTitleCase(inquiryData.vehicle_condition);
     
     const brevoApiKey = process.env.BREVO_API_KEY;
     
@@ -28,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 <p><strong>License Plate:</strong> ${inquiryData.license_plate}</p>
 <p><strong>Current Mileage:</strong> ${inquiryData.current_mileage?.toLocaleString() || 'Not provided'}</p>
 <p><strong>ZIP Code:</strong> ${inquiryData.zip_code}</p>
-<p><strong>Vehicle Condition:</strong> ${inquiryData.vehicle_condition}</p>
+<p><strong>Vehicle Condition:</strong> ${vehicleConditionDisplay}</p>
 <p><strong>Submitted:</strong> ${new Date(inquiryData.created_at || new Date()).toLocaleString()}</p>
     `.trim();
 

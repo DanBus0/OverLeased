@@ -7,6 +7,11 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
 };
 
+function toTitleCase(value: unknown): string {
+  const s = typeof value === "string" ? value : String(value || "");
+  return s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 async function sendBrevoEmail(brevoApiKey: string, emailData: any, retryCount = 0): Promise<any> {
   const maxRetries = 2;
   
@@ -57,6 +62,7 @@ async function handler(req: Request): Promise<Response> {
 
   try {
     const inquiryData = await req.json();
+    const vehicleConditionDisplay = toTitleCase(inquiryData.vehicle_condition);
     
     const brevoApiKey = Deno.env.get("BREVO_API_KEY");
     
@@ -72,7 +78,7 @@ async function handler(req: Request): Promise<Response> {
 <p><strong>License Plate:</strong> ${inquiryData.license_plate}</p>
 <p><strong>Current Mileage:</strong> ${inquiryData.current_mileage?.toLocaleString() || 'Not provided'}</p>
 <p><strong>ZIP Code:</strong> ${inquiryData.zip_code}</p>
-<p><strong>Vehicle Condition:</strong> ${inquiryData.vehicle_condition}</p>
+<p><strong>Vehicle Condition:</strong> ${vehicleConditionDisplay}</p>
 <p><strong>Submitted:</strong> ${new Date(inquiryData.created_at).toLocaleString()}</p>
     `.trim();
 
