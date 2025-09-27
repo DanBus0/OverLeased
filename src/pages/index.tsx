@@ -162,7 +162,13 @@ export default function HomePage() {
                   asChild
                   className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                 >
-                  <Link href="/get-started" scroll>
+                  <Link
+                    href="/get-started"
+                    scroll
+                    onClick={() => {
+                      try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
+                    }}
+                  >
                     Check My Lease Options
                   </Link>
                 </Button>

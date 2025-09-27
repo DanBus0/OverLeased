@@ -28,7 +28,11 @@ export default function GetStartedPage() {
   // Pre-paint scroll to top to avoid any initial offset
   useLayoutEffect(() => {
     if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      window.scrollTo(0, 0);
+      try {
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      } catch {}
     }
   }, []);
 
@@ -38,7 +42,14 @@ export default function GetStartedPage() {
         window.history.scrollRestoration = "manual";
       }
 
-      const scrollNow = () => window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      const scrollNow = () => {
+        window.scrollTo(0, 0);
+        try {
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+        } catch {}
+      };
+      
       const hasFlag = (() => {
         try {
           return sessionStorage.getItem("forceScrollTopOnGetStarted") === "1";
@@ -47,19 +58,34 @@ export default function GetStartedPage() {
         }
       })();
 
-      requestAnimationFrame(scrollNow);
+      // Base scrolling - always happens
+      requestAnimationFrame(() => {
+        scrollNow();
+        requestAnimationFrame(scrollNow);
+      });
       setTimeout(scrollNow, 0);
       setTimeout(scrollNow, 50);
       setTimeout(scrollNow, 150);
       setTimeout(scrollNow, 300);
+      setTimeout(scrollNow, 500);
 
+      // Extra aggressive scrolling if flag is set
       if (hasFlag) {
         setTimeout(scrollNow, 600);
+        setTimeout(scrollNow, 800);
         setTimeout(scrollNow, 1000);
+        setTimeout(scrollNow, 1200);
+        setTimeout(scrollNow, 1500);
+        
+        // Clear the flag
         try {
           sessionStorage.removeItem("forceScrollTopOnGetStarted");
         } catch {}
       }
+
+      // Also set up an interval for the first 2 seconds to keep forcing scroll
+      const scrollInterval = setInterval(scrollNow, 100);
+      setTimeout(() => clearInterval(scrollInterval), 2000);
     }
   }, []);
 

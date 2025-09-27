@@ -173,7 +173,13 @@ export default function HowItWorksSection() {
                       asChild
                       className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm md:text-base px-4 md:px-6 py-3 md:py-4 h-auto"
                     >
-                      <Link href="/get-started" scroll>
+                      <Link
+                        href="/get-started"
+                        scroll
+                        onClick={() => {
+                          try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
+                        }}
+                      >
                         <span className="md:hidden">Check My Lease Options</span>
                         <span className="hidden md:inline">Check My Lease Options</span>
                       </Link>

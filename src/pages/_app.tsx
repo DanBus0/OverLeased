@@ -18,10 +18,21 @@ export default function App({ Component, pageProps }: AppProps) {
     };
 
     const ensureScrollTop = () => {
-      const scrollNow = () => window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-      requestAnimationFrame(scrollNow);
+      const scrollNow = () => {
+        window.scrollTo(0, 0);
+        try {
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+        } catch {}
+      };
+      requestAnimationFrame(() => {
+        scrollNow();
+        requestAnimationFrame(scrollNow);
+      });
       setTimeout(scrollNow, 0);
       setTimeout(scrollNow, 50);
+      setTimeout(scrollNow, 150);
+      setTimeout(scrollNow, 300);
     };
 
     const handleRouteChangeStart = (url: string) => {
@@ -43,10 +54,21 @@ export default function App({ Component, pageProps }: AppProps) {
   // NEW: Handle clicks on /get-started links when already on /get-started (no route change fires)
   useEffect(() => {
     const ensureScrollTop = () => {
-      const scrollNow = () => window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-      requestAnimationFrame(scrollNow);
+      const scrollNow = () => {
+        window.scrollTo(0, 0);
+        try {
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+        } catch {}
+      };
+      requestAnimationFrame(() => {
+        scrollNow();
+        requestAnimationFrame(scrollNow);
+      });
       setTimeout(scrollNow, 0);
       setTimeout(scrollNow, 50);
+      setTimeout(scrollNow, 150);
+      setTimeout(scrollNow, 300);
     };
 
     const onLinkClick = (e: MouseEvent) => {
@@ -58,22 +80,21 @@ export default function App({ Component, pageProps }: AppProps) {
       const href = anchor.getAttribute("href");
       if (!href) return;
 
-      let url: URL;
-      try {
-        url = new URL(href, window.location.origin);
-      } catch {
-        return;
-      }
-
-      // Set a flag so the get-started page knows to force top on arrival
-      if (url.pathname === "/get-started") {
+      // Check if it's a /get-started link
+      if (href === "/get-started" || href.startsWith("/get-started?") || href.startsWith("/get-started#")) {
+        // Set flag for get-started page to read
         try {
           sessionStorage.setItem("forceScrollTopOnGetStarted", "1");
         } catch {}
-      }
 
-      if (url.pathname === "/get-started" && router.pathname === "/get-started") {
-        e.preventDefault();
+        // If we're already on get-started page, prevent default and scroll immediately
+        if (router.pathname === "/get-started") {
+          e.preventDefault();
+          ensureScrollTop();
+          return;
+        }
+
+        // For navigation from other pages, let it proceed but ensure scroll happens
         ensureScrollTop();
       }
     };
