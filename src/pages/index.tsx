@@ -158,11 +158,14 @@ export default function HomePage() {
                 <p className="text-base sm:text-lg text-gray-600 mb-6 leading-relaxed">
                   Don't stay in a lease that you don't want. OverLeased is here to help.
                 </p>
-                <Link href="/get-started" scroll>
-                  <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                <Button
+                  asChild
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                >
+                  <Link href="/get-started" scroll>
                     Check My Lease Options
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             </div>
           </section>

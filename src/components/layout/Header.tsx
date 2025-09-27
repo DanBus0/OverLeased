@@ -36,18 +36,20 @@ export default function Header() {
                 </a>
               </div>
             </div>
-            <Link href="/get-started" scroll>
-              <Button className="bg-blue-600 hover:bg-blue-700">Check My Lease Options</Button>
-            </Link>
+            <Button asChild className="bg-blue-600 hover:bg-blue-700">
+              <Link href="/get-started" scroll>
+                Check My Lease Options
+              </Link>
+            </Button>
           </div>
 
           {/* Mobile CTA - No hamburger menu */}
           <div className="md:hidden">
-            <Link href="/get-started" scroll>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-sm px-3 py-2">
+            <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-sm px-3 py-2">
+              <Link href="/get-started" scroll>
                 Get Started
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
