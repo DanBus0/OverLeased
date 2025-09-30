@@ -153,7 +153,7 @@ export default function HomePage() {
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
               <div className="max-w-2xl mx-auto">
                 <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
-                  Check My Lease Options
+                  Get Started Now
                 </h2>
                 <p className="text-base sm:text-lg text-gray-600 mb-6 leading-relaxed">
                   Don't stay in a lease that you don't want. OverLeased is here to help.
