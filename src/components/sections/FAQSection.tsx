@@ -15,10 +15,6 @@ export default function FAQSection() {
       answer: "Ending your lease early gives you the freedom to exit your current lease commitment whenever you want. Whether you need a different vehicle, want to stop monthly payments, or simply want out of your lease, we make it possible."
     },
     {
-      question: "Is there any cost to use OverLeased?",
-      answer: "No, our service is completely free for consumers. We're compensated by participating dealers when successful transactions occur. You'll never pay any fees to get offers for your leased vehicle."
-    },
-    {
       question: "How long does it take to end my lease early?",
       answer: "Most early lease terminations complete within 3-7 business days. After submitting your vehicle information, interested dealers typically respond within 24-48 hours. Once you accept an offer, the inspection and paperwork process usually takes 2-3 days."
     },

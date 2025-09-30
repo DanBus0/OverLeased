@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -25,67 +25,28 @@ export default function GetStartedPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
 
-  // Pre-paint scroll to top to avoid any initial offset
-  useLayoutEffect(() => {
-    if (typeof window !== "undefined") {
-      window.scrollTo(0, 0);
-      try {
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-      } catch {}
-    }
-  }, []);
-
+  // More aggressive scroll to top approach
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      if ("scrollRestoration" in window.history) {
-        window.history.scrollRestoration = "manual";
-      }
-
-      const scrollNow = () => {
-        window.scrollTo(0, 0);
-        try {
+    try {
+      const shouldScrollToTop = sessionStorage.getItem("forceScrollTopOnGetStarted");
+      if (shouldScrollToTop === "1") {
+        // Multiple approaches to ensure scroll reaches top
+        setTimeout(() => {
           document.documentElement.scrollTop = 0;
           document.body.scrollTop = 0;
-        } catch {}
-      };
-      
-      const hasFlag = (() => {
-        try {
-          return sessionStorage.getItem("forceScrollTopOnGetStarted") === "1";
-        } catch {
-          return false;
-        }
-      })();
-
-      // Base scrolling - always happens
-      requestAnimationFrame(() => {
-        scrollNow();
-        requestAnimationFrame(scrollNow);
-      });
-      setTimeout(scrollNow, 0);
-      setTimeout(scrollNow, 50);
-      setTimeout(scrollNow, 150);
-      setTimeout(scrollNow, 300);
-      setTimeout(scrollNow, 500);
-
-      // Extra aggressive scrolling if flag is set
-      if (hasFlag) {
-        setTimeout(scrollNow, 600);
-        setTimeout(scrollNow, 800);
-        setTimeout(scrollNow, 1000);
-        setTimeout(scrollNow, 1200);
-        setTimeout(scrollNow, 1500);
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        }, 0);
         
-        // Clear the flag
-        try {
-          sessionStorage.removeItem("forceScrollTopOnGetStarted");
-        } catch {}
+        // Double-check after a small delay
+        setTimeout(() => {
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+        }, 50);
+        
+        sessionStorage.removeItem("forceScrollTopOnGetStarted");
       }
-
-      // Also set up an interval for the first 2 seconds to keep forcing scroll
-      const scrollInterval = setInterval(scrollNow, 100);
-      setTimeout(() => clearInterval(scrollInterval), 2000);
+    } catch (error) {
+      // Silently handle any sessionStorage errors
     }
   }, []);
 
@@ -355,7 +316,7 @@ export default function GetStartedPage() {
                 <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-12">
                   <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
                     <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                    <span className="whitespace-nowrap">100% Secure & Free</span>
+                    <span className="whitespace-nowrap">100% Secure</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
                     <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />

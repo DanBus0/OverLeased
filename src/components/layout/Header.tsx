@@ -37,7 +37,13 @@ export default function Header() {
               </div>
             </div>
             <Button asChild className="bg-blue-600 hover:bg-blue-700">
-              <Link href="/get-started" scroll>
+              <Link 
+                href="/get-started" 
+                scroll
+                onClick={() => {
+                  try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
+                }}
+              >
                 Check My Lease Options
               </Link>
             </Button>
@@ -46,7 +52,13 @@ export default function Header() {
           {/* Mobile CTA - No hamburger menu */}
           <div className="md:hidden">
             <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-sm px-3 py-2">
-              <Link href="/get-started" scroll>
+              <Link 
+                href="/get-started" 
+                scroll
+                onClick={() => {
+                  try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
+                }}
+              >
                 Get Started
               </Link>
             </Button>

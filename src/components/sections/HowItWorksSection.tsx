@@ -133,9 +133,9 @@ export default function HowItWorksSection() {
                 <div className="bg-blue-100 rounded-full w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mx-auto mb-3 md:mb-4">
                   <span className="text-blue-600 font-bold text-lg md:text-xl">✓</span>
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-2 md:mb-3 text-base md:text-xl">No Hidden Fees</h4>
+                <h4 className="font-semibold text-gray-900 mb-2 md:mb-3 text-base md:text-xl">No Lease Penalties</h4>
                 <p className="text-gray-600 text-sm md:text-lg leading-relaxed">
-                  Our service is completely free
+                  Clear and straightforward process
                 </p>
               </div>
               <div className="text-center p-4 md:p-6">

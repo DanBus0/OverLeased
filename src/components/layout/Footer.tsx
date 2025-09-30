@@ -15,7 +15,7 @@ export default function Footer() {
               <span className="text-2xl font-bold">OverLeased</span>
             </div>
             <p className="text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-md">
-              <span className="inline-block">Helping drivers end their car leases early</span> <span className="inline-block">with no fees or penalties.</span>
+              <span className="inline-block">Helping drivers end their car leases early</span> <span className="inline-block">with no penalties.</span>
             </p>
           </div>
 

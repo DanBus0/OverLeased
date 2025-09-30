@@ -23,7 +23,7 @@ export default function HeroSection() {
             <span className="block">End Your Car</span>
             <span className="block">Lease Early</span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 block">
-              No Fees or Penalties
+              No Lease Penalties
             </span>
           </h1>
           
@@ -31,7 +31,7 @@ export default function HeroSection() {
           <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight px-2 hidden md:block lg:hidden">
             <span className="block">End Your Car Lease Early</span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 block">
-              No Fees or Penalties
+              No Lease Penalties
             </span>
           </h1>
           
@@ -39,7 +39,7 @@ export default function HeroSection() {
           <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight px-2 hidden lg:block">
             End Your Car Lease Early
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 block">
-              No Fees or Penalties
+              No Lease Penalties
             </span>
           </h1>
           
@@ -54,6 +54,9 @@ export default function HeroSection() {
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm sm:text-base md:text-lg px-6 md:px-8 py-4 md:py-6 h-auto w-full sm:w-auto"
+                onClick={() => {
+                  try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
+                }}
               >
                 Check My Lease Options
                 <Search className="ml-2 h-4 md:h-5 w-4 md:w-5" />
