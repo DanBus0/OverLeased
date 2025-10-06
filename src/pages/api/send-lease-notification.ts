@@ -5,6 +5,23 @@ function toTitleCase(value: unknown): string {
   return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 }
 
+function formatTimestamp(dateString?: string): string {
+  const date = dateString ? new Date(dateString) : new Date();
+  
+  // Format: "October 6, 2025 at 5:50 PM EST"
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: 'America/New_York',
+    timeZoneName: 'short'
+  };
+  
+  return new Intl.DateTimeFormat('en-US', options).format(date);
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -25,6 +42,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
+    // Use current time if created_at is not provided
+    const timestamp = formatTimestamp(inquiryData.created_at);
+
     const emailSubject = "New Lease Inquiry from OverLeased";
     const emailContent = `
 <h2>New Lease Inquiry Submission</h2>
@@ -34,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 <p><strong>Current Mileage:</strong> ${inquiryData.current_mileage?.toLocaleString() || 'Not provided'}</p>
 <p><strong>ZIP Code:</strong> ${inquiryData.zip_code}</p>
 <p><strong>Vehicle Condition:</strong> ${vehicleConditionDisplay}</p>
-<p><strong>Submitted:</strong> ${new Date(inquiryData.created_at || new Date()).toLocaleString()}</p>
+<p><strong>Submitted:</strong> ${timestamp}</p>
     `.trim();
 
     const emailData = {
