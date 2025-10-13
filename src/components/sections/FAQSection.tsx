@@ -40,7 +40,7 @@ export default function FAQSection() {
     },
     {
       question: "Can I negotiate the dealer offers?",
-      answer: "Yes, dealer offers are starting points for negotiation. Factors like vehicle condition, local demand, and timing can influence the final terms. We work to secure the best possible outcome for your early lease termination."
+      answer: "Yes, dealer offers are starting points for negotiation. Factors like vehicle condition, local demand, and timing can influence the final terms."
     },
     {
       question: "What if I change my mind after getting offers?",

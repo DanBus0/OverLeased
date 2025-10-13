@@ -40,14 +40,14 @@ export default function PrivacyPolicyPage() {
     <>
       <Head>
         <title>Privacy Policy | OverLeased</title>
-        <meta name="description" content="Privacy Policy for OverLeased - Learn how we collect, use, and protect your personal information when using our lease equity evaluation services." />
+        <meta name="description" content="Privacy Policy for OverLeased - Learn how we collect, use, and protect your personal information when using our early lease termination information services." />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.overleased.com/privacy-policy" />
         <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
         
         {/* Open Graph Tags */}
         <meta property="og:title" content="Privacy Policy | OverLeased" />
-        <meta property="og:description" content="Privacy Policy for OverLeased - Learn how we collect, use, and protect your personal information when using our lease equity evaluation services." />
+        <meta property="og:description" content="Privacy Policy for OverLeased - Learn how we collect, use, and protect your personal information when using our early lease termination information services." />
         <meta property="og:url" content="https://www.overleased.com/privacy-policy" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="OverLeased" />
@@ -55,7 +55,7 @@ export default function PrivacyPolicyPage() {
         {/* Twitter Card Tags */}
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="Privacy Policy | OverLeased" />
-        <meta name="twitter:description" content="Privacy Policy for OverLeased - Learn how we collect, use, and protect your personal information when using our lease equity evaluation services." />
+        <meta name="twitter:description" content="Privacy Policy for OverLeased - Learn how we collect, use, and protect your personal information when using our early lease termination information services." />
       </Head>
       
       <div className="min-h-screen bg-gray-50">
@@ -84,26 +84,27 @@ export default function PrivacyPolicyPage() {
           <Card className="shadow-lg">
             <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
               <CardTitle className="text-3xl font-bold">Privacy Policy</CardTitle>
-              <p className="text-blue-100 mt-2">Last updated: December 2024</p>
+              <p className="text-blue-100 mt-2">Last updated: October 2025</p>
             </CardHeader>
             <CardContent className="p-8 space-y-8">
               <section>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Information We Collect</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
-                    At OverLeased, we collect information you provide directly to us, such as when you use our lease equity calculator, contact us, or communicate with our team.
+                    At OverLeased, we collect information you provide directly to us when you use our early lease termination information service, submit inquiries through our form, contact us, or communicate with our team.
                   </p>
                   <h3 className="text-lg font-medium text-gray-900">Personal Information:</h3>
                   <ul className="list-disc pl-6 space-y-2">
-                    <li>Name and email address</li>
-                    <li>Vehicle information (make, model, year, trim, license plate, state)</li>
-                    <li>Lease details (current mileage, annual mileage allowance, months remaining, lease term)</li>
+                    <li>Name, email address, and phone number</li>
+                    <li>Vehicle information (year, make, model, trim, VIN, license plate, state)</li>
+                    <li>Lease details (current mileage, annual mileage allowance, months remaining, lease term, monthly payment)</li>
+                    <li>Lease payoff information when available</li>
                     <li>Communication preferences and correspondence with us</li>
                   </ul>
                   <h3 className="text-lg font-medium text-gray-900">Automatically Collected Information:</h3>
                   <ul className="list-disc pl-6 space-y-2">
                     <li>Device information and browser type</li>
-                    <li>IP address and location data</li>
+                    <li>IP address and approximate location data</li>
                     <li>Website usage patterns and analytics</li>
                     <li>Cookies and similar tracking technologies</li>
                   </ul>
@@ -115,13 +116,20 @@ export default function PrivacyPolicyPage() {
                 <div className="space-y-4 text-gray-700">
                   <p>We use the information we collect to:</p>
                   <ul className="list-disc pl-6 space-y-2">
-                    <li>Calculate your lease equity and provide market valuations</li>
-                    <li>Connect you with verified dealers interested in purchasing your lease</li>
-                    <li>Communicate with you about our services and your inquiries</li>
-                    <li>Improve our website and services</li>
+                    <li>Provide information about options for ending your car lease early</li>
+                    <li>Connect you with dealerships that may be interested in purchasing your leased vehicle</li>
+                    <li>Respond to your inquiries and provide customer support</li>
+                    <li>Communicate with you about our services and relevant updates</li>
+                    <li>Improve our website, services, and user experience</li>
                     <li>Comply with legal obligations and protect our rights</li>
-                    <li>Send you relevant updates and promotional materials (with your consent)</li>
+                    <li>Send you marketing communications (with your consent)</li>
                   </ul>
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mt-4">
+                    <p className="text-blue-900 font-semibold mb-2">Important Note About Our Services:</p>
+                    <p className="text-blue-800 text-sm">
+                      OverLeased is a marketing and sourcing service that provides information to help consumers end their car lease early. We are NOT a dealer, broker, lender, or lessor. We do not negotiate deals, execute vehicle sales, or handle lease payoffs directly. We connect consumers with dealerships and provide information only.
+                    </p>
+                  </div>
                 </div>
               </section>
 
@@ -131,23 +139,41 @@ export default function PrivacyPolicyPage() {
                   <p>We may share your information in the following circumstances:</p>
                   
                   <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-4">
-                    <h4 className="text-md font-semibold text-blue-900 mb-2">Your Consent</h4>
-                    <p className="text-blue-800 text-sm">
-                      By clicking "Check Your Lease Value", you explicitly give OverLeased permission to share your information with trusted third parties, which may include the sale of data as described in this Privacy Policy.
+                    <h4 className="text-md font-semibold text-blue-900 mb-2">Your Consent (DDPA Compliance)</h4>
+                    <p className="text-blue-800 text-sm mb-2">
+                      By submitting the form on our website and checking the consent box, you explicitly authorize OverLeased to:
+                    </p>
+                    <ul className="list-disc pl-6 text-blue-800 text-sm space-y-1">
+                      <li>Review your vehicle and lease information</li>
+                      <li>Share your information with dealerships and third-party service providers</li>
+                      <li>Contact you via phone, email, or text message regarding your inquiry</li>
+                    </ul>
+                    <p className="text-blue-800 text-sm mt-2">
+                      This consent includes the potential sale or transfer of your data to trusted partners as described in this Privacy Policy.
                     </p>
                   </div>
                   
-                  <h3 className="text-lg font-medium text-gray-900">With Verified Dealers:</h3>
+                  <h3 className="text-lg font-medium text-gray-900">With Dealerships:</h3>
                   <p>
-                    We share relevant vehicle and contact information with pre-screened dealers who may be interested in purchasing your lease. This is essential to our service.
+                    We share relevant vehicle and contact information with pre-screened dealerships who may be interested in purchasing your leased vehicle. This is a core part of our marketing and sourcing service. We do not control what offers, if any, dealerships may make.
                   </p>
-                  <h3 className="text-lg font-medium text-gray-900">Service Providers and Third Parties:</h3>
+                  <h3 className="text-lg font-medium text-gray-900">Service Providers and Business Partners:</h3>
                   <p>
-                    We work with third-party service providers who assist us in operating our website, conducting business, and serving our users. When you use our lease value calculator service, you consent to sharing your information with these trusted partners.
+                    We work with third-party service providers who assist us in operating our website, conducting our business, analyzing data, and serving our users. These partners may include:
                   </p>
+                  <ul className="list-disc pl-6 space-y-1 mt-2">
+                    <li>Email service providers (Brevo/Sendinblue)</li>
+                    <li>Analytics providers (Google Analytics)</li>
+                    <li>Hosting and infrastructure providers</li>
+                    <li>Marketing and advertising partners</li>
+                  </ul>
                   <h3 className="text-lg font-medium text-gray-900">Legal Requirements:</h3>
                   <p>
-                    We may disclose information when required by law or to protect our rights, property, or safety, or that of our users or others.
+                    We may disclose information when required by law, court order, or government request, or to protect our rights, property, safety, or that of our users or others.
+                  </p>
+                  <h3 className="text-lg font-medium text-gray-900">Business Transfers:</h3>
+                  <p>
+                    If OverLeased is involved in a merger, acquisition, or sale of assets, your information may be transferred as part of that transaction.
                   </p>
                 </div>
               </section>
@@ -156,7 +182,16 @@ export default function PrivacyPolicyPage() {
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Data Security</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
-                    We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet or electronic storage is 100% secure.
+                    We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. These measures include:
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>Secure data transmission using encryption (SSL/TLS)</li>
+                    <li>Access controls and authentication requirements</li>
+                    <li>Regular security assessments and updates</li>
+                    <li>Secure data storage with reputable providers</li>
+                  </ul>
+                  <p>
+                    However, no method of transmission over the internet or electronic storage is 100% secure. While we strive to protect your information, we cannot guarantee absolute security.
                   </p>
                 </div>
               </section>
@@ -166,13 +201,19 @@ export default function PrivacyPolicyPage() {
                 <div className="space-y-4 text-gray-700">
                   <p>You have the right to:</p>
                   <ul className="list-disc pl-6 space-y-2">
-                    <li>Access, update, or delete your personal information</li>
-                    <li>Opt out of promotional communications</li>
-                    <li>Request information about how we use your data</li>
-                    <li>File a complaint with relevant data protection authorities</li>
+                    <li><strong>Access:</strong> Request access to the personal information we hold about you</li>
+                    <li><strong>Correction:</strong> Request correction of inaccurate or incomplete information</li>
+                    <li><strong>Deletion:</strong> Request deletion of your personal information (subject to legal obligations)</li>
+                    <li><strong>Opt-Out:</strong> Opt out of marketing communications at any time</li>
+                    <li><strong>Data Portability:</strong> Request a copy of your data in a portable format</li>
+                    <li><strong>Withdraw Consent:</strong> Withdraw your consent for data processing where consent is the legal basis</li>
+                    <li><strong>Complain:</strong> File a complaint with relevant data protection authorities</li>
                   </ul>
                   <p>
-                    To exercise these rights, please contact us at support@overleased.com or (484) 702-9539.
+                    To exercise these rights, please contact us at <strong>support@overleased.com</strong> or <strong>(484) 702-9539</strong>.
+                  </p>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Please note that opting out of communications or requesting deletion may limit our ability to provide you with information about lease termination options or connect you with dealerships.
                   </p>
                 </div>
               </section>
@@ -181,33 +222,68 @@ export default function PrivacyPolicyPage() {
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Cookies and Tracking Technologies</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
-                    We use cookies and similar technologies to enhance your experience, analyze website traffic, and for marketing purposes. You can control cookie settings through your browser preferences.
+                    We use cookies and similar technologies to enhance your experience, analyze website traffic, understand user behavior, and for marketing purposes. You can control cookie settings through your browser preferences.
+                  </p>
+                  <p>
+                    For more information about our use of cookies, please see our <Link href="/cookie-policy" className="text-blue-600 hover:underline">Cookie Policy</Link>.
                   </p>
                 </div>
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Third-Party Links</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Data Retention</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
-                    Our website may contain links to third-party websites. We are not responsible for the privacy practices or content of these external sites.
+                    We retain your personal information for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required or permitted by law. When determining retention periods, we consider:
                   </p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>The nature and sensitivity of the information</li>
+                    <li>The purposes for which we process the information</li>
+                    <li>Legal and regulatory requirements</li>
+                    <li>Whether you have an active inquiry or relationship with us</li>
+                  </ul>
                 </div>
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Changes to This Privacy Policy</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Third-Party Links</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
-                    We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the "Last updated" date.
+                    Our website may contain links to third-party websites, including dealership websites and other service providers. We are not responsible for the privacy practices or content of these external sites. We encourage you to read the privacy policies of any third-party sites you visit.
                   </p>
                 </div>
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Contact Us</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Children's Privacy</h2>
                 <div className="space-y-4 text-gray-700">
-                  <p>If you have any questions about this Privacy Policy, please contact us:</p>
+                  <p>
+                    Our services are not directed to individuals under the age of 18. We do not knowingly collect personal information from children. If we become aware that we have collected personal information from a child without parental consent, we will take steps to delete that information.
+                  </p>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Changes to This Privacy Policy</h2>
+                <div className="space-y-4 text-gray-700">
+                  <p>
+                    We may update this Privacy Policy from time to time to reflect changes in our practices, technology, legal requirements, or other factors. We will notify you of any material changes by:
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>Posting the updated Privacy Policy on this page</li>
+                    <li>Updating the "Last updated" date at the top of this policy</li>
+                    <li>Sending you an email notification (for significant changes)</li>
+                  </ul>
+                  <p>
+                    Your continued use of our services after any changes indicates your acceptance of the updated Privacy Policy.
+                  </p>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Contact Us</h2>
+                <div className="space-y-4 text-gray-700">
+                  <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p><strong>Email:</strong> support@overleased.com</p>
                     <p><strong>Phone:</strong> (484) 702-9539</p>

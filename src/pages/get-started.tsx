@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Car, Clock, Shield, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +19,8 @@ export default function GetStartedPage() {
     licensePlate: "",
     mileage: "",
     zipCode: "",
-    vehicleCondition: ""
+    vehicleCondition: "",
+    consentGiven: false
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,6 +87,13 @@ export default function GetStartedPage() {
     setFormData(prev => ({
       ...prev,
       vehicleCondition: value
+    }));
+  };
+
+  const handleConsentChange = (checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      consentGiven: checked
     }));
   };
 
@@ -202,9 +211,16 @@ export default function GetStartedPage() {
     setError("");
     setIsSubmitting(true);
 
-    // Validate required fields
+    // Validate required fields including consent
     if (!formData.firstName || !formData.email || !formData.licensePlate || !formData.mileage || !formData.zipCode || !formData.vehicleCondition) {
       setError("Please fill in all required fields.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Validate consent checkbox
+    if (!formData.consentGiven) {
+      setError("Please provide consent to review your lease information.");
       setIsSubmitting(false);
       return;
     }
@@ -467,17 +483,40 @@ export default function GetStartedPage() {
                         </div>
                       </div>
 
-                      <div className="pt-4">
+                      <div className="pt-4 space-y-4">
+                        {/* DDPA Consent Checkbox */}
+                        <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                          <Checkbox
+                            id="consent"
+                            checked={formData.consentGiven}
+                            onCheckedChange={handleConsentChange}
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1">
+                            <Label
+                              htmlFor="consent"
+                              className="text-[9px] sm:text-[11px] text-gray-700 leading-snug cursor-pointer"
+                            >
+                              <span className="font-semibold">Consent to Review Your Vehicle Information</span>
+                              <br />
+                              <span className="text-gray-600">
+                                By submitting, you authorize OverLeased to review your lease information to determine your options for ending your lease early. You understand that OverLeased is not a dealer, lender, or lessor and does not negotiate or execute any vehicle sale or lease payoff.
+                              </span>
+                            </Label>
+                          </div>
+                        </div>
+
                         <Button 
                           type="submit" 
-                          disabled={isSubmitting}
-                          className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-base sm:text-lg font-semibold"
+                          disabled={isSubmitting || !formData.consentGiven}
+                          className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-base sm:text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <span className="lg:hidden">Check My Lease Options</span>
                           <span className="hidden lg:inline">Check My Lease Options</span>
                         </Button>
 
-                        <p className="text-[9px] sm:text-[10px] md:text-[11px] text-gray-500 text-center italic mt-4 px-2">
+                        {/* Contact Agreement Note */}
+                        <p className="text-[10px] sm:text-xs text-center text-gray-500 mt-2 italic">
                           By submitting this form, you agree to be contacted by OverLeased.
                         </p>
                       </div>
