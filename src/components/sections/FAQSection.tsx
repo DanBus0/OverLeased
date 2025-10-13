@@ -11,6 +11,10 @@ export default function FAQSection() {
       answer: "You can end your car lease early at any time by having OverLeased connect with authorized dealers who will purchase your leased vehicle and handle the lease payoff directly with your leasing company."
     },
     {
+      question: "Do I need to pay penalties, get a loan, or buy out my lease with cash?",
+      answer: "No - OverLeased's process requires no penalties, no loans, and no cash buyout from you. The dealer handles the entire lease payoff directly with your leasing company, and you walk away free from your lease obligations."
+    },
+    {
       question: "What are the benefits of ending my lease early?",
       answer: "Ending your lease early gives you the freedom to exit your current lease commitment whenever you want. Whether you need a different vehicle, want to stop monthly payments, or simply want out of your lease, we make it possible."
     },
