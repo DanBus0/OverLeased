@@ -112,6 +112,10 @@ export default function TermsOfServicePage() {
                     <li>Guidance and support throughout the information gathering process</li>
                   </ul>
                   
+                  <p>
+                    OverLeased may request purchase offers from authorized dealerships and present them to users for review. OverLeased does not negotiate or guarantee such offers and all transactions occur directly between the user and dealership.
+                  </p>
+                  
                   <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mt-4">
                     <p className="text-blue-900 font-semibold mb-2">IMPORTANT DISCLAIMER:</p>
                     <p className="text-blue-800 text-sm mb-2">

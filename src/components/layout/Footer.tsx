@@ -17,6 +17,9 @@ export default function Footer() {
             <p className="text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-md">
               <span className="inline-block">Helping drivers end their car leases early</span> <span className="inline-block">with no penalties.</span>
             </p>
+            <p className="text-gray-400 text-xs leading-relaxed max-w-md mt-4">
+              OverLeased provides marketing and introduction services only and does not buy, negotiate, or execute vehicle sales or lease payoffs. All offers come from authorized dealerships and are contingent on vehicle condition, payoff, and dealer discretion.
+            </p>
           </div>
 
           <div>

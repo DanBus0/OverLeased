@@ -514,11 +514,6 @@ export default function GetStartedPage() {
                           <span className="lg:hidden">Check My Lease Options</span>
                           <span className="hidden lg:inline">Check My Lease Options</span>
                         </Button>
-
-                        {/* Contact Agreement Note */}
-                        <p className="text-[10px] sm:text-xs text-center text-gray-500 mt-2 italic">
-                          By submitting this form, you agree to be contacted by OverLeased.
-                        </p>
                       </div>
                     </form>
                   </CardContent>

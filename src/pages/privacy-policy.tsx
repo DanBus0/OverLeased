@@ -151,6 +151,9 @@ export default function PrivacyPolicyPage() {
                     <p className="text-blue-800 text-sm mt-2">
                       This consent includes the potential sale or transfer of your data to trusted partners as described in this Privacy Policy.
                     </p>
+                    <p className="text-blue-800 text-sm mt-2">
+                      We record your consent and submission timestamp to maintain an audit trail for compliance.
+                    </p>
                   </div>
                   
                   <h3 className="text-lg font-medium text-gray-900">With Dealerships:</h3>
@@ -167,6 +170,9 @@ export default function PrivacyPolicyPage() {
                     <li>Hosting and infrastructure providers</li>
                     <li>Marketing and advertising partners</li>
                   </ul>
+                  <p className="mt-2">
+                    Advertising partners may use cookies and similar technologies to deliver ads and measure their effectiveness. These partners do not receive personal identifiers such as names or VINs.
+                  </p>
                   <h3 className="text-lg font-medium text-gray-900">Legal Requirements:</h3>
                   <p>
                     We may disclose information when required by law, court order, or government request, or to protect our rights, property, safety, or that of our users or others.
@@ -179,7 +185,25 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Data Security</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Offer Process & Dealership Contact</h2>
+                <div className="space-y-4 text-gray-700">
+                  <p>
+                    Once you provide your lease and vehicle information and explicitly consent to proceed, OverLeased may:
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>Request and collect purchase offers from authorized dealerships in your region</li>
+                    <li>Share your vehicle and contact information with those dealerships solely for the purpose of generating such offers</li>
+                    <li>Present those offers to you for review and selection</li>
+                    <li>With your approval, coordinate the drop-off appointment with the chosen dealership</li>
+                  </ul>
+                  <p className="mt-4">
+                    OverLeased remains an independent marketing and introduction platform and does not buy, sell, negotiate, or execute vehicle sales, lease payoffs, or title transfers. Each dealership sets its own purchase offers and terms independently. OverLeased does not influence or guarantee these offers and all final transactions occur directly between you and the dealership.
+                  </p>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Data Security</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
                     We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. These measures include:
@@ -197,7 +221,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Your Rights and Choices</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Your Rights and Choices</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>You have the right to:</p>
                   <ul className="list-disc pl-6 space-y-2">
@@ -219,19 +243,19 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Cookies and Tracking Technologies</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Cookies and Tracking Technologies</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
                     We use cookies and similar technologies to enhance your experience, analyze website traffic, understand user behavior, and for marketing purposes. You can control cookie settings through your browser preferences.
                   </p>
                   <p>
-                    For more information about our use of cookies, please see our <Link href="/cookie-policy" className="text-blue-600 hover:underline">Cookie Policy</Link>.
+                    We use Google Analytics, Google Ads, and similar technologies to measure marketing effectiveness and deliver relevant advertising. For more details, see our <Link href="/cookie-policy" className="text-blue-600 hover:underline">Cookie Policy</Link>.
                   </p>
                 </div>
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Data Retention</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Data Retention</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
                     We retain your personal information for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required or permitted by law. When determining retention periods, we consider:
@@ -242,11 +266,14 @@ export default function PrivacyPolicyPage() {
                     <li>Legal and regulatory requirements</li>
                     <li>Whether you have an active inquiry or relationship with us</li>
                   </ul>
+                  <p className="mt-4">
+                    We also maintain a record of your consent and the version of this Privacy Policy you accepted to ensure compliance and transparency.
+                  </p>
                 </div>
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Third-Party Links</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Third-Party Links</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
                     Our website may contain links to third-party websites, including dealership websites and other service providers. We are not responsible for the privacy practices or content of these external sites. We encourage you to read the privacy policies of any third-party sites you visit.
@@ -255,7 +282,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Children's Privacy</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Children's Privacy</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
                     Our services are not directed to individuals under the age of 18. We do not knowingly collect personal information from children. If we become aware that we have collected personal information from a child without parental consent, we will take steps to delete that information.
@@ -264,7 +291,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Changes to This Privacy Policy</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Changes to This Privacy Policy</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
                     We may update this Privacy Policy from time to time to reflect changes in our practices, technology, legal requirements, or other factors. We will notify you of any material changes by:
@@ -281,7 +308,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Contact Us</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Contact Us</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
                   <div className="bg-gray-50 p-4 rounded-lg">

@@ -18,27 +18,27 @@ export default function HeroSection() {
       
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-8 md:mb-12">
-          {/* Mobile title with specific line breaks - slightly smaller to prevent hanging */}
-          <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 leading-[1.1] px-2 block md:hidden">
-            <span className="block text-4xl sm:text-5xl">End Your Car</span>
-            <span className="block text-4xl sm:text-5xl">Lease Early</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 block text-[1.6rem] sm:text-[2rem]">
+          {/* Mobile title with specific line breaks - lighter font weight */}
+          <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 leading-[1.15] px-2 block md:hidden">
+            <span className="block text-[2.75rem] sm:text-[3.25rem] font-semibold">End Your Car</span>
+            <span className="block text-[2.75rem] sm:text-[3.25rem] font-semibold">Lease Early</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 block text-[1.85rem] sm:text-[2.25rem] font-bold mt-1 leading-[1.3] pb-2">
               No Penalties, Loans or Cash Buyout Needed
             </span>
           </h1>
           
-          {/* Tablet title - optimized for tablet breakpoint */}
-          <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight px-2 hidden md:block lg:hidden">
-            <span className="block text-5xl">End Your Car Lease Early</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 block text-[2rem]">
+          {/* Tablet title - lighter font weight for better cohesion */}
+          <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 leading-[1.15] px-2 hidden md:block lg:hidden">
+            <span className="block text-[3.5rem] font-semibold">End Your Car Lease Early</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 text-[1.75rem] font-bold mt-1 leading-[1.3] pb-2">
               No Penalties, Loans or Cash Buyout Needed
             </span>
           </h1>
           
-          {/* Desktop title - unchanged */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight px-2 hidden lg:block">
-            <span className="block text-6xl">End Your Car Lease Early</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 block text-[2.5rem]">
+          {/* Desktop title - lighter font weight for refined appearance */}
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-[1.15] px-2 hidden lg:block">
+            <span className="block text-[4rem] font-semibold">End Your Car Lease Early</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 block text-[3rem] font-bold mt-1 leading-[1.3] pb-2">
               No Penalties, Loans or Cash Buyout Needed
             </span>
           </h1>

@@ -15,6 +15,10 @@ export default function FAQSection() {
       answer: "No - OverLeased's process requires no penalties, no loans, and no cash buyout from you. The dealer handles the entire lease payoff directly with your leasing company, and you walk away free from your lease obligations."
     },
     {
+      question: "Is ending my lease early part of a new process?",
+      answer: "No, ending your lease early has always been possible—it's simply not widely advertised. Dealerships typically prefer customers complete their full lease terms to maximize revenue opportunities. OverLeased makes this existing option more accessible by connecting you directly with dealers interested in purchasing leased vehicles, giving you control over when to exit your lease."
+    },
+    {
       question: "What are the benefits of ending my lease early?",
       answer: "Ending your lease early gives you the freedom to exit your current lease commitment whenever you want. Whether you need a different vehicle, want to stop monthly payments, or simply want out of your lease, we make it possible."
     },
@@ -37,10 +41,6 @@ export default function FAQSection() {
     {
       question: "What happens to my lease agreement when I sell?",
       answer: "The dealer assumes your lease obligations and pays off the leasing company directly. You're completely released from your lease agreement and all future responsibilities once the transaction is complete. The dealer handles all paperwork with the leasing company."
-    },
-    {
-      question: "Can I negotiate the dealer offers?",
-      answer: "Yes, dealer offers are starting points for negotiation. Factors like vehicle condition, local demand, and timing can influence the final terms."
     },
     {
       question: "What if I change my mind after getting offers?",

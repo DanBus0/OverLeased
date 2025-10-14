@@ -29,7 +29,7 @@ export default function HowItWorksSection() {
       step: 3,
       icon: Handshake,
       title: "Agreement",
-      description: "OverLeased secures an offer for your car from an interested dealership.",
+      description: "OverLeased requests an offer for your car from an interested dealership.",
       color: "bg-purple-500",
       bgColor: "bg-purple-50",
       borderColor: "border-purple-200"
@@ -38,7 +38,7 @@ export default function HowItWorksSection() {
       step: 4,
       icon: CheckCircle,
       title: "End Lease",
-      description: "Drop off your car at the dealership and OverLeased will handle the rest.",
+      description: "Drop off your car at the dealership and OverLeased will coordinate the rest.",
       color: "bg-orange-500",
       bgColor: "bg-orange-50",
       borderColor: "border-orange-200"
