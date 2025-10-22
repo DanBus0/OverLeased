@@ -242,13 +242,15 @@ export default function GetStartedPage() {
       
       if (supabaseResult.success) {
         console.log('Form successfully submitted to Supabase');
-        setIsSubmitted(true);
+        // Redirect to tracking URL for Google Ads conversion tracking
+        window.location.href = "/lease-review-submitted";
       } else {
         console.log('Supabase submission failed, using localStorage fallback');
         const localStorageResult = submitToLocalStorage();
         
         if (localStorageResult.success) {
-          setIsSubmitted(true);
+          // Redirect to tracking URL for Google Ads conversion tracking
+          window.location.href = "/lease-review-submitted";
         } else {
           throw new Error('Both Supabase and localStorage submissions failed');
         }
@@ -256,7 +258,6 @@ export default function GetStartedPage() {
     } catch (err) {
       console.error('Form submission error:', err);
       setError("Something went wrong. Please try again.");
-    } finally {
       setIsSubmitting(false);
     }
   };
