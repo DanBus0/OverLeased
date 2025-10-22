@@ -15,21 +15,16 @@ export default function Header() {
             <span className="text-2xl font-bold text-gray-900">OverLeased</span>
           </Link>
 
-          {/* Desktop Navigation - Empty as requested */}
-          <nav className="hidden md:flex items-center gap-8">
-            {/* Navigation items removed as requested */}
-          </nav>
-
-          {/* Desktop CTA and Contact */}
+          {/* Desktop Navigation and Contact Info */}
           <div className="hidden md:flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-4 text-sm text-black">
-              <div className="flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-8 text-sm">
+              <div className="flex items-center gap-1 text-gray-700">
                 <Phone className="h-4 w-4" />
                 <a href="tel:+14847029539" className="hover:text-blue-600 transition-colors cursor-pointer">
                   (484) 702-9539
                 </a>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 text-gray-700">
                 <Mail className="h-4 w-4" />
                 <a href="mailto:support@overleased.com" className="hover:text-blue-600 transition-colors cursor-pointer">
                   support@overleased.com
@@ -44,7 +39,7 @@ export default function Header() {
                   try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                 }}
               >
-                Check My Lease Options
+                Get My Lease Reviewed
               </Link>
             </Button>
           </div>

@@ -1,8 +1,44 @@
 import React from "react";
 import { Car, Phone, Mail } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Footer() {
+  const router = useRouter();
+  const isHomePage = router.pathname === "/";
+
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLButtonElement>, targetId: string) => {
+    e.preventDefault();
+    const element = document.getElementById(targetId);
+    if (element) {
+      const headerHeight = 80;
+      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - headerHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+  };
+
+  const handleNavigateAndScroll = (targetId: string) => {
+    router.push("/").then(() => {
+      setTimeout(() => {
+        const element = document.getElementById(targetId);
+        if (element) {
+          const headerHeight = 80;
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          const offsetPosition = elementPosition - headerHeight;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
+          });
+        }
+      }, 300);
+    });
+  };
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
@@ -15,9 +51,12 @@ export default function Footer() {
               <span className="text-2xl font-bold">OverLeased</span>
             </div>
             <p className="text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-md">
-              <span className="inline-block">Helping drivers end their car leases early</span> <span className="inline-block">with no penalties.</span>
+              Helping drivers end car leases early — safely and penalty-free.
             </p>
-            <p className="text-gray-400 text-xs leading-relaxed max-w-md mt-4">
+            <p className="text-gray-400 text-[0.6875rem] sm:text-xs md:text-sm leading-relaxed max-w-md mt-2">
+              Trusted by drivers nationwide. Verified same-brand dealerships only.
+            </p>
+            <p className="text-gray-400 text-xs leading-relaxed max-w-md mt-4 italic">
               OverLeased provides marketing and introduction services only and does not buy, negotiate, or execute vehicle sales or lease payoffs. All offers come from authorized dealerships and are contingent on vehicle condition, payoff, and dealer discretion.
             </p>
           </div>
@@ -34,11 +73,19 @@ export default function Footer() {
                     try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                   }}
                 >
-                  Check My Lease Options
+                  Get My Lease Reviewed
                 </Link>
               </li>
-              <li><a href="#how-it-works" className="text-gray-300 hover:text-white transition-colors text-sm md:text-base block">How It Works</a></li>
-              <li><a href="#faq" className="text-gray-300 hover:text-white transition-colors text-sm md:text-base block">FAQ</a></li>
+              <li>
+                <a href={isHomePage ? "#how-it-works" : "/#how-it-works"} className="text-gray-300 hover:text-white transition-colors text-sm md:text-base block cursor-pointer">
+                  How It Works
+                </a>
+              </li>
+              <li>
+                <a href={isHomePage ? "#faq-section" : "/#faq-section"} className="text-gray-300 hover:text-white transition-colors text-sm md:text-base block cursor-pointer">
+                  FAQ
+                </a>
+              </li>
               <li><Link href="/payoff-lookup" className="text-gray-300 hover:text-white transition-colors text-sm md:text-base block">Payoff Lookup</Link></li>
             </ul>
           </div>

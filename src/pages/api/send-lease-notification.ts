@@ -50,6 +50,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 <h2>New Lease Inquiry Submission</h2>
 <p><strong>Name:</strong> ${inquiryData.first_name}</p>
 <p><strong>Email:</strong> ${inquiryData.email}</p>
+<p><strong>Vehicle Make:</strong> ${inquiryData.make || 'Not provided'}</p>
+<p><strong>Vehicle Model:</strong> ${inquiryData.model || 'Not provided'}</p>
 <p><strong>License Plate:</strong> ${inquiryData.license_plate}</p>
 <p><strong>Current Mileage:</strong> ${inquiryData.current_mileage?.toLocaleString() || 'Not provided'}</p>
 <p><strong>ZIP Code:</strong> ${inquiryData.zip_code}</p>

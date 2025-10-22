@@ -11,8 +11,40 @@ export default function FAQSection() {
       answer: "You can end your car lease early at any time by having OverLeased connect with authorized dealers who will purchase your leased vehicle and handle the lease payoff directly with your leasing company."
     },
     {
-      question: "Do I need to pay penalties, get a loan, or buy out my lease with cash?",
+      question: "Do you charge drivers anything?",
+      answer: "No. Our service is completely free for drivers. We receive compensation from dealers only when they successfully purchase your vehicle. There are no fees or hidden charges for you."
+    },
+    {
+      question: "Are the dealers on your platform trustworthy?",
+      answer: "All dealers in our network are licensed, insured, and pre-screened. We verify their credentials, check their reputation, and monitor transaction quality. We only work with established dealerships with proven track records."
+    },
+    {
+      question: "Do I need to pay penalties, get a loan, or buy out my lease?",
       answer: "No - OverLeased's process requires no penalties, no loans, and no cash buyout from you. The dealer handles the entire lease payoff directly with your leasing company, and you walk away free from your lease obligations."
+    },
+    {
+      question: "What if I owe more than the car is worth?",
+      answer: "We'll still help you explore your options. Even if your lease payoff exceeds the current market value, dealers may be interested depending on various factors. You have no obligation to accept any offers."
+    },
+    {
+      question: "How long does it take?",
+      answer: "Most early lease terminations complete within 3-7 business days. After submitting your vehicle information, interested dealers typically respond within 24-48 hours. Once you accept an offer, the inspection and paperwork process usually takes 2-3 days."
+    },
+    {
+      question: "Can I change my mind after getting offers?",
+      answer: "You're under no obligation to accept any offers. You can decline all offers and continue with your current lease, or wait and try again later. There's no commitment until you sign an agreement with a dealer."
+    },
+    {
+      question: "What happens to my lease agreement when I sell?",
+      answer: "The dealer assumes your lease obligations and pays off the leasing company directly. You're completely released from your lease agreement and all future responsibilities once the transaction is complete. The dealer handles all paperwork with the leasing company."
+    },
+    {
+      question: "Will you contact dealers without my permission?",
+      answer: "No. We prioritize your privacy and control throughout the process. After you submit your vehicle information, we'll email you with available options. We only contact dealers after you explicitly reply \"I consent\" to our email."
+    },
+    {
+      question: "Is my information safe?",
+      answer: "Yes. Your details are securely processed and only shared with authorized dealerships for your specific brand, never with third parties."
     },
     {
       question: "Is ending my lease early part of a new process?",
@@ -23,33 +55,17 @@ export default function FAQSection() {
       answer: "Ending your lease early gives you the freedom to exit your current lease commitment whenever you want. Whether you need a different vehicle, want to stop monthly payments, or simply want out of your lease, we make it possible."
     },
     {
-      question: "How long does it take to end my lease early?",
-      answer: "Most early lease terminations complete within 3-7 business days. After submitting your vehicle information, interested dealers typically respond within 24-48 hours. Once you accept an offer, the inspection and paperwork process usually takes 2-3 days."
-    },
-    {
-      question: "What if my lease has excess mileage or wear and tear?",
-      answer: "High mileage and wear issues are factored into dealer offers but don't prevent you from ending your lease early. Dealers will assess your vehicle's condition and provide offers based on its current state and market value."
-    },
-    {
       question: "Can I end my lease early if I still owe money on it?",
       answer: "Yes, absolutely. Most people ending their lease early still have remaining payments. The dealer handles the entire lease payoff process with your leasing company, and you're released from all future lease obligations."
     },
     {
-      question: "Are the dealers on your platform trustworthy?",
-      answer: "All dealers in our network are licensed, insured, and pre-screened. We verify their credentials, check their reputation, and monitor transaction quality. We only work with established dealerships with proven track records."
-    },
-    {
-      question: "What happens to my lease agreement when I sell?",
-      answer: "The dealer assumes your lease obligations and pays off the leasing company directly. You're completely released from your lease agreement and all future responsibilities once the transaction is complete. The dealer handles all paperwork with the leasing company."
-    },
-    {
-      question: "What if I change my mind after getting offers?",
-      answer: "You're under no obligation to accept any offers. You can decline all offers and continue with your current lease, or wait and try again later. There's no commitment until you sign an agreement with a dealer."
+      question: "What if my lease has excess mileage or wear and tear?",
+      answer: "High mileage and wear issues are factored into dealer offers but don't prevent you from ending your lease early. Dealers will assess your vehicle's condition and provide offers based on its current state and market value."
     }
   ];
 
   return (
-    <section className="pt-6 md:pt-8 pb-16 md:pb-20 px-4 bg-gray-50">
+    <section id="faq-section" className="pt-6 md:pt-8 pb-16 md:pb-20 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6 md:mb-8">
           <Badge variant="secondary" className="mb-4 md:mb-6 bg-blue-100 text-blue-800 text-sm md:text-base px-3 py-1.5 md:px-4 md:py-2">
@@ -86,7 +102,7 @@ export default function FAQSection() {
             Still Have Questions?
           </h3>
           <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6 max-w-2xl mx-auto px-2 leading-relaxed">
-            Our lease specialists are here to help with your specific situation.
+            Our lease specialists are here to help and will respond within one business day.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center">
             <div className="text-center p-3 md:p-0">

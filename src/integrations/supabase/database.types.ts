@@ -47,6 +47,8 @@ export type Database = {
           first_name: string
           id: string
           license_plate: string
+          make: string | null
+          model: string | null
           updated_at: string | null
           vehicle_condition: string | null
           zip_code: string | null
@@ -58,6 +60,8 @@ export type Database = {
           first_name: string
           id?: string
           license_plate: string
+          make?: string | null
+          model?: string | null
           updated_at?: string | null
           vehicle_condition?: string | null
           zip_code?: string | null
@@ -69,6 +73,8 @@ export type Database = {
           first_name?: string
           id?: string
           license_plate?: string
+          make?: string | null
+          model?: string | null
           updated_at?: string | null
           vehicle_condition?: string | null
           zip_code?: string | null

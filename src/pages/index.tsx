@@ -140,13 +140,9 @@ export default function HomePage() {
         <main className="w-full pt-16">
           <HeroSection />
           
-          <section id="how-it-works">
-            <HowItWorksSection />
-          </section>
+          <HowItWorksSection />
           
-          <section id="faq">
-            <FAQSection />
-          </section>
+          <FAQSection />
           
           {/* CTA Section after FAQ */}
           <section className="py-16 bg-gradient-to-r from-blue-50 to-blue-100">
@@ -169,7 +165,7 @@ export default function HomePage() {
                       try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                     }}
                   >
-                    Check My Lease Options
+                    Get My Lease Reviewed
                   </Link>
                 </Button>
               </div>

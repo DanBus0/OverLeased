@@ -11,7 +11,8 @@ export default function HowItWorksSection() {
       step: 1,
       icon: FileText,
       title: "Submit Your Details",
-      description: "Fill out our form with your information to get started with ending your lease.",
+      subtitle: "",
+      description: "Tell us about your lease to start your early-exit review — it takes less than a minute.",
       color: "bg-blue-500",
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200"
@@ -20,7 +21,8 @@ export default function HowItWorksSection() {
       step: 2,
       icon: Users,
       title: "Interested Dealers",
-      description: "OverLeased connects with same-brand dealerships in your area.",
+      subtitle: "(With your consent)",
+      description: "We contact authorized same-brand dealers in your area that can accept your lease.",
       color: "bg-emerald-500",
       bgColor: "bg-emerald-50",
       borderColor: "border-emerald-200"
@@ -28,8 +30,15 @@ export default function HowItWorksSection() {
     {
       step: 3,
       icon: Handshake,
-      title: "Agreement",
-      description: "OverLeased requests an offer for your car from an interested dealership.",
+      title: "Review Offers",
+      subtitle: "",
+      description: "Get transparent offers from verified dealerships — no negotiations or pressure.",
+      tabletDescription: (
+        <>
+          Get transparent <br className="hidden md:block lg:hidden" />
+          offers from verified dealerships — no negotiations or pressure.
+        </>
+      ),
       color: "bg-purple-500",
       bgColor: "bg-purple-50",
       borderColor: "border-purple-200"
@@ -37,8 +46,9 @@ export default function HowItWorksSection() {
     {
       step: 4,
       icon: CheckCircle,
-      title: "End Lease",
-      description: "Drop off your car at the dealership and OverLeased will coordinate the rest.",
+      title: "Finish the Process",
+      subtitle: "",
+      description: "Choose your preferred offer and drop off your car — we'll coordinate the rest.",
       color: "bg-orange-500",
       bgColor: "bg-orange-50",
       borderColor: "border-orange-200"
@@ -46,11 +56,16 @@ export default function HowItWorksSection() {
   ];
 
   return (
-    <section className="py-12 md:py-20 pb-6 md:pb-8 px-4 bg-gray-50">
+    <section id="how-it-works" className="py-12 md:py-20 pb-6 md:pb-8 px-4 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6 px-2">
-            How to End Your Car Lease Early
+            <span className="hidden sm:inline">How to End Your Car Lease Early</span>
+            <span className="block sm:hidden">
+              How to End Your
+              <br />
+              Car Lease Early
+            </span>
           </h2>
           <p className="text-sm sm:text-base md:text-xl lg:text-xl text-gray-600 max-w-3xl mx-auto px-2 leading-relaxed">
             Our streamlined process makes it easy to exit your car lease early. From initial consultation to ending your lease, we guide you every step.
@@ -72,10 +87,15 @@ export default function HowItWorksSection() {
                       Step {step.step}
                     </Badge>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2 leading-tight">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1 leading-tight">
                     {step.title}
                   </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed break-words">
+                  {step.subtitle && (
+                    <p className="text-sm text-gray-600 italic mb-2">
+                      {step.subtitle}
+                    </p>
+                  )}
+                  <p className="text-[0.75rem] sm:text-sm text-gray-600 leading-relaxed break-words">
                     {step.description}
                   </p>
                 </div>
@@ -95,22 +115,30 @@ export default function HowItWorksSection() {
                 )}
                 
                 <Card className={`relative z-10 md:h-full md:min-h-[340px] ${step.bgColor} ${step.borderColor} border-2 hover:shadow-lg transition-shadow duration-300 flex flex-col`}>
-                  <CardHeader className="text-center pb-4 md:pb-6 md:h-[240px] flex flex-col">
+                  <CardHeader className="text-center pb-4 md:pb-6 md:h-[240px] lg:h-[260px] flex flex-col">
                     <div className={`${step.color} rounded-full w-16 h-16 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-4 md:mb-6 shrink-0`}>
                       <Icon className="h-8 w-8 md:h-10 md:w-10 text-white" />
                     </div>
-                    <div className="md:h-[32px] flex items-center justify-center mb-2 md:mb-3">
+                    <div className="md:h-[32px] flex items-center justify-center mb-2 md:mb-3 lg:mb-4">
                       <Badge variant="secondary" className="w-fit text-sm md:text-base px-3 py-1">
                         Step {step.step}
                       </Badge>
                     </div>
-                    <CardTitle className="text-xl md:text-2xl font-bold text-gray-900 md:min-h-[56px]">
-                      {step.title}
-                    </CardTitle>
+                    <div>
+                      <CardTitle className="text-xl md:text-2xl font-bold text-gray-900">
+                        {step.title}
+                      </CardTitle>
+                      {step.subtitle && (
+                        <p className="text-sm text-gray-600 italic mt-1">
+                          {step.subtitle}
+                        </p>
+                      )}
+                    </div>
                   </CardHeader>
                   <CardContent className="text-center px-4 md:px-6">
                     <p className="text-gray-700 text-base md:text-base lg:text-lg leading-relaxed">
-                      {step.description}
+                      <span className="hidden md:block lg:hidden">{step.tabletDescription || step.description}</span>
+                      <span className="block md:hidden lg:block">{step.description}</span>
                     </p>
                   </CardContent>
                 </Card>
@@ -119,41 +147,50 @@ export default function HowItWorksSection() {
           })}
         </div>
 
-        <div className="mt-12 md:mt-16 bg-white rounded-2xl p-6 md:p-10 shadow-lg border border-gray-200">
+        <div id="why-overleased" className="mt-12 md:mt-16 bg-white rounded-2xl p-6 md:p-10 shadow-lg border border-gray-200">
           <div className="text-center">
             <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 md:mb-6 px-2">
               Why Use OverLeased?
             </h3>
-            <p className="text-sm sm:text-base md:text-xl lg:text-xl text-gray-600 max-w-2xl mx-auto mb-6 md:mb-8 px-2 leading-relaxed">
-              <span className="block sm:inline">We make ending your lease early simple </span>
-              <span className="block sm:inline">and secure for you.</span>
+            <p className="text-[0.8125rem] sm:text-base md:text-xl lg:text-xl text-gray-600 max-w-2xl mx-auto mb-6 md:mb-8 px-2 leading-relaxed">
+              <span className="hidden sm:inline">We help you end your car lease early with peace of mind — </span>
+              <span className="hidden sm:inline lg:block">no surprises, no pressure, and no hidden costs.</span>
+              <span className="block sm:hidden">We help you end your car lease early with </span>
+              <span className="block sm:hidden">peace of mind — no surprises, no pressure, </span>
+              <span className="block sm:hidden">and no hidden costs.</span>
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-6 md:mt-8">
-              <div className="text-center p-4 md:p-6">
+              <div className="text-center p-4 md:p-6 md:min-h-[280px] lg:min-h-0 flex flex-col">
                 <div className="bg-blue-100 rounded-full w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mx-auto mb-3 md:mb-4">
                   <span className="text-blue-600 font-bold text-lg md:text-xl">✓</span>
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-2 md:mb-3 text-base md:text-xl">No Lease Penalties</h4>
-                <p className="text-gray-600 text-sm md:text-lg leading-relaxed">
-                  Clear and straightforward process
+                <h4 className="font-semibold text-gray-900 mb-2 md:mb-3 text-base md:text-xl">No Hidden Costs</h4>
+                <p className="text-gray-600 text-xs md:text-base leading-relaxed flex-1">
+                  <span className="block sm:inline">We ensure full transparency — no penalties, </span>
+                  <span className="block sm:inline">hidden fees, or unclear conditions.</span>
                 </p>
               </div>
-              <div className="text-center p-4 md:p-6">
+              <div className="text-center p-4 md:p-6 md:min-h-[280px] lg:min-h-0 flex flex-col">
                 <div className="bg-emerald-100 rounded-full w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mx-auto mb-3 md:mb-4">
                   <span className="text-emerald-600 font-bold text-lg md:text-xl">✓</span>
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-2 md:mb-3 text-base md:text-xl">Verified Dealers</h4>
-                <p className="text-gray-600 text-sm md:text-lg leading-relaxed">
-                  All dealers are pre-screened and verified
+                <h4 className="font-semibold text-gray-900 mb-2 md:mb-3 text-base md:text-xl">Authorized Brand Dealers</h4>
+                <p className="text-gray-600 text-xs md:text-base leading-relaxed flex-1">
+                  We only connect you with official, same-brand dealerships — not third-party buyers.
                 </p>
               </div>
-              <div className="text-center p-4 md:p-6">
+              <div className="text-center p-4 md:p-6 md:min-h-[280px] lg:min-h-0 flex flex-col">
                 <div className="bg-purple-100 rounded-full w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mx-auto mb-3 md:mb-4">
                   <span className="text-purple-600 font-bold text-lg md:text-xl">✓</span>
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-2 md:mb-3 text-base md:text-xl">Expert Support</h4>
-                <p className="text-gray-600 text-sm md:text-lg leading-relaxed">
-                  Get help from our lease specialists
+                <h4 className="font-semibold text-gray-900 mb-2 md:mb-3 text-base md:text-xl">Personal Lease Guidance</h4>
+                <p className="text-gray-600 text-xs md:text-base leading-relaxed flex-1">
+                  <span className="hidden sm:inline">A real person reviews your lease details and helps you understand your best options.</span>
+                  <span className="block sm:hidden">
+                    A real person reviews your lease details and
+                    <br />
+                    helps you understand your best options.
+                  </span>
                 </p>
               </div>
             </div>
@@ -166,7 +203,7 @@ export default function HowItWorksSection() {
                     <span className="block sm:inline">Partnership Guarantee</span>
                   </h4>
                   <p className="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed max-w-5xl mx-auto px-2">
-                    OverLeased partners exclusively with manufacturer-authorized dealerships for your car's brand. For example, if you drive a Toyota, we'll only work with official Toyota dealerships to end your lease early. This guarantees a seamless, legitimate process handled by the same car brand that issued your lease.
+                    OverLeased partners only with manufacturer-authorized dealerships for your car's brand. For example, if you drive a Toyota, we'll connect you only with official Toyota dealerships. This ensures a legitimate, seamless process handled by the same brand that issued your lease — never a third-party or reseller.
                   </p>
                   <div className="mt-6 md:mt-8 flex justify-center">
                     <Button 
@@ -180,11 +217,14 @@ export default function HowItWorksSection() {
                           try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                         }}
                       >
-                        <span className="md:hidden">Check My Lease Options</span>
-                        <span className="hidden md:inline">Check My Lease Options</span>
+                        <span className="md:hidden">Get My Lease Reviewed</span>
+                        <span className="hidden md:inline">Get My Lease Reviewed</span>
                       </Link>
                     </Button>
                   </div>
+                  <p className="text-gray-500 text-xs md:text-sm mt-3 md:mt-4">
+                    Your information is private — we only share it with your consent.
+                  </p>
                 </div>
               </div>
             </div>
