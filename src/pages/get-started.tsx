@@ -634,7 +634,7 @@ export default function GetStartedPage() {
                                   <span className="font-semibold">Consent to Review Your Vehicle Information</span>
                                   <br />
                                   <span className="text-gray-600">
-                                    By submitting, you authorize OverLeased to review your lease information to determine your options for ending your lease early. We will not contact any dealership until you reply 'I consent' to our email. You understand that OverLeased is not a dealer, lender, or lessor and does not negotiate or execute any vehicle sale or lease payoff.
+                                    By submitting, you authorize OverLeased to review your lease information to determine your options for ending your lease early. You understand that OverLeased is not a dealer, lender, or lessor and does not negotiate or execute any vehicle sale or lease payoff.
                                   </span>
                                 </Label>
                               </div>
