@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Car, Clock, Shield, CheckCircle, AlertCircle, ArrowLeft, ArrowRight, Info, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 export default function GetStartedPage() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [showLicensePlateInfo, setShowLicensePlateInfo] = useState(false);
   const [formData, setFormData] = useState({
     make: "",
     model: "",
@@ -395,8 +397,8 @@ export default function GetStartedPage() {
                         </div>
                       </div>
 
-                      <CardTitle className="text-[0.9375rem] sm:text-lg md:text-xl text-gray-900 text-center">
-                        Get My Lease Reviewed for Free
+                      <CardTitle className="text-lg sm:text-xl md:text-2xl text-gray-900 text-center">
+                        Get My Lease Reviewed <br className="sm:hidden" />for Free
                       </CardTitle>
                       <p className="text-[0.75rem] sm:text-sm md:text-base text-gray-600 text-center px-2">
                         Submit your details — we'll email you within 24 hours with your next steps.
@@ -472,22 +474,14 @@ export default function GetStartedPage() {
                                 <Label htmlFor="licensePlate" className="text-sm font-medium text-gray-700">
                                   License Plate Number *
                                 </Label>
-                                <TooltipProvider delayDuration={0}>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <button 
-                                        type="button" 
-                                        className="inline-flex items-center justify-center touch-manipulation p-1 -m-1"
-                                        aria-label="License plate information"
-                                      >
-                                        <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 active:text-gray-600 transition-colors" />
-                                      </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" className="max-w-xs z-50 text-center">
-                                      <p className="text-sm">We use plate information for lease payoff calculations. We never share vehicle details without your explicit consent.</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
+                                <button 
+                                  type="button" 
+                                  onClick={() => setShowLicensePlateInfo(!showLicensePlateInfo)}
+                                  className="inline-flex items-center justify-center touch-manipulation p-1 rounded-full hover:bg-gray-100 active:bg-blue-100 transition-colors"
+                                  aria-label="License plate information"
+                                >
+                                  <Info className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                                </button>
                               </div>
                               <Input
                                 id="licensePlate"
@@ -501,6 +495,11 @@ export default function GetStartedPage() {
                                   formData.licensePlate ? 'bg-blue-50' : 'bg-white'
                                 }`}
                               />
+                              {showLicensePlateInfo && (
+                                <div className="text-xs text-gray-600 bg-blue-50 border border-blue-200 rounded-md p-2 mt-1">
+                                  We use plate information for lease payoff calculations. We never share vehicle details without your explicit consent.
+                                </div>
+                              )}
                             </div>
 
                             <div className="space-y-2">
