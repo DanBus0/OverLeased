@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Car, Clock, Shield, CheckCircle, AlertCircle, ArrowLeft, ArrowRight, Info } from "lucide-react";
+import { Car, Clock, Shield, CheckCircle, AlertCircle, ArrowLeft, ArrowRight, Info, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -396,7 +396,7 @@ export default function GetStartedPage() {
                       </div>
 
                       <CardTitle className="text-[0.9375rem] sm:text-lg md:text-xl text-gray-900 text-center">
-                        Review Your Lease Options for Free
+                        Get My Lease Reviewed for Free
                       </CardTitle>
                       <p className="text-[0.75rem] sm:text-sm md:text-base text-gray-600 text-center px-2">
                         Submit your details — we'll email you within 24 hours with your next steps.
@@ -415,16 +415,16 @@ export default function GetStartedPage() {
                         <form onSubmit={handleContinueToStep2} className="space-y-6">
                           <div className="flex flex-wrap justify-center gap-4 sm:gap-6 pb-4 border-b border-gray-200">
                             <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-                              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                              <span className="whitespace-nowrap">Free for drivers</span>
+                              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                              <span className="whitespace-nowrap">100% Secure</span>
                             </div>
                             <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-                              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-                              <span className="whitespace-nowrap">No commitment required</span>
+                              <UserCheck className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                              <span className="whitespace-nowrap">No Commitment Required</span>
                             </div>
                             <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
                               <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
-                              <span className="whitespace-nowrap">Authorized dealers only</span>
+                              <span className="whitespace-nowrap">Authorized Dealers Only</span>
                             </div>
                           </div>
 
@@ -477,16 +477,13 @@ export default function GetStartedPage() {
                                     <TooltipTrigger asChild>
                                       <button 
                                         type="button" 
-                                        className="inline-flex items-center touch-manipulation"
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          e.stopPropagation();
-                                        }}
+                                        className="inline-flex items-center justify-center touch-manipulation p-1 -m-1"
+                                        aria-label="License plate information"
                                       >
                                         <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 active:text-gray-600 transition-colors" />
                                       </button>
                                     </TooltipTrigger>
-                                    <TooltipContent side="top" className="max-w-xs z-50">
+                                    <TooltipContent side="top" className="max-w-xs z-50 text-center">
                                       <p className="text-sm">We use plate information for lease payoff calculations. We never share vehicle details without your explicit consent.</p>
                                     </TooltipContent>
                                   </Tooltip>

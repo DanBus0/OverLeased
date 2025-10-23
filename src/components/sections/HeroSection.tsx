@@ -110,9 +110,9 @@ export default function HeroSection() {
         <div className="text-center mb-8 md:mb-12">
           {/* Trust Badge */}
           <div className="flex justify-center mb-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full shadow-lg">
-              <div className="w-1.5 h-1.5 bg-white/60 rounded-full"></div>
-              <span className="text-xs font-medium text-white/80 tracking-wide">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 md:px-3 md:py-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full shadow-lg">
+              <div className="w-1 h-1 bg-white/60 rounded-full"></div>
+              <span className="text-[0.625rem] md:text-xs font-medium text-white/80 tracking-wide">
                 Trusted by Drivers Across the U.S.
               </span>
             </div>
