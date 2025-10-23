@@ -556,21 +556,27 @@ export default function GetStartedPage() {
                               <Label htmlFor="vehicleCondition" className="text-sm font-medium text-gray-700">
                                 Vehicle Condition *
                               </Label>
-                              <Select onValueChange={handleSelectChange} required>
-                                <SelectTrigger 
-                                  className={`h-12 text-[0.8125rem] sm:text-base text-gray-900 data-[placeholder]:text-[0.6875rem] sm:data-[placeholder]:text-sm data-[placeholder]:text-gray-400 sm:data-[placeholder]:text-gray-500 focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 ${
-                                    formData.vehicleCondition ? 'bg-blue-50' : 'bg-white'
-                                  }`}
-                                >
-                                  <SelectValue placeholder="Select vehicle condition" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="bad">Bad</SelectItem>
-                                  <SelectItem value="average">Average</SelectItem>
-                                  <SelectItem value="good">Good</SelectItem>
-                                  <SelectItem value="excellent">Excellent</SelectItem>
-                                </SelectContent>
-                              </Select>
+                              <select
+                                id="vehicleCondition"
+                                name="vehicleCondition"
+                                required
+                                value={formData.vehicleCondition}
+                                onChange={(e) => handleSelectChange(e.target.value)}
+                                className={`h-12 w-full rounded-md border border-input px-3 py-2 text-[0.75rem] sm:text-[0.9375rem] ring-offset-background focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${
+                                  formData.vehicleCondition 
+                                    ? 'bg-blue-50 text-gray-900' 
+                                    : 'bg-white text-gray-400 sm:text-gray-500'
+                                }`}
+                                style={{
+                                  color: formData.vehicleCondition ? '#111827' : '#9ca3af'
+                                }}
+                              >
+                                <option value="" disabled hidden className="text-gray-400 sm:text-gray-500">Select condition</option>
+                                <option value="bad" className="text-gray-900">Bad</option>
+                                <option value="average" className="text-gray-900">Average</option>
+                                <option value="good" className="text-gray-900">Good</option>
+                                <option value="excellent" className="text-gray-900">Excellent</option>
+                              </select>
                             </div>
                           </div>
 
