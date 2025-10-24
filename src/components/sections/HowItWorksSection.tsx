@@ -56,7 +56,7 @@ export default function HowItWorksSection() {
   ];
 
   return (
-    <section id="how-it-works" className="py-12 md:py-20 pb-6 md:pb-8 px-4 bg-gray-50">
+    <section id="how-it-works" className="scroll-mt-24 pt-8 md:pt-12 py-12 md:py-20 pb-6 md:pb-8 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6 px-2">
@@ -91,7 +91,7 @@ export default function HowItWorksSection() {
                     {step.title}
                   </h3>
                   {step.subtitle && (
-                    <p className="text-sm text-gray-600 italic mb-2">
+                    <p className="text-[0.6875rem] md:text-sm text-gray-600 italic mb-2">
                       {step.subtitle}
                     </p>
                   )}
@@ -129,7 +129,7 @@ export default function HowItWorksSection() {
                         {step.title}
                       </CardTitle>
                       {step.subtitle && (
-                        <p className="text-sm text-gray-600 italic mt-1">
+                        <p className="text-xs md:text-sm text-gray-600 italic mt-1">
                           {step.subtitle}
                         </p>
                       )}
@@ -217,8 +217,8 @@ export default function HowItWorksSection() {
                           try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                         }}
                       >
-                        <span className="md:hidden">Get My Lease Reviewed</span>
-                        <span className="hidden md:inline">Get My Lease Reviewed</span>
+                        <span className="md:hidden">Get a Free Lease Review</span>
+                        <span className="hidden md:inline">Get a Free Lease Review</span>
                       </Link>
                     </Button>
                   </div>

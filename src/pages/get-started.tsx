@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ export default function GetStartedPage() {
     vehicleCondition: "",
     consentGiven: false
   });
+  const step2FormRef = useRef<HTMLFormElement>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -108,7 +109,40 @@ export default function GetStartedPage() {
     e.preventDefault();
     if (validateStep1()) {
       setCurrentStep(2);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Mobile-optimized scroll strategy - multiple aggressive attempts
+      // 1. Immediate scroll to top
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      
+      // 2. After state updates (requestAnimationFrame)
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        
+        // 3. After DOM updates (short timeout)
+        setTimeout(() => {
+          window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+          
+          // 4. Final scroll with smooth behavior after form is fully rendered
+          setTimeout(() => {
+            if (step2FormRef.current) {
+              // Get the form's position
+              const formTop = step2FormRef.current.getBoundingClientRect().top + window.pageYOffset;
+              // Scroll to just above the form (accounting for header)
+              const targetScroll = Math.max(0, formTop - 120);
+              window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+            } else {
+              // Fallback: just ensure we're at top
+              window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            }
+          }, 150);
+        }, 50);
+      });
     }
   };
 
@@ -398,7 +432,7 @@ export default function GetStartedPage() {
                       </div>
 
                       <CardTitle className="text-lg sm:text-xl md:text-2xl text-gray-900 text-center">
-                        Get My Lease Reviewed <br className="sm:hidden" />for Free
+                        Get a Free Lease Review
                       </CardTitle>
                       <p className="text-[0.75rem] sm:text-sm md:text-base text-gray-600 text-center px-2">
                         Submit your details — we'll email you within 24 hours with your next steps.
@@ -532,7 +566,7 @@ export default function GetStartedPage() {
                       )}
 
                       {currentStep === 2 && (
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form ref={step2FormRef} onSubmit={handleSubmit} className="space-y-6">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                               <Label htmlFor="mileage" className="text-sm font-medium text-gray-700">
@@ -656,7 +690,7 @@ export default function GetStartedPage() {
                                 disabled={isSubmitting || !formData.consentGiven}
                                 className="w-full h-12 sm:h-14 sm:flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
                               >
-                                {isSubmitting ? "Submitting..." : "Get My Lease Reviewed"}
+                                {isSubmitting ? "Submitting..." : "Get a Free Lease Review"}
                               </Button>
                             </div>
                           </div>

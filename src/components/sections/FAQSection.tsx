@@ -28,7 +28,7 @@ export default function FAQSection() {
     },
     {
       question: "How long does it take?",
-      answer: "Most early lease terminations complete within 3-7 business days. After submitting your vehicle information, interested dealers typically respond within 24-48 hours. Once you accept an offer, the inspection and paperwork process usually takes 2-3 days."
+      answer: "Most early lease exits complete within 3-7 business days. After submitting your vehicle information, interested dealers typically respond within 24-48 hours. Once you accept an offer, the inspection and paperwork process usually takes 2-3 days."
     },
     {
       question: "Can I change my mind after getting offers?",
@@ -65,7 +65,7 @@ export default function FAQSection() {
   ];
 
   return (
-    <section id="faq-section" className="pt-6 md:pt-8 pb-16 md:pb-20 px-4 bg-gray-50">
+    <section id="faq-section" className="scroll-mt-24 pt-6 md:pt-8 pb-16 md:pb-20 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6 md:mb-8">
           <Badge variant="secondary" className="mb-4 md:mb-6 bg-blue-100 text-blue-800 text-sm md:text-base px-3 py-1.5 md:px-4 md:py-2">

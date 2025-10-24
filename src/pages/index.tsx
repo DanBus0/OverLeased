@@ -165,7 +165,7 @@ export default function HomePage() {
                       try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                     }}
                   >
-                    Get My Lease Reviewed
+                    Get a Free Lease Review
                   </Link>
                 </Button>
               </div>

@@ -53,10 +53,7 @@ export default function Footer() {
             <p className="text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-md">
               Helping drivers end car leases early — safely and penalty-free.
             </p>
-            <p className="text-gray-400 text-[0.6875rem] sm:text-xs md:text-sm leading-relaxed max-w-md mt-2">
-              Trusted by drivers nationwide. Verified same-brand dealerships only.
-            </p>
-            <p className="text-gray-400 text-xs leading-relaxed max-w-md mt-4 italic">
+            <p className="text-gray-400 text-[0.6875rem] md:text-xs leading-relaxed max-w-md mt-4 italic">
               OverLeased provides marketing and introduction services only and does not buy, negotiate, or execute vehicle sales or lease payoffs. All offers come from authorized dealerships and are contingent on vehicle condition, payoff, and dealer discretion.
             </p>
           </div>
@@ -73,7 +70,7 @@ export default function Footer() {
                     try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                   }}
                 >
-                  Get My Lease Reviewed
+                  Get a Free Lease Review
                 </Link>
               </li>
               <li>
