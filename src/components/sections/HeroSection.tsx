@@ -102,7 +102,7 @@ export default function HeroSection() {
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-8 md:mb-12">
           {/* Trust Indicator */}
-          <div className="flex justify-center mb-8 md:mb-10">
+          <div className="flex justify-center mb-4 md:mb-10">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 md:px-4 md:py-2 bg-blue-50 border border-blue-100 rounded-lg shadow-sm">
               <div className="w-0.5 h-0.5 md:w-1.5 md:h-1.5 bg-blue-500 rounded-full"></div>
               <span className="text-[0.625rem] md:text-xs font-semibold text-blue-900 tracking-wide">
