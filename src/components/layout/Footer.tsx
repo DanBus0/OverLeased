@@ -70,7 +70,7 @@ export default function Footer() {
                     try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                   }}
                 >
-                  Get a Free Lease Review
+                  See My Early Lease Options
                 </Link>
               </li>
               <li>

@@ -217,14 +217,11 @@ export default function HowItWorksSection() {
                           try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                         }}
                       >
-                        <span className="md:hidden">Get a Free Lease Review</span>
-                        <span className="hidden md:inline">Get a Free Lease Review</span>
+                        <span className="md:hidden">See My Early Lease Options</span>
+                        <span className="hidden md:inline">See My Early Lease Options</span>
                       </Link>
                     </Button>
                   </div>
-                  <p className="text-gray-500 text-xs md:text-sm mt-3 md:mt-4">
-                    Your information is private — we only share it with your consent.
-                  </p>
                 </div>
               </div>
             </div>

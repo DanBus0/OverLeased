@@ -46,7 +46,7 @@ export type Database = {
           email: string
           first_name: string
           id: string
-          license_plate: string
+          license_plate: string | null
           make: string | null
           model: string | null
           updated_at: string | null
@@ -59,7 +59,7 @@ export type Database = {
           email: string
           first_name: string
           id?: string
-          license_plate: string
+          license_plate?: string | null
           make?: string | null
           model?: string | null
           updated_at?: string | null
@@ -72,7 +72,7 @@ export type Database = {
           email?: string
           first_name?: string
           id?: string
-          license_plate?: string
+          license_plate?: string | null
           make?: string | null
           model?: string | null
           updated_at?: string | null

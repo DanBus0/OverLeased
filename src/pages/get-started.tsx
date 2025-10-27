@@ -97,7 +97,7 @@ export default function GetStartedPage() {
   };
 
   const validateStep1 = () => {
-    if (!formData.make || !formData.model || !formData.licensePlate || !formData.zipCode) {
+    if (!formData.make || !formData.model || !formData.mileage || !formData.zipCode) {
       setError("Please fill in all required fields.");
       return false;
     }
@@ -162,7 +162,7 @@ export default function GetStartedPage() {
             model: formData.model,
             first_name: formData.firstName,
             email: formData.email,
-            license_plate: formData.licensePlate,
+            license_plate: formData.licensePlate || null,
             current_mileage: parseInt(parseNumberFromCommas(formData.mileage)),
             zip_code: formData.zipCode,
             vehicle_condition: formData.vehicleCondition
@@ -261,7 +261,7 @@ export default function GetStartedPage() {
     setError("");
     setIsSubmitting(true);
 
-    if (!formData.firstName || !formData.email || !formData.mileage || !formData.vehicleCondition) {
+    if (!formData.firstName || !formData.email || !formData.vehicleCondition) {
       setError("Please fill in all required fields.");
       setIsSubmitting(false);
       return;
@@ -432,7 +432,7 @@ export default function GetStartedPage() {
                       </div>
 
                       <CardTitle className="text-lg sm:text-xl md:text-2xl text-gray-900 text-center">
-                        Get a Free Lease Review
+                        See My Early Lease Options
                       </CardTitle>
                       <p className="text-[0.75rem] sm:text-sm md:text-base text-gray-600 text-center px-2">
                         Submit your details — we'll email you within 24 hours with your next steps.
@@ -504,36 +504,21 @@ export default function GetStartedPage() {
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                              <div className="flex items-center gap-1">
-                                <Label htmlFor="licensePlate" className="text-sm font-medium text-gray-700">
-                                  License Plate Number *
-                                </Label>
-                                <button 
-                                  type="button" 
-                                  onClick={() => setShowLicensePlateInfo(!showLicensePlateInfo)}
-                                  className="inline-flex items-center justify-center touch-manipulation p-1 rounded-full hover:bg-gray-100 active:bg-blue-100 transition-colors"
-                                  aria-label="License plate information"
-                                >
-                                  <Info className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                                </button>
-                              </div>
+                              <Label htmlFor="mileage" className="text-sm font-medium text-gray-700">
+                                Current Mileage *
+                              </Label>
                               <Input
-                                id="licensePlate"
-                                name="licensePlate"
+                                id="mileage"
+                                name="mileage"
                                 type="text"
                                 required
-                                value={formData.licensePlate}
+                                value={formData.mileage}
                                 onChange={handleInputChange}
-                                placeholder="e.g., ABC1234"
+                                placeholder="e.g., 25,000"
                                 className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
-                                  formData.licensePlate ? 'bg-blue-50' : 'bg-white'
+                                  formData.mileage ? 'bg-blue-50' : 'bg-white'
                                 }`}
                               />
-                              {showLicensePlateInfo && (
-                                <div className="text-xs text-gray-600 bg-blue-50 border border-blue-200 rounded-md p-2 mt-1">
-                                  We use plate information for lease payoff calculations. We never share vehicle details without your explicit consent.
-                                </div>
-                              )}
                             </div>
 
                             <div className="space-y-2">
@@ -569,21 +554,35 @@ export default function GetStartedPage() {
                         <form ref={step2FormRef} onSubmit={handleSubmit} className="space-y-6">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                              <Label htmlFor="mileage" className="text-sm font-medium text-gray-700">
-                                Current Mileage *
-                              </Label>
+                              <div className="flex items-center gap-1">
+                                <Label htmlFor="licensePlate" className="text-sm font-medium text-gray-700">
+                                  License Plate Number <span className="text-gray-500 font-normal">(optional)</span>
+                                </Label>
+                                <button 
+                                  type="button" 
+                                  onClick={() => setShowLicensePlateInfo(!showLicensePlateInfo)}
+                                  className="inline-flex items-center justify-center touch-manipulation p-1 rounded-full hover:bg-gray-100 active:bg-blue-100 transition-colors"
+                                  aria-label="License plate information"
+                                >
+                                  <Info className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                                </button>
+                              </div>
                               <Input
-                                id="mileage"
-                                name="mileage"
+                                id="licensePlate"
+                                name="licensePlate"
                                 type="text"
-                                required
-                                value={formData.mileage}
+                                value={formData.licensePlate}
                                 onChange={handleInputChange}
-                                placeholder="e.g., 25,000"
+                                placeholder="e.g., ABC1234"
                                 className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
-                                  formData.mileage ? 'bg-blue-50' : 'bg-white'
+                                  formData.licensePlate ? 'bg-blue-50' : 'bg-white'
                                 }`}
                               />
+                              {showLicensePlateInfo && (
+                                <div className="text-xs text-gray-600 bg-blue-50 border border-blue-200 rounded-md p-2 mt-1">
+                                  We use plate information for lease payoff calculations. We never share vehicle details without your explicit consent.
+                                </div>
+                              )}
                             </div>
 
                             <div className="space-y-2">
@@ -690,7 +689,7 @@ export default function GetStartedPage() {
                                 disabled={isSubmitting || !formData.consentGiven}
                                 className="w-full h-12 sm:h-14 sm:flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
                               >
-                                {isSubmitting ? "Submitting..." : "Get a Free Lease Review"}
+                                {isSubmitting ? "Submitting..." : "See My Early Lease Options"}
                               </Button>
                             </div>
                           </div>

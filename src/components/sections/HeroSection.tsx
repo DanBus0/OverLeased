@@ -22,12 +22,12 @@ export default function HeroSection() {
       iconBg: "bg-blue-50",
       iconColor: "text-blue-600",
       question: "Can I End My Lease Early?",
-      answer: "Yes, at any time by connecting with authorized dealers who purchase your vehicle and handle the payoff. There are no penalties, hidden fees or buyout required.",
+      answer: "Yes, at any time by connecting with same-brand authorized dealers who purchase your vehicle and handle the remaining payoff.",
       tabletAnswer: (
         <>
-          Yes, at any time by connecting with authorized dealers who purchase your vehicle and handle the
+          Yes, at any time by connecting with same-brand authorized dealers who purchase your vehicle and handle the remaining
           <br className="hidden md:block lg:hidden" />
-          payoff. There are no penalties, hidden fees or buyout required.
+          payoff.
         </>
       ),
       disclaimer: null
@@ -102,7 +102,7 @@ export default function HeroSection() {
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-8 md:mb-12">
           {/* Trust Indicator */}
-          <div className="flex justify-center mb-4 md:mb-10">
+          <div className="flex justify-center mb-2 md:mb-4">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 md:px-4 md:py-2 bg-blue-50 border border-blue-100 rounded-lg shadow-sm">
               <div className="w-0.5 h-0.5 md:w-1.5 md:h-1.5 bg-blue-500 rounded-full"></div>
               <span className="text-[0.625rem] md:text-xs font-semibold text-blue-900 tracking-wide">
@@ -112,7 +112,7 @@ export default function HeroSection() {
           </div>
 
           {/* Mobile title */}
-          <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight px-2 block md:hidden text-slate-900">
+          <h1 className="text-[2.625rem] sm:text-[3.25rem] md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight px-2 block md:hidden text-slate-900">
             <span className="block">End Your Car</span>
             <span className="block">Lease Early</span>
             <span className="block text-blue-600 mt-2 text-2xl sm:text-3xl md:text-3xl font-medium">
@@ -124,7 +124,7 @@ export default function HeroSection() {
           </h1>
           
           {/* Tablet title */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight px-2 hidden md:block lg:hidden text-slate-900">
+          <h1 className="text-[2.75rem] md:text-[3.25rem] lg:text-6xl font-bold mb-4 md:mb-6 leading-tight px-2 hidden md:block lg:hidden text-slate-900">
             <span className="block">End Your Car Lease Early</span>
             <span className="block text-blue-600 mt-2 text-3xl font-medium">
               We'll Handle the Entire Process for You
@@ -132,17 +132,43 @@ export default function HeroSection() {
           </h1>
           
           {/* Desktop title */}
-          <h1 className="text-5xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight px-2 hidden lg:block text-slate-900">
+          <h1 className="text-5xl md:text-5xl lg:text-[4rem] font-bold mb-4 md:mb-6 leading-tight px-2 hidden lg:block text-slate-900">
             <span className="block">End Your Car Lease Early</span>
             <span className="block text-blue-600 mt-2 text-4xl font-medium">
               We'll Handle the Entire Process for You
             </span>
           </h1>
+
+          {/* New Callouts Section */}
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3 mt-4 md:mt-6 mb-6 md:mb-8 px-4">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm">
+              <span className="text-sm">✅</span>
+              <span className="text-xs md:text-sm font-medium text-slate-700">No Penalties</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm">
+              <span className="text-sm">✅</span>
+              <span className="text-xs md:text-sm font-medium text-slate-700">No Hidden Fees</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm">
+              <span className="text-sm">✅</span>
+              <span className="text-xs md:text-sm font-medium text-slate-700">No Loans or Cash Buyout</span>
+            </div>
+          </div>
         </div>
 
         {/* FAQ Section */}
         <div className="relative mb-8 md:mb-10">
-          <Accordion type="single" collapsible className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
+          {/* FAQ Heading - positioned closer to cards */}
+          <div className="text-center mb-4 md:mb-5">
+            <div className="inline-block relative">
+              <h2 className="text-lg md:text-xl lg:text-2xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 bg-clip-text text-transparent mb-2">
+                FAQ
+              </h2>
+              <div className="h-0.5 w-28 md:w-32 bg-gradient-to-r from-blue-400 via-blue-600 to-blue-400 rounded-full mx-auto"></div>
+            </div>
+          </div>
+          
+          <Accordion type="single" collapsible className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 max-w-7xl mx-auto">
               {faqItems.map((item, index) => {
                 const IconComponent = item.icon;
                 
@@ -152,32 +178,32 @@ export default function HeroSection() {
                     value={`faq-${index}`}
                     className="bg-white border-2 border-slate-200 text-slate-900 hover:border-blue-300 hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden"
                   >
-                    <AccordionTrigger className="hover:no-underline px-4 pt-5 pb-4 md:px-6 md:pt-7 md:pb-5 [&>svg]:hidden">
-                      <div className="flex flex-col items-center text-center w-full gap-3 md:gap-4">
-                        <div className={`${item.iconBg} rounded-xl w-12 h-12 md:w-16 md:h-16 lg:w-18 lg:h-18 flex items-center justify-center flex-shrink-0 shadow-sm`}>
-                          <IconComponent className={`h-6 w-6 md:h-8 md:w-8 lg:h-9 lg:w-9 ${item.iconColor}`} />
+                    <AccordionTrigger className="hover:no-underline px-4 pt-4 pb-3 md:px-5 md:pt-5 md:pb-3.5 [&>svg]:hidden">
+                      <div className="flex flex-col items-center text-center w-full gap-2.5 md:gap-3">
+                        <div className={`${item.iconBg} rounded-lg w-12 h-12 md:w-14 md:h-14 flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                          <IconComponent className={`h-6 w-6 md:h-7 md:w-7 ${item.iconColor}`} />
                         </div>
                         
-                        <h3 className="text-sm md:text-base lg:text-lg font-bold text-slate-900 leading-tight">
+                        <h3 className="text-sm md:text-base font-bold text-slate-900 leading-tight">
                           {item.question}
                         </h3>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                           <span className="text-xs md:text-sm text-blue-600 font-semibold">Learn More</span>
-                          <ChevronDown className="h-3 w-3 md:h-4 md:w-4 text-blue-600" />
+                          <ChevronDown className="h-3.5 w-3.5 text-blue-600" />
                         </div>
                       </div>
                     </AccordionTrigger>
                     
-                    <AccordionContent className="px-4 pb-5 pt-0 md:px-6 md:pb-7">
-                      <p className="text-xs md:text-sm lg:text-base text-slate-700 leading-relaxed text-center font-medium">
+                    <AccordionContent className="px-4 pb-4 pt-0 md:px-5 md:pb-5">
+                      <p className="text-xs md:text-sm text-slate-700 leading-relaxed text-center font-medium">
                         <span className="block sm:hidden">{item.mobileAnswer || item.answer}</span>
                         <span className="hidden sm:block md:hidden">{item.answer}</span>
                         <span className="hidden md:block lg:hidden">{item.tabletAnswer || item.answer}</span>
                         <span className="hidden lg:block">{item.answer}</span>
                       </p>
                       {item.disclaimer && (
-                        <p className="text-[0.6875rem] md:text-xs lg:text-sm text-slate-500 leading-relaxed text-center mt-3 md:mt-4 italic font-medium">
+                        <p className="text-[0.6875rem] md:text-xs text-slate-500 leading-relaxed text-center mt-2.5 md:mt-3 italic font-medium">
                           {item.disclaimer}
                         </p>
                       )}
@@ -197,11 +223,17 @@ export default function HeroSection() {
                   <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">
                     Ready to End Your Lease?
                   </h2>
-                  <p className="text-sm md:text-base text-slate-600 font-medium">
-                    Get your free lease review and <br className="block sm:hidden" />discover your options.
-                  </p>
+                  <div className="text-xs md:text-sm text-slate-500 mb-4 font-medium">
+                    <div className="flex flex-wrap justify-center gap-x-2 gap-y-1 items-center">
+                      <span className="whitespace-nowrap">✅ Official Brand Dealers</span>
+                      <span className="hidden sm:inline">|</span>
+                      <span className="whitespace-nowrap">🔒 Secure Review</span>
+                      <span className="hidden sm:inline">|</span>
+                      <span className="whitespace-nowrap w-full sm:w-auto text-center sm:text-left">⚡ 24-Hour Response</span>
+                    </div>
+                  </div>
                 </div>
-                <Link href="/get-started" scroll className="flex justify-center">
+                <Link href="/get-started" scroll className="flex justify-center mb-3">
                   <Button 
                     size="lg" 
                     className="bg-blue-600 hover:bg-blue-700 text-white text-base md:text-lg px-8 md:px-10 py-3 md:py-3.5 h-auto shadow-sm hover:shadow-md transition-all duration-300 font-semibold rounded-xl border-2 border-blue-700"
@@ -209,12 +241,12 @@ export default function HeroSection() {
                       try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                     }}
                   >
-                    Get a Free Lease Review
+                    See My Early Lease Options
                     <Search className="ml-2.5 h-5 w-5" />
                   </Button>
                 </Link>
-                <p className="text-xs md:text-sm text-slate-500 text-center mt-4 font-medium">
-                  No commitment • Takes less than a minute • Response within 24 hours
+                <p className="text-sm md:text-base text-slate-600 font-medium text-center">
+                  Takes less than a minute — no commitment required.
                 </p>
               </div>
             </div>

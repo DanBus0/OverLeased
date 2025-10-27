@@ -68,7 +68,7 @@ export default function Header() {
                   try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                 }}
               >
-                Get a Free Lease Review
+                Get Started
               </Link>
             </Button>
           </div>
