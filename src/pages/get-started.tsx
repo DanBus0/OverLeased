@@ -422,7 +422,7 @@ export default function GetStartedPage() {
                         End Your Lease Early —<br className="sm:hidden" /> Check If You Qualify
                       </CardTitle>
                       <p className="text-[0.75rem] sm:text-sm md:text-base text-gray-600 text-center px-2">
-                        Submit your details and we'll email you within 24 hours with next steps.
+                        Submit your details and we'll email you<br className="sm:hidden" /> within 24 hours with next steps.
                       </p>
                     </CardHeader>
                     
