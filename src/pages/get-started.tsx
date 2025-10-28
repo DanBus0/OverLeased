@@ -97,7 +97,7 @@ export default function GetStartedPage() {
   };
 
   const validateStep1 = () => {
-    if (!formData.make || !formData.model || !formData.mileage || !formData.zipCode) {
+    if (!formData.make || !formData.model || !formData.vehicleCondition || !formData.zipCode) {
       setError("Please fill in all required fields.");
       return false;
     }
@@ -110,34 +110,26 @@ export default function GetStartedPage() {
     if (validateStep1()) {
       setCurrentStep(2);
       
-      // Mobile-optimized scroll strategy - multiple aggressive attempts
-      // 1. Immediate scroll to top
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
       
-      // 2. After state updates (requestAnimationFrame)
       requestAnimationFrame(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
         
-        // 3. After DOM updates (short timeout)
         setTimeout(() => {
           window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
           document.documentElement.scrollTop = 0;
           document.body.scrollTop = 0;
           
-          // 4. Final scroll with smooth behavior after form is fully rendered
           setTimeout(() => {
             if (step2FormRef.current) {
-              // Get the form's position
               const formTop = step2FormRef.current.getBoundingClientRect().top + window.pageYOffset;
-              // Scroll to just above the form (accounting for header)
               const targetScroll = Math.max(0, formTop - 120);
               window.scrollTo({ top: targetScroll, behavior: 'smooth' });
             } else {
-              // Fallback: just ensure we're at top
               window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             }
           }, 150);
@@ -261,7 +253,7 @@ export default function GetStartedPage() {
     setError("");
     setIsSubmitting(true);
 
-    if (!formData.firstName || !formData.email || !formData.vehicleCondition) {
+    if (!formData.firstName || !formData.email || !formData.mileage) {
       setError("Please fill in all required fields.");
       setIsSubmitting(false);
       return;
@@ -278,14 +270,12 @@ export default function GetStartedPage() {
       
       if (supabaseResult.success) {
         console.log('Form successfully submitted to Supabase');
-        // Redirect to tracking URL for Google Ads conversion tracking
         window.location.href = "/lease-review-submitted";
       } else {
         console.log('Supabase submission failed, using localStorage fallback');
         const localStorageResult = submitToLocalStorage();
         
         if (localStorageResult.success) {
-          // Redirect to tracking URL for Google Ads conversion tracking
           window.location.href = "/lease-review-submitted";
         } else {
           throw new Error('Both Supabase and localStorage submissions failed');
@@ -416,11 +406,8 @@ export default function GetStartedPage() {
                     <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200">
                       <div className="mb-4">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-[0.6875rem] sm:text-sm font-medium text-gray-700">
+                          <span className="text-sm sm:text-base font-medium text-gray-700">
                             Step {currentStep} of 2
-                          </span>
-                          <span className="text-[0.6875rem] sm:text-sm text-gray-600">
-                            {currentStep === 1 ? "Vehicle Information" : "Contact & Details"}
                           </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -431,11 +418,11 @@ export default function GetStartedPage() {
                         </div>
                       </div>
 
-                      <CardTitle className="text-lg sm:text-xl md:text-2xl text-gray-900 text-center">
-                        See My Early Lease Options
+                      <CardTitle className="text-xl sm:text-2xl md:text-[1.75rem] text-gray-900 text-center">
+                        End Your Lease Early —<br className="sm:hidden" /> Check If You Qualify
                       </CardTitle>
                       <p className="text-[0.75rem] sm:text-sm md:text-base text-gray-600 text-center px-2">
-                        Submit your details — we'll email you within 24 hours with your next steps.
+                        Submit your details and we'll email you within 24 hours with next steps.
                       </p>
                     </CardHeader>
                     
@@ -504,21 +491,30 @@ export default function GetStartedPage() {
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                              <Label htmlFor="mileage" className="text-sm font-medium text-gray-700">
-                                Current Mileage *
+                              <Label htmlFor="vehicleCondition" className="text-sm font-medium text-gray-700">
+                                Vehicle Condition *
                               </Label>
-                              <Input
-                                id="mileage"
-                                name="mileage"
-                                type="text"
+                              <select
+                                id="vehicleCondition"
+                                name="vehicleCondition"
                                 required
-                                value={formData.mileage}
-                                onChange={handleInputChange}
-                                placeholder="e.g., 25,000"
-                                className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
-                                  formData.mileage ? 'bg-blue-50' : 'bg-white'
+                                value={formData.vehicleCondition}
+                                onChange={(e) => handleSelectChange(e.target.value)}
+                                className={`h-12 w-full rounded-md border border-input px-3 py-2 text-[0.75rem] sm:text-[0.9375rem] ring-offset-background focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${
+                                  formData.vehicleCondition 
+                                    ? 'bg-blue-50 text-gray-900' 
+                                    : 'bg-white text-gray-400 sm:text-gray-500'
                                 }`}
-                              />
+                                style={{
+                                  color: formData.vehicleCondition ? '#111827' : '#9ca3af'
+                                }}
+                              >
+                                <option value="" disabled hidden className="text-gray-400 sm:text-gray-500">Select condition</option>
+                                <option value="bad" className="text-gray-900">Bad</option>
+                                <option value="average" className="text-gray-900">Average</option>
+                                <option value="good" className="text-gray-900">Good</option>
+                                <option value="excellent" className="text-gray-900">Excellent</option>
+                              </select>
                             </div>
 
                             <div className="space-y-2">
@@ -586,30 +582,21 @@ export default function GetStartedPage() {
                             </div>
 
                             <div className="space-y-2">
-                              <Label htmlFor="vehicleCondition" className="text-sm font-medium text-gray-700">
-                                Vehicle Condition *
+                              <Label htmlFor="mileage" className="text-sm font-medium text-gray-700">
+                                Current Mileage *
                               </Label>
-                              <select
-                                id="vehicleCondition"
-                                name="vehicleCondition"
+                              <Input
+                                id="mileage"
+                                name="mileage"
+                                type="text"
                                 required
-                                value={formData.vehicleCondition}
-                                onChange={(e) => handleSelectChange(e.target.value)}
-                                className={`h-12 w-full rounded-md border border-input px-3 py-2 text-[0.75rem] sm:text-[0.9375rem] ring-offset-background focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${
-                                  formData.vehicleCondition 
-                                    ? 'bg-blue-50 text-gray-900' 
-                                    : 'bg-white text-gray-400 sm:text-gray-500'
+                                value={formData.mileage}
+                                onChange={handleInputChange}
+                                placeholder="e.g., 25,000"
+                                className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
+                                  formData.mileage ? 'bg-blue-50' : 'bg-white'
                                 }`}
-                                style={{
-                                  color: formData.vehicleCondition ? '#111827' : '#9ca3af'
-                                }}
-                              >
-                                <option value="" disabled hidden className="text-gray-400 sm:text-gray-500">Select condition</option>
-                                <option value="bad" className="text-gray-900">Bad</option>
-                                <option value="average" className="text-gray-900">Average</option>
-                                <option value="good" className="text-gray-900">Good</option>
-                                <option value="excellent" className="text-gray-900">Excellent</option>
-                              </select>
+                              />
                             </div>
                           </div>
 
@@ -689,7 +676,7 @@ export default function GetStartedPage() {
                                 disabled={isSubmitting || !formData.consentGiven}
                                 className="w-full h-12 sm:h-14 sm:flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
                               >
-                                {isSubmitting ? "Submitting..." : "See My Early Lease Options"}
+                                {isSubmitting ? "Submitting..." : "Check If You Qualify"}
                               </Button>
                             </div>
                           </div>

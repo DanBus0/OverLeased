@@ -1,6 +1,8 @@
 import React from "react";
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/sections/HeroSection";
@@ -9,6 +11,13 @@ import FAQSection from "@/components/sections/FAQSection";
 import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
+  const router = useRouter();
+
+  // Aggressively prefetch /get-started page on mount
+  useEffect(() => {
+    router.prefetch("/get-started");
+  }, [router]);
+
   return (
     <>
       <Head>
@@ -20,6 +29,10 @@ export default function HomePage() {
         
         {/* Favicon */}
         <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
+        
+        {/* Aggressive preloading for /get-started page - eliminates first-click lag */}
+        <link rel="prefetch" href="/get-started" />
+        <link rel="preload" href="/get-started" as="document" />
         
         {/* Open Graph Tags */}
         <meta property="og:title" content="OverLeased | End Your Car Lease Early" />
@@ -135,6 +148,9 @@ export default function HomePage() {
         />
       </Head>
       <div className="min-h-screen bg-white w-full max-w-full overflow-x-hidden">
+        {/* Hidden prefetch link - loads /get-started in background */}
+        <Link href="/get-started" prefetch={true} className="hidden" aria-hidden="true" tabIndex={-1} />
+        
         <Header />
         
         <main className="w-full pt-16">
@@ -165,7 +181,7 @@ export default function HomePage() {
                       try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                     }}
                   >
-                    See My Early Lease Options
+                    Check If You Qualify
                   </Link>
                 </Button>
               </div>

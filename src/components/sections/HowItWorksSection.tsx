@@ -217,8 +217,8 @@ export default function HowItWorksSection() {
                           try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                         }}
                       >
-                        <span className="md:hidden">See My Early Lease Options</span>
-                        <span className="hidden md:inline">See My Early Lease Options</span>
+                        <span className="md:hidden">Check If You Qualify</span>
+                        <span className="hidden md:inline">Check If You Qualify</span>
                       </Link>
                     </Button>
                   </div>

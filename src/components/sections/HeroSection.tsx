@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, HelpCircle, DollarSign, Handshake, Clock, ChevronDown } from "lucide-react";
+import { Search, HelpCircle, DollarSign, Handshake, Clock, ChevronDown, CircleCheck, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import {
   Accordion,
@@ -22,10 +22,10 @@ export default function HeroSection() {
       iconBg: "bg-blue-50",
       iconColor: "text-blue-600",
       question: "Can I End My Lease Early?",
-      answer: "Yes, at any time by connecting with same-brand authorized dealers who purchase your vehicle and handle the remaining payoff.",
+      answer: "Yes, at any time. We work with same-brand authorized dealers to purchase your vehicle and handle the remaining payoff.",
       tabletAnswer: (
         <>
-          Yes, at any time by connecting with same-brand authorized dealers who purchase your vehicle and handle the remaining
+          Yes, at any time. We work with same-brand authorized dealers who purchase your vehicle and handle the remaining
           <br className="hidden md:block lg:hidden" />
           payoff.
         </>
@@ -37,12 +37,12 @@ export default function HeroSection() {
       iconBg: "bg-emerald-50",
       iconColor: "text-emerald-600",
       question: "Will I Owe Money?",
-      answer: "In most cases you'll actually make money. The dealer will pay you market price which often is more than your remaining lease balance.",
+      answer: "In most cases you'll actually make money. The dealer will pay market price for your car which often is more than your remaining lease balance.",
       tabletAnswer: (
         <>
-          In most cases you'll actually make money. The dealer will pay you market price which often is more than your remaining
+          In most cases you'll actually make money. The dealer will pay market price for your car which often is more than your
           <br className="hidden md:block lg:hidden" />
-          lease balance.
+          remaining lease balance.
         </>
       ),
       disclaimer: "*Based upon lease review and subject to dealer offers"
@@ -98,13 +98,13 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative bg-slate-50 pt-8 md:pt-12 pb-12 md:pb-16 px-4">
+    <section className="relative bg-slate-50 pt-4 md:pt-6 pb-12 md:pb-16 px-4">
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-8 md:mb-12">
           {/* Trust Indicator */}
-          <div className="flex justify-center mb-2 md:mb-4">
+          <div className="flex justify-center mb-4 md:mb-6">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 md:px-4 md:py-2 bg-blue-50 border border-blue-100 rounded-lg shadow-sm">
-              <div className="w-0.5 h-0.5 md:w-1.5 md:h-1.5 bg-blue-500 rounded-full"></div>
+              <ShieldCheck className="w-3 h-3 md:w-4 md:h-4 text-blue-600" />
               <span className="text-[0.625rem] md:text-xs font-semibold text-blue-900 tracking-wide">
                 Trusted By Drivers Nationwide
               </span>
@@ -142,27 +142,59 @@ export default function HeroSection() {
           {/* New Callouts Section */}
           <div className="flex flex-wrap justify-center gap-2 md:gap-3 mt-4 md:mt-6 mb-6 md:mb-8 px-4">
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm">
-              <span className="text-sm">✅</span>
+              <CircleCheck className="h-4 w-4 text-emerald-600" />
               <span className="text-xs md:text-sm font-medium text-slate-700">No Penalties</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm">
-              <span className="text-sm">✅</span>
+              <CircleCheck className="h-4 w-4 text-emerald-600" />
               <span className="text-xs md:text-sm font-medium text-slate-700">No Hidden Fees</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm">
-              <span className="text-sm">✅</span>
+              <CircleCheck className="h-4 w-4 text-emerald-600" />
               <span className="text-xs md:text-sm font-medium text-slate-700">No Loans or Cash Buyout</span>
             </div>
           </div>
         </div>
 
-        {/* FAQ Section */}
+        {/* CTA Section - Completely Rewritten */}
         <div className="relative mb-8 md:mb-10">
+          <div className="flex justify-center px-2">
+            <div className="w-full sm:w-auto md:w-full md:max-w-xl lg:max-w-2xl">
+              <div className="bg-white rounded-2xl shadow-md border-2 border-slate-200 p-6 md:p-8">
+                <div className="text-center mb-6">
+                  <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">
+                    Ready to End Your Lease?
+                  </h2>
+                </div>
+                <div className="flex justify-center mb-3">
+                  <Link
+                    href="/get-started"
+                    prefetch={true}
+                    scroll
+                    onClick={() => {
+                      try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
+                    }}
+                    className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-base md:text-lg px-8 md:px-10 py-3 md:py-4 shadow-lg transition-colors duration-200 font-bold rounded-2xl border-0"
+                  >
+                    Check If You Qualify
+                    <Search className="ml-2.5 h-4 w-4 md:h-5 md:w-5" />
+                  </Link>
+                </div>
+                <p className="text-sm md:text-base text-slate-600 font-medium text-center">
+                  Takes less than a minute —<br className="sm:hidden" /> no commitment required.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQ Section - Now below CTA */}
+        <div className="relative">
           {/* FAQ Heading - positioned closer to cards */}
           <div className="text-center mb-4 md:mb-5">
             <div className="inline-block relative">
-              <h2 className="text-lg md:text-xl lg:text-2xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 bg-clip-text text-transparent mb-2">
-                FAQ
+              <h2 className="text-base md:text-lg lg:text-xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 bg-clip-text text-transparent mb-2">
+                Most Common Questions
               </h2>
               <div className="h-0.5 w-28 md:w-32 bg-gradient-to-r from-blue-400 via-blue-600 to-blue-400 rounded-full mx-auto"></div>
             </div>
@@ -212,45 +244,6 @@ export default function HeroSection() {
                 );
               })}
           </Accordion>
-        </div>
-
-        {/* CTA Section - Now below FAQ cards */}
-        <div className="relative">
-          <div className="flex justify-center px-2">
-            <div className="w-full sm:w-auto md:w-full md:max-w-xl lg:max-w-2xl">
-              <div className="bg-white rounded-2xl shadow-md border-2 border-slate-200 p-6 md:p-8">
-                <div className="text-center mb-6">
-                  <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">
-                    Ready to End Your Lease?
-                  </h2>
-                  <div className="text-xs md:text-sm text-slate-500 mb-4 font-medium">
-                    <div className="flex flex-wrap justify-center gap-x-2 gap-y-1 items-center">
-                      <span className="whitespace-nowrap">✅ Official Brand Dealers</span>
-                      <span className="hidden sm:inline">|</span>
-                      <span className="whitespace-nowrap">🔒 Secure Review</span>
-                      <span className="hidden sm:inline">|</span>
-                      <span className="whitespace-nowrap w-full sm:w-auto text-center sm:text-left">⚡ 24-Hour Response</span>
-                    </div>
-                  </div>
-                </div>
-                <Link href="/get-started" scroll className="flex justify-center mb-3">
-                  <Button 
-                    size="lg" 
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-base md:text-lg px-8 md:px-10 py-3 md:py-3.5 h-auto shadow-sm hover:shadow-md transition-all duration-300 font-semibold rounded-xl border-2 border-blue-700"
-                    onClick={() => {
-                      try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
-                    }}
-                  >
-                    See My Early Lease Options
-                    <Search className="ml-2.5 h-5 w-5" />
-                  </Button>
-                </Link>
-                <p className="text-sm md:text-base text-slate-600 font-medium text-center">
-                  Takes less than a minute — no commitment required.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>

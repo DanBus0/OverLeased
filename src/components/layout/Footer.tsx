@@ -70,7 +70,7 @@ export default function Footer() {
                     try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                   }}
                 >
-                  See My Early Lease Options
+                  Check If You Qualify
                 </Link>
               </li>
               <li>
