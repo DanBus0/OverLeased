@@ -115,7 +115,7 @@ export default function HeroSection() {
           <h1 className="text-[2.625rem] sm:text-[3.25rem] md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-[1.05] sm:leading-tight px-2 block md:hidden text-slate-900">
             <span className="block">End Your Car</span>
             <span className="block">Lease Early</span>
-            <span className="block text-blue-600 mt-2 text-2xl sm:text-3xl md:text-3xl font-medium leading-[1.05]">
+            <span className="block text-blue-600 mt-3 text-2xl sm:text-3xl md:text-3xl font-medium leading-[1.05]">
               We'll Handle the
             </span>
             <span className="block text-blue-600 text-2xl sm:text-3xl md:text-3xl font-medium leading-[1.05]">
