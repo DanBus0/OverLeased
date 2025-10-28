@@ -37,11 +37,11 @@ export default function LeaseReviewSubmittedPage() {
                   <CheckCircle className="h-10 w-10 text-green-600" />
                 </div>
                 
-                <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 text-center">
                   Thanks — Your Lease Review Is In Progress
                 </h1>
                 
-                <p className="text-lg text-gray-600 mb-8 text-center leading-relaxed">
+                <p className="text-base sm:text-lg text-gray-600 mb-8 text-center leading-relaxed">
                   We've received your details and are reviewing your lease information.
                   <br />
                   <br />

@@ -649,12 +649,12 @@ export default function GetStartedPage() {
                               <div className="flex-1">
                                 <Label
                                   htmlFor="consent"
-                                  className="text-[9px] sm:text-[10px] text-gray-700 leading-[1.5] cursor-pointer block"
+                                  className="text-[11px] sm:text-xs text-gray-700 leading-[1.5] cursor-pointer block"
                                 >
-                                  <span className="font-semibold">Consent to Review Your Vehicle Information</span>
+                                  <span className="font-semibold">Consent to Review Your <br className="sm:hidden" />Vehicle Information</span>
                                   <br />
-                                  <span className="text-gray-600">
-                                    By submitting, you authorize OverLeased to review your lease information to determine your options for ending your lease early. You understand that OverLeased is not a dealer, lender, or lessor and does not negotiate or execute any vehicle sale or lease payoff.
+                                  <span className="text-gray-600 block mt-1">
+                                    By submitting, you authorize OverLeased to review your lease information to determine your options for ending your lease. You understand that OverLeased is not a dealer, broker, lender, or lessor and does not negotiate or execute any vehicle sale or lease payoff.
                                   </span>
                                 </Label>
                               </div>
