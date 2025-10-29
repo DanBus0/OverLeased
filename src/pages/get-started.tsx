@@ -421,7 +421,7 @@ export default function GetStartedPage() {
                       <CardTitle className="text-xl sm:text-2xl md:text-[1.75rem] text-gray-900 text-center">
                         End Your Lease Early —<br className="sm:hidden" /> Check If You Qualify
                       </CardTitle>
-                      <p className="text-[0.75rem] sm:text-sm md:text-base text-gray-600 text-center px-2">
+                      <p className="text-[0.8125rem] sm:text-sm md:text-base text-gray-600 text-center px-2">
                         Submit your details and we'll email you<br className="sm:hidden" /> within 24 hours with next steps.
                       </p>
                     </CardHeader>
@@ -436,22 +436,7 @@ export default function GetStartedPage() {
 
                       {currentStep === 1 && (
                         <form onSubmit={handleContinueToStep2} className="space-y-6">
-                          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 pb-4 border-b border-gray-200">
-                            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-                              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-                              <span className="whitespace-nowrap">100% Secure</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-                              <UserCheck className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                              <span className="whitespace-nowrap">No Commitment Required</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-                              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
-                              <span className="whitespace-nowrap">Authorized Dealers Only</span>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 -mt-2">
                             <div className="space-y-2">
                               <Label htmlFor="make" className="text-sm font-medium text-gray-700">
                                 Make *
