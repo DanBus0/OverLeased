@@ -164,7 +164,7 @@ export default function HomePage() {
           <section className="py-16 bg-gradient-to-r from-blue-50 to-blue-100">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
               <div className="max-w-2xl mx-auto">
-                <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
+                <h2 className="text-2xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
                   Get Started Now
                 </h2>
                 <p className="text-base sm:text-lg text-gray-600 mb-6 leading-relaxed">
