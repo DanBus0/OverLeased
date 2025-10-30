@@ -22,12 +22,12 @@ export default function HeroSection() {
       iconBg: "bg-blue-50",
       iconColor: "text-blue-600",
       question: "Can I End My Lease Early?",
-      answer: "Yes, at any time. We work with same-brand authorized dealers to purchase your vehicle and handle the remaining payoff.",
+      answer: "Yes, at any time. We work with same-brand authorized dealers to purchase your lease and handle the remaining payoff. OverLeased handles this entire process for you.",
       tabletAnswer: (
         <>
-          Yes, at any time. We work with same-brand authorized dealers who purchase your vehicle and handle the remaining
+          Yes, at any time. We work with same-brand authorized dealers to purchase your lease and handle the remaining payoff.
           <br className="hidden md:block lg:hidden" />
-          payoff.
+          OverLeased handles this entire process for you.
         </>
       ),
       disclaimer: null
@@ -115,43 +115,43 @@ export default function HeroSection() {
           <h1 className="text-[2.625rem] sm:text-[3.25rem] md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-[1.05] sm:leading-tight px-2 block md:hidden text-slate-900">
             <span className="block">End Your Car</span>
             <span className="block">Lease Early</span>
-            <span className="block text-blue-600 mt-3 text-2xl sm:text-3xl md:text-3xl font-medium leading-[1.05]">
-              We'll Handle the
+            <span className="block text-blue-600 mt-3 text-[2rem] sm:text-[2.5rem] md:text-4xl font-normal leading-[1.05]">
+              No Lease
             </span>
-            <span className="block text-blue-600 text-2xl sm:text-3xl md:text-3xl font-medium leading-[1.05]">
-              Entire Process for You
+            <span className="block text-blue-600 text-[2rem] sm:text-[2.5rem] md:text-4xl font-normal leading-[1.05]">
+              Buyout Required
             </span>
           </h1>
           
           {/* Tablet title */}
           <h1 className="text-[2.75rem] md:text-[3.25rem] lg:text-6xl font-bold mb-4 md:mb-6 leading-tight px-2 hidden md:block lg:hidden text-slate-900">
             <span className="block">End Your Car Lease Early</span>
-            <span className="block text-blue-600 mt-2 text-3xl font-medium">
-              We'll Handle the Entire Process for You
+            <span className="block text-blue-600 mt-2 text-[2.5rem] font-normal">
+              No Lease Buyout Required
             </span>
           </h1>
           
           {/* Desktop title */}
           <h1 className="text-5xl md:text-5xl lg:text-[4rem] font-bold mb-4 md:mb-6 leading-tight px-2 hidden lg:block text-slate-900">
             <span className="block">End Your Car Lease Early</span>
-            <span className="block text-blue-600 mt-2 text-4xl font-medium">
-              We'll Handle the Entire Process for You
+            <span className="block text-blue-600 mt-2 text-5xl font-normal">
+              No Lease Buyout Required
             </span>
           </h1>
 
           {/* New Callouts Section */}
-          <div className="flex flex-wrap justify-center gap-2 md:gap-3 mt-4 md:mt-6 mb-6 md:mb-8 px-4">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm">
-              <CircleCheck className="h-4 w-4 text-emerald-600" />
+          <div className="flex flex-col md:flex-row md:justify-center gap-2 md:gap-3 mt-4 md:mt-6 mb-6 md:mb-8 px-4">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-full max-w-[280px] md:max-w-none md:w-auto justify-center mx-auto md:mx-0">
+              <CircleCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+              <span className="text-xs md:text-sm font-medium text-slate-700">No Loans or Financing</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-full max-w-[280px] md:max-w-none md:w-auto justify-center mx-auto md:mx-0">
+              <CircleCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
               <span className="text-xs md:text-sm font-medium text-slate-700">No Penalties</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm">
-              <CircleCheck className="h-4 w-4 text-emerald-600" />
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-full max-w-[280px] md:max-w-none md:w-auto justify-center mx-auto md:mx-0">
+              <CircleCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
               <span className="text-xs md:text-sm font-medium text-slate-700">No Hidden Fees</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm">
-              <CircleCheck className="h-4 w-4 text-emerald-600" />
-              <span className="text-xs md:text-sm font-medium text-slate-700">No Loans or Cash Buyout</span>
             </div>
           </div>
         </div>
