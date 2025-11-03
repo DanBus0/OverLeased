@@ -141,17 +141,17 @@ export default function HeroSection() {
 
           {/* New Callouts Section */}
           <div className="flex flex-col md:flex-row md:justify-center gap-2 md:gap-3 mt-4 md:mt-6 mb-6 md:mb-8 px-4">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-full max-w-[280px] md:max-w-none md:w-auto justify-center mx-auto md:mx-0">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-[280px] md:w-auto justify-center mx-auto md:mx-0">
               <CircleCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-              <span className="text-xs md:text-sm font-medium text-slate-700">No Loans or Financing</span>
+              <span className="text-xs md:text-sm font-medium text-slate-700 text-left w-[125px] md:w-auto">No Loans or Financing</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-full max-w-[280px] md:max-w-none md:w-auto justify-center mx-auto md:mx-0">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-[280px] md:w-auto justify-center mx-auto md:mx-0">
               <CircleCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-              <span className="text-xs md:text-sm font-medium text-slate-700">No Penalties</span>
+              <span className="text-xs md:text-sm font-medium text-slate-700 text-left w-[125px] md:w-auto">No Penalties</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-full max-w-[280px] md:max-w-none md:w-auto justify-center mx-auto md:mx-0">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-[280px] md:w-auto justify-center mx-auto md:mx-0">
               <CircleCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-              <span className="text-xs md:text-sm font-medium text-slate-700">No Hidden Fees</span>
+              <span className="text-xs md:text-sm font-medium text-slate-700 text-left w-[125px] md:w-auto">No Hidden Fees</span>
             </div>
           </div>
         </div>

@@ -395,11 +395,8 @@ export default function GetStartedPage() {
           </div>
         </header>
         
-        <main className="w-full pt-16 pb-16">
+        <main className="w-full pt-12 sm:pt-16 pb-16">
           <div className="max-w-6xl mx-auto px-4">
-              <div className="text-center mb-12">
-              </div>
-
               <div className="max-w-3xl mx-auto">
                 <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 p-6 sm:p-8 rounded-2xl shadow-sm">
                   <Card className="shadow-lg border-0">
