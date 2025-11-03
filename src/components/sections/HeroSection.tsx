@@ -98,12 +98,12 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative bg-slate-50 pt-4 md:pt-6 pb-12 md:pb-16 px-4">
+    <section className="relative bg-blue-50 pt-4 md:pt-6 pb-12 md:pb-16 px-4">
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-8 md:mb-12">
           {/* Trust Indicator */}
           <div className="flex justify-center mb-4 md:mb-6">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 md:px-4 md:py-2 bg-blue-50 border border-blue-100 rounded-lg shadow-sm">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 md:px-4 md:py-2 bg-blue-50 border border-slate-300 rounded-lg shadow-sm">
               <ShieldCheck className="w-3 h-3 md:w-4 md:h-4 text-blue-600" />
               <span className="text-[0.625rem] md:text-xs font-semibold text-blue-900 tracking-wide">
                 Trusted By Drivers Nationwide
