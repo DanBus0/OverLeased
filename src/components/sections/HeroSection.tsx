@@ -104,7 +104,7 @@ export default function HeroSection() {
           </div>
 
           {/* Desktop Title Box - Tablet & Desktop Only */}
-          <div className="hidden md:block mb-6">
+          <div className="hidden md:block mb-0">
             <div className="bg-white/95 backdrop-blur-sm border-2 border-slate-200/80 rounded-2xl shadow-md py-10 px-8 max-w-7xl mx-auto">
               {/* Tablet title */}
               <h1 className="text-[2.75rem] lg:text-6xl font-bold mb-0 leading-tight block lg:hidden text-slate-900">
@@ -323,7 +323,7 @@ export default function HeroSection() {
           </div>
 
           {/* Desktop FAQ - With Box */}
-          <div className="hidden md:block mt-2">
+          <div className="hidden md:block md:-mt-8">
             <div className="bg-white backdrop-blur-sm border-2 border-slate-200/80 rounded-2xl shadow-md py-10 px-8 max-w-7xl mx-auto">
               {/* FAQ Heading */}
               <div className="text-center mb-6">
