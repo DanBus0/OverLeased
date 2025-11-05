@@ -68,7 +68,7 @@ export default function FAQSection() {
     <section id="faq-section" className="scroll-mt-24 pt-6 md:pt-8 pb-16 md:pb-20 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6 md:mb-8">
-          <Badge variant="secondary" className="mb-4 md:mb-6 bg-blue-100 text-blue-800 text-sm md:text-base px-3 py-1.5 md:px-4 md:py-2">
+          <Badge variant="secondary" className="mb-4 md:mb-6 bg-blue-100 text-blue-800 text-base md:text-lg px-3 py-1.5 md:px-4 md:py-2">
             <HelpCircle className="h-4 w-4 md:h-5 md:w-5 mr-2" />
             Frequently Asked Questions
           </Badge>

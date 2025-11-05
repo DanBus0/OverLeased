@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, HelpCircle, DollarSign, Handshake, Clock, ChevronDown, CircleCheck, ShieldCheck } from "lucide-react";
+import { Search, HelpCircle, DollarSign, Handshake, Clock, ChevronDown, Check, ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import {
   Accordion,
@@ -104,54 +104,105 @@ export default function HeroSection() {
           {/* Trust Indicator */}
           <div className="flex justify-center mb-4 md:mb-6">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 md:px-4 md:py-2 bg-blue-50 border border-slate-300 rounded-lg shadow-sm">
-              <ShieldCheck className="w-3 h-3 md:w-4 md:h-4 text-blue-600" />
-              <span className="text-[0.625rem] md:text-xs font-semibold text-blue-900 tracking-wide">
+              <ShieldCheck className="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600" />
+              <span className="text-[0.6875rem] md:text-xs font-semibold text-blue-900 tracking-wide">
                 Trusted By Drivers Nationwide
               </span>
             </div>
           </div>
 
-          {/* Mobile title */}
-          <h1 className="text-[2.625rem] sm:text-[3.25rem] md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-[1.05] sm:leading-tight px-2 block md:hidden text-slate-900">
-            <span className="block">End Your Car</span>
-            <span className="block">Lease Early</span>
-            <span className="block text-blue-600 mt-3 text-[2rem] sm:text-[2.5rem] md:text-4xl font-normal leading-[1.05]">
-              No Lease
-            </span>
-            <span className="block text-blue-600 text-[2rem] sm:text-[2.5rem] md:text-4xl font-normal leading-[1.05]">
-              Buyout Required
-            </span>
-          </h1>
-          
           {/* Tablet title */}
           <h1 className="text-[2.75rem] md:text-[3.25rem] lg:text-6xl font-bold mb-4 md:mb-6 leading-tight px-2 hidden md:block lg:hidden text-slate-900">
             <span className="block">End Your Car Lease Early</span>
-            <span className="block text-blue-600 mt-2 text-[2.5rem] font-normal">
-              No Lease Buyout Required
+            <span className="flex items-center justify-center gap-3 text-slate-600 mt-2 text-[2.25rem] font-normal">
+              <div className="flex-shrink-0 w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center shadow-sm">
+                <ArrowRight className="h-4 w-4 text-white" strokeWidth={2.5} />
+              </div>
+              <span>No Lease Buyout Required</span>
             </span>
           </h1>
           
           {/* Desktop title */}
           <h1 className="text-5xl md:text-5xl lg:text-[4rem] font-bold mb-4 md:mb-6 leading-tight px-2 hidden lg:block text-slate-900">
             <span className="block">End Your Car Lease Early</span>
-            <span className="block text-blue-600 mt-2 text-5xl font-normal">
-              No Lease Buyout Required
+            <span className="flex items-center justify-center gap-3 text-slate-600 mt-2 text-[2.75rem] font-normal">
+              <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-sm">
+                <ArrowRight className="h-4.5 w-4.5 text-white" strokeWidth={2.5} />
+              </div>
+              <span>No Lease Buyout Required</span>
             </span>
           </h1>
 
-          {/* New Callouts Section */}
-          <div className="flex flex-col md:flex-row md:justify-center gap-2 md:gap-3 mt-4 md:mt-6 mb-6 md:mb-8 px-4">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-[280px] md:w-auto justify-center mx-auto md:mx-0">
-              <CircleCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-              <span className="text-xs md:text-sm font-medium text-slate-700 text-left w-[125px] md:w-auto">No Loans or Financing</span>
+          {/* Unified Callouts Container - Mobile Only - NOW INCLUDES HERO TITLE */}
+          <div className="block md:hidden mt-6 mb-6 px-2">
+            <div className="bg-white/95 backdrop-blur-sm border-2 border-slate-200/80 rounded-2xl shadow-md p-7 max-w-[350px] mx-auto">
+              {/* Hero Title - Mobile Only */}
+              <div className="text-center mb-4">
+                <h1 className="text-[2.5rem] sm:text-[3rem] font-bold leading-[1.1] sm:leading-tight text-slate-900">
+                  <span className="block">End Your Car</span>
+                  <span className="block">Lease Early</span>
+                </h1>
+              </div>
+              
+              {/* Badge - Mobile Only */}
+              <div className="flex justify-center mb-7">
+                <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg shadow-sm">
+                  <div className="flex-shrink-0 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center shadow-sm">
+                    <ArrowRight className="h-3 w-3 text-white" strokeWidth={2.5} />
+                  </div>
+                  <span className="text-[0.9375rem] font-semibold text-blue-900 whitespace-nowrap">
+                    No Lease Buyout Required
+                  </span>
+                </div>
+              </div>
+              
+              {/* Callouts List - Full width to match badge */}
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2.5 px-2.5 py-2.5 bg-slate-50 rounded-lg border-[0.5px] border-slate-200 w-full">
+                  <div className="flex-shrink-0 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm border-2 border-blue-600">
+                    <Check className="h-2.5 w-2.5 text-blue-600" strokeWidth={3} />
+                  </div>
+                  <span className="text-[0.8125rem] font-medium text-slate-900">No Loans or Financing</span>
+                </div>
+                
+                <div className="flex items-center gap-2.5 px-2.5 py-2.5 bg-slate-50 rounded-lg border-[0.5px] border-slate-200 w-full">
+                  <div className="flex-shrink-0 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm border-2 border-blue-600">
+                    <Check className="h-2.5 w-2.5 text-blue-600" strokeWidth={3} />
+                  </div>
+                  <span className="text-[0.8125rem] font-medium text-slate-900">No Penalties</span>
+                </div>
+                
+                <div className="flex items-center gap-2.5 px-2.5 py-2.5 bg-slate-50 rounded-lg border-[0.5px] border-slate-200 w-full">
+                  <div className="flex-shrink-0 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm border-2 border-blue-600">
+                    <Check className="h-2.5 w-2.5 text-blue-600" strokeWidth={3} />
+                  </div>
+                  <span className="text-[0.8125rem] font-medium text-slate-900">No Hidden Fees</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-[280px] md:w-auto justify-center mx-auto md:mx-0">
-              <CircleCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-              <span className="text-xs md:text-sm font-medium text-slate-700 text-left w-[125px] md:w-auto">No Penalties</span>
+          </div>
+
+          {/* Desktop Callouts - Unchanged */}
+          <div className="hidden md:flex flex-row justify-center gap-3 mt-6 mb-6 px-4">
+            <div className="flex items-center gap-2.5 px-4 py-3.5 bg-white backdrop-blur-sm border border-slate-200 rounded-lg shadow-sm">
+              <div className="flex-shrink-0 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm border-2 border-blue-600">
+                <Check className="h-2.5 w-2.5 text-blue-600" strokeWidth={3} />
+              </div>
+              <span className="text-sm font-medium text-slate-900 tracking-tight">No Loans or Financing</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg shadow-sm w-[280px] md:w-auto justify-center mx-auto md:mx-0">
-              <CircleCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-              <span className="text-xs md:text-sm font-medium text-slate-700 text-left w-[125px] md:w-auto">No Hidden Fees</span>
+            
+            <div className="flex items-center gap-2.5 px-4 py-3.5 bg-white backdrop-blur-sm border border-slate-200 rounded-lg shadow-sm">
+              <div className="flex-shrink-0 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm border-2 border-blue-600">
+                <Check className="h-2.5 w-2.5 text-blue-600" strokeWidth={3} />
+              </div>
+              <span className="text-sm font-medium text-slate-900 tracking-tight">No Penalties</span>
+            </div>
+            
+            <div className="flex items-center gap-2.5 px-4 py-3.5 bg-white backdrop-blur-sm border border-slate-200 rounded-lg shadow-sm">
+              <div className="flex-shrink-0 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm border-2 border-blue-600">
+                <Check className="h-2.5 w-2.5 text-blue-600" strokeWidth={3} />
+              </div>
+              <span className="text-sm font-medium text-slate-900 tracking-tight">No Hidden Fees</span>
             </div>
           </div>
         </div>
@@ -160,8 +211,8 @@ export default function HeroSection() {
         <div className="relative mb-8 md:mb-10">
           <div className="flex justify-center px-2">
             <div className="w-full sm:w-auto md:w-full md:max-w-xl lg:max-w-2xl">
-              <div className="bg-white rounded-2xl shadow-md border-2 border-slate-200 p-6 md:p-8">
-                <div className="text-center mb-6">
+              <div className="bg-white rounded-2xl shadow-md border border-blue-300 p-7 md:p-7">
+                <div className="text-center mb-3">
                   <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">
                     Ready to End Your Lease?
                   </h2>
@@ -193,7 +244,7 @@ export default function HeroSection() {
           {/* FAQ Heading - positioned closer to cards */}
           <div className="text-center mb-4 md:mb-5">
             <div className="inline-block relative">
-              <h2 className="text-base md:text-lg lg:text-xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 bg-clip-text text-transparent mb-2">
+              <h2 className="text-base md:text-lg lg:text-xl font-bold text-gray-900 mb-2">
                 Most Common Questions
               </h2>
               <div className="h-0.5 w-28 md:w-32 bg-gradient-to-r from-blue-400 via-blue-600 to-blue-400 rounded-full mx-auto"></div>
@@ -210,7 +261,7 @@ export default function HeroSection() {
                     value={`faq-${index}`}
                     className="bg-white border-2 border-slate-200 text-slate-900 hover:border-blue-300 hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden"
                   >
-                    <AccordionTrigger className="hover:no-underline px-4 pt-4 pb-3 md:px-5 md:pt-5 md:pb-3.5 [&>svg]:hidden">
+                    <AccordionTrigger className="hover:no-underline px-7 pt-7 pb-3 md:px-7 md:pt-7 md:pb-3.5 [&>svg]:hidden">
                       <div className="flex flex-col items-center text-center w-full gap-2.5 md:gap-3">
                         <div className={`${item.iconBg} rounded-lg w-12 h-12 md:w-14 md:h-14 flex items-center justify-center flex-shrink-0 shadow-sm`}>
                           <IconComponent className={`h-6 w-6 md:h-7 md:w-7 ${item.iconColor}`} />
@@ -227,7 +278,7 @@ export default function HeroSection() {
                       </div>
                     </AccordionTrigger>
                     
-                    <AccordionContent className="px-4 pb-4 pt-0 md:px-5 md:pb-5">
+                    <AccordionContent className="px-7 pb-7 pt-0 md:px-7 md:pb-7">
                       <p className="text-xs md:text-sm text-slate-700 leading-relaxed text-center font-medium">
                         <span className="block sm:hidden">{item.mobileAnswer || item.answer}</span>
                         <span className="hidden sm:block md:hidden">{item.answer}</span>
