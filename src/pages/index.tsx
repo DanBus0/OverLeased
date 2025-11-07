@@ -161,7 +161,7 @@ export default function HomePage() {
           <FAQSection />
           
           {/* CTA Section after FAQ */}
-          <section className="py-16 bg-gradient-to-r from-blue-50 to-blue-100">
+          <section className="py-6 md:py-16 bg-gradient-to-r from-blue-50 to-blue-100">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
               <div className="max-w-2xl mx-auto">
                 <h2 className="text-2xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
