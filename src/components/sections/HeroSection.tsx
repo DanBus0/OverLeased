@@ -37,12 +37,12 @@ export default function HeroSection() {
       iconBg: "bg-emerald-50",
       iconColor: "text-emerald-600",
       question: "Will I Owe Money?",
-      answer: "In most cases you'll actually make money. The dealer will pay market price for your car which often is more than your remaining lease balance.",
+      answer: "You can actually make money if your car's value is higher than your lease payoff. If it's lower, dealers can often find other ways to reduce your cost.",
       tabletAnswer: (
         <>
-          In most cases you'll actually make money. The dealer will pay market price for your car which often is more than your
+          You can actually make money if your car's value is higher than your lease payoff. If it's lower, dealers can often find
           <br className="hidden md:block lg:hidden" />
-          remaining lease balance.
+          other ways to reduce your cost.
         </>
       ),
       disclaimer: "*Based upon lease review and subject to dealer offers"
