@@ -6,34 +6,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Car, Clock, Shield, CheckCircle, AlertCircle, ArrowLeft, ArrowRight, Info, UserCheck } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, Car, CheckCircle, ShieldCheck, Clock, DollarSign, X, ZoomIn } from "lucide-react";
 import Link from "next/link";
-import { supabase } from "@/integrations/supabase/client";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import Image from "next/image";
 
 export default function GetStartedPage() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [showLicensePlateInfo, setShowLicensePlateInfo] = useState(false);
   const [formData, setFormData] = useState({
+    firstName: "",
+    customerGoal: "",
+    year: "",
     make: "",
     model: "",
-    firstName: "",
-    email: "",
-    licensePlate: "",
+    trim: "",
+    vehicleCondition: "",
     mileage: "",
     zipCode: "",
-    vehicleCondition: "",
-    consentGiven: false
+    email: "",
+    website: "", // Honeypot field - should remain empty
   });
   const step2FormRef = useRef<HTMLFormElement>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -53,6 +50,7 @@ export default function GetStartedPage() {
         sessionStorage.removeItem("forceScrollTopOnGetStarted");
       }
     } catch (error) {
+      // Silent fail for sessionStorage
     }
   }, []);
 
@@ -82,32 +80,50 @@ export default function GetStartedPage() {
     }
   };
 
-  const handleSelectChange = (value: string) => {
+  const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({
       ...prev,
-      vehicleCondition: value
-    }));
-  };
-
-  const handleConsentChange = (checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      consentGiven: checked
+      [name]: value
     }));
   };
 
   const validateStep1 = () => {
-    if (!formData.make || !formData.model || !formData.vehicleCondition || !formData.zipCode) {
+    if (!formData.firstName || !formData.customerGoal || !formData.year || !formData.make || !formData.model || !formData.trim || !formData.vehicleCondition || !formData.mileage || !formData.zipCode || !formData.email) {
       setError("Please fill in all required fields.");
       return false;
     }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address.");
+      return false;
+    }
+    
     setError("");
     return true;
   };
 
   const handleContinueToStep2 = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent double submission
+    if (isSubmitting) return;
+    
     if (validateStep1()) {
+      setIsSubmitting(true);
+      
+      // Send notification to support (non-blocking)
+      fetch("/api/send-get-started-notification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }).catch(err => {
+        console.error("Failed to send notification:", err);
+        // Don't block the user flow if notification fails
+      });
+      
       setCurrentStep(2);
       
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -132,6 +148,8 @@ export default function GetStartedPage() {
             } else {
               window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             }
+            // Re-enable button after navigation completes
+            setIsSubmitting(false);
           }, 150);
         }, 50);
       });
@@ -142,90 +160,6 @@ export default function GetStartedPage() {
     setCurrentStep(1);
     setError("");
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const submitToSupabase = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('lease_inquiries')
-        .insert([
-          {
-            make: formData.make,
-            model: formData.model,
-            first_name: formData.firstName,
-            email: formData.email,
-            license_plate: formData.licensePlate || null,
-            current_mileage: parseInt(parseNumberFromCommas(formData.mileage)),
-            zip_code: formData.zipCode,
-            vehicle_condition: formData.vehicleCondition
-          }
-        ])
-        .select();
-
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-
-      console.log('Successfully submitted to Supabase:', data);
-
-      if (data && data[0]) {
-        try {
-          console.log('Calling Next.js email notification API...');
-          
-          const emailResponse = await fetch('/api/send-lease-notification', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              make: formData.make,
-              model: formData.model,
-              email: formData.email,
-              first_name: formData.firstName,
-              license_plate: formData.licensePlate,
-              current_mileage: parseInt(parseNumberFromCommas(formData.mileage)),
-              zip_code: formData.zipCode,
-              vehicle_condition: formData.vehicleCondition,
-              created_at: data[0].created_at
-            }),
-          });
-
-          const emailResult = await emailResponse.json();
-
-          if (!emailResponse.ok) {
-            console.error('Email notification error:', emailResult);
-            
-            if (emailResult.code === 'ip_restriction') {
-              console.warn('Email notification failed due to IP restriction - this is a known issue and will be resolved by the admin');
-            } else if (emailResult.code === 'config_error') {
-              console.warn('Email notification failed due to configuration issue - admin needs to check settings');
-            } else {
-              console.error('Unexpected email notification error:', emailResult);
-            }
-          } else {
-            console.log('Email notification sent successfully:', emailResult);
-          }
-        } catch (emailErr) {
-          console.error('Error calling email notification API:', emailErr);
-          
-          if (emailErr && typeof emailErr === 'object') {
-            const errorMessage = emailErr.message || JSON.stringify(emailErr);
-            
-            if (errorMessage.includes('Brevo IP restriction') || errorMessage.includes('ip_restriction')) {
-              console.warn('Email notification blocked by Brevo IP restrictions - using Next.js API route should resolve this');
-            } else if (errorMessage.includes('config_error')) {
-              console.warn('Email service configuration error - admin needs to check Brevo API key');
-            }
-          }
-        }
-      }
-
-      return { success: true, data };
-    } catch (err) {
-      console.error('Error submitting to Supabase:', err);
-      return { success: false, error: err };
-    }
   };
 
   const submitToLocalStorage = () => {
@@ -248,128 +182,40 @@ export default function GetStartedPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePurchase = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent double submission
+    if (isSubmitting) return;
+    
     setError("");
     setIsSubmitting(true);
-
-    if (!formData.firstName || !formData.email || !formData.mileage) {
-      setError("Please fill in all required fields.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (!formData.consentGiven) {
-      setError("Please provide consent to review your lease information.");
-      setIsSubmitting(false);
-      return;
-    }
-
+    
     try {
-      const supabaseResult = await submitToSupabase();
-      
-      if (supabaseResult.success) {
-        console.log('Form successfully submitted to Supabase');
-        window.location.href = "/lease-review-submitted";
-      } else {
-        console.log('Supabase submission failed, using localStorage fallback');
-        const localStorageResult = submitToLocalStorage();
-        
-        if (localStorageResult.success) {
-          window.location.href = "/lease-review-submitted";
-        } else {
-          throw new Error('Both Supabase and localStorage submissions failed');
-        }
+      // Honeypot validation - if filled, it's a bot
+      if (formData.website) {
+        setError("Invalid submission detected.");
+        setIsSubmitting(false);
+        return;
       }
+
+      // Save form data to sessionStorage for checkout page
+      sessionStorage.setItem("leaseFormData", JSON.stringify(formData));
+      
+      // Redirect to checkout page
+      window.location.href = "/checkout";
     } catch (err) {
-      console.error('Form submission error:', err);
+      console.error('Error saving form data:', err);
       setError("Something went wrong. Please try again.");
       setIsSubmitting(false);
     }
   };
 
-  if (isSubmitted) {
-    return (
-      <>
-        <Head>
-          <title>Thank You | OverLeased - End Your Car Lease Early</title>
-          <meta name="description" content="Thank you for your submission. We'll be in touch soon with offers to help you end your car lease early." />
-          <meta name="robots" content="noindex" />
-        </Head>
-        <div className="min-h-screen bg-white w-full max-w-full overflow-x-hidden">
-          <main className="w-full pt-24 pb-16">
-            <div className="max-w-2xl mx-auto px-4">
-              <Card className="shadow-lg border-0">
-                <CardContent className="p-8">
-                  <div className="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle className="h-10 w-10 text-green-600" />
-                  </div>
-                  
-                  <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-                    Thanks — Your Lease Review Is In Progress
-                  </h1>
-                  
-                  <p className="text-lg text-gray-600 mb-8 text-center leading-relaxed">
-                    We've received your details and are reviewing your lease information.
-                    <br />
-                    <br />
-                    Within the next business day, we'll email you personalized next steps — including how to confirm your dealer lease payoff amount and connecting with authorized dealerships near you.
-                  </p>
-                  
-                  <div className="space-y-4 mb-8 bg-gray-50 p-6 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                        <CheckCircle className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-900 text-[0.6875rem] leading-tight tracking-wide sm:text-base sm:leading-normal sm:tracking-normal">Step 1: Details received</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
-                        <div className="w-3 h-3 rounded-full bg-white"></div>
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-500 text-[0.6875rem] leading-tight tracking-wide sm:text-base sm:leading-normal sm:tracking-normal">Step 2: Verify lease payoff amount</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
-                        <div className="w-3 h-3 rounded-full bg-white"></div>
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-500 text-[0.6875rem] leading-tight tracking-wide sm:text-base sm:leading-normal sm:tracking-normal">Step 3: Receive dealer offers</p>
-                        <p className="text-[0.625rem] sm:text-xs text-gray-500 mt-1 italic">We'll never contact a dealership without your explicit permission.</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <Button 
-                      onClick={() => window.location.href = "/"}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      Return to Homepage
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </main>
-          
-          <Footer />
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
       <Head>
-        <title>Get Started | End Your Car Lease Early - OverLeased</title>
-        <meta name="description" content="Start the process to end your car lease early. Get cash offers from verified dealers and avoid lease-end penalties." />
+        <title>Get Started | OverLeased - Your Personalized Lease Exit Guide</title>
+        <meta name="description" content="Get your personalized lease exit guide. Know exactly what your lease is worth and all your options for just $39." />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.overleased.com/get-started" />
@@ -397,282 +243,533 @@ export default function GetStartedPage() {
         
         <main className="w-full pt-12 sm:pt-16 pb-16">
           <div className="max-w-6xl mx-auto px-4">
-              <div className="max-w-3xl mx-auto">
-                <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 p-6 sm:p-8 rounded-2xl shadow-sm">
-                  <Card className="shadow-lg border-0">
-                    <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200">
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm sm:text-base font-medium text-gray-700">
-                            Step {currentStep} of 2
-                          </span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5">
-                          <div 
-                            className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-in-out"
-                            style={{ width: `${(currentStep / 2) * 100}%` }}
-                          ></div>
-                        </div>
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 p-6 sm:p-8 rounded-2xl shadow-sm">
+                <Card className="shadow-lg border-0">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200">
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm sm:text-base font-medium text-gray-700">
+                          Step {currentStep} of 2
+                        </span>
                       </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div 
+                          className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-in-out"
+                          style={{ width: `${(currentStep / 2) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
 
-                      <CardTitle className="text-xl sm:text-2xl md:text-[1.75rem] text-gray-900 text-center">
-                        End Your Lease Early —<br className="sm:hidden" /> Check If You Qualify
-                      </CardTitle>
-                      <p className="text-[0.8125rem] sm:text-sm md:text-base text-gray-600 text-center px-2">
-                        Submit your details and we'll email you<br className="sm:hidden" /> within 24 hours with next steps.
-                      </p>
-                    </CardHeader>
-                    
-                    <CardContent className="p-8">
-                      {error && (
-                        <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
-                          <AlertCircle className="h-5 w-5 text-red-600" />
-                          <span className="text-red-700">{error}</span>
-                        </div>
+                    <CardTitle className="text-xl sm:text-2xl md:text-[1.75rem] text-gray-900 text-center">
+                      {currentStep === 1 ? (
+                        <>Get Your Personalized Lease Exit Guide</>
+                      ) : (
+                        <>Complete Your Purchase</>
                       )}
+                    </CardTitle>
+                    <p className="text-[0.8125rem] sm:text-sm md:text-base text-gray-600 text-center px-2">
+                      {currentStep === 1 ? (
+                        <>Tell us about your leased vehicle to get started</>
+                      ) : (
+                        <>Secure your detailed guide</>
+                      )}
+                    </p>
+                  </CardHeader>
+                  
+                  <CardContent className="p-8">
+                    {error && (
+                      <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+                        <AlertCircle className="h-5 w-5 text-red-600" />
+                        <span className="text-red-700">{error}</span>
+                      </div>
+                    )}
 
-                      {currentStep === 1 && (
-                        <form onSubmit={handleContinueToStep2} className="space-y-6">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 -mt-2">
-                            <div className="space-y-2">
-                              <Label htmlFor="make" className="text-sm font-medium text-gray-700">
-                                Make *
-                              </Label>
-                              <Input
-                                id="make"
-                                name="make"
-                                type="text"
-                                required
-                                value={formData.make}
-                                onChange={handleInputChange}
-                                placeholder="e.g., Toyota"
-                                className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
-                                  formData.make ? 'bg-blue-50' : 'bg-white'
-                                }`}
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label htmlFor="model" className="text-sm font-medium text-gray-700">
-                                Model *
-                              </Label>
-                              <Input
-                                id="model"
-                                name="model"
-                                type="text"
-                                required
-                                value={formData.model}
-                                onChange={handleInputChange}
-                                placeholder="e.g., Camry"
-                                className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
-                                  formData.model ? 'bg-blue-50' : 'bg-white'
-                                }`}
-                              />
-                            </div>
+                    {currentStep === 1 && (
+                      <form onSubmit={handleContinueToStep2} className="space-y-6">
+                        {/* First Line: First Name, Email Address, What's Your Goal */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                              First Name *
+                            </Label>
+                            <Input
+                              id="firstName"
+                              name="firstName"
+                              type="text"
+                              required
+                              value={formData.firstName}
+                              onChange={handleInputChange}
+                              placeholder="e.g., John"
+                              className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
+                                formData.firstName ? 'bg-blue-50' : 'bg-white'
+                              }`}
+                            />
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                              <Label htmlFor="vehicleCondition" className="text-sm font-medium text-gray-700">
-                                Vehicle Condition *
-                              </Label>
-                              <select
-                                id="vehicleCondition"
-                                name="vehicleCondition"
-                                required
-                                value={formData.vehicleCondition}
-                                onChange={(e) => handleSelectChange(e.target.value)}
-                                className={`h-12 w-full rounded-md border border-input px-3 py-2 text-[0.75rem] sm:text-[0.9375rem] ring-offset-background focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${
-                                  formData.vehicleCondition 
-                                    ? 'bg-blue-50 text-gray-900' 
-                                    : 'bg-white text-gray-400 sm:text-gray-500'
+                          <div className="space-y-2">
+                            <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                              Email Address *
+                            </Label>
+                            <Input
+                              id="email"
+                              name="email"
+                              type="email"
+                              required
+                              value={formData.email}
+                              onChange={handleInputChange}
+                              placeholder="your@email.com"
+                              className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
+                                formData.email ? 'bg-blue-50' : 'bg-white'
+                              }`}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="customerGoal" className="text-sm font-medium text-gray-700">
+                              What's Your Goal? *
+                            </Label>
+                            <Select 
+                              value={formData.customerGoal} 
+                              onValueChange={(value) => handleSelectChange("customerGoal", value)}
+                              required
+                            >
+                              <SelectTrigger 
+                                id="customerGoal"
+                                className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 ${
+                                  formData.customerGoal 
+                                    ? 'bg-blue-50' 
+                                    : 'bg-white [&>span]:text-[0.6875rem] sm:[&>span]:text-sm [&>span]:text-gray-400 sm:[&>span]:text-gray-500'
                                 }`}
-                                style={{
-                                  color: formData.vehicleCondition ? '#111827' : '#9ca3af'
-                                }}
                               >
-                                <option value="" disabled hidden className="text-gray-400 sm:text-gray-500">Select condition</option>
-                                <option value="bad" className="text-gray-900">Bad</option>
-                                <option value="average" className="text-gray-900">Average</option>
-                                <option value="good" className="text-gray-900">Good</option>
-                                <option value="excellent" className="text-gray-900">Excellent</option>
-                              </select>
-                            </div>
+                                <SelectValue placeholder="Select your goal" />
+                              </SelectTrigger>
+                              <SelectContent className="font-sans">
+                                <SelectItem value="no-longer-need" className="text-[0.8125rem] sm:text-base">No Longer Need A Vehicle</SelectItem>
+                                <SelectItem value="different-vehicle" className="text-[0.8125rem] sm:text-base">Want A Different Vehicle</SelectItem>
+                                <SelectItem value="keep-current" className="text-[0.8125rem] sm:text-base">Want To Keep Current Vehicle</SelectItem>
+                                <SelectItem value="lower-cost" className="text-[0.8125rem] sm:text-base">Lower Monthly Cost</SelectItem>
+                                <SelectItem value="not-sure" className="text-[0.8125rem] sm:text-base">Not Sure</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
 
-                            <div className="space-y-2">
-                              <Label htmlFor="zipCode" className="text-sm font-medium text-gray-700">
-                                Zip Code *
-                              </Label>
-                              <Input
-                                id="zipCode"
-                                name="zipCode"
-                                type="text"
-                                required
-                                value={formData.zipCode}
-                                onChange={handleInputChange}
-                                placeholder="e.g., 90210"
-                                className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
-                                  formData.zipCode ? 'bg-blue-50' : 'bg-white'
+                        {/* Second Line: Year, Make, Model, Trim */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="year" className="text-sm font-medium text-gray-700">
+                              Year *
+                            </Label>
+                            <Input
+                              id="year"
+                              name="year"
+                              type="text"
+                              required
+                              value={formData.year}
+                              onChange={handleInputChange}
+                              placeholder="e.g., 2022"
+                              maxLength={4}
+                              className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
+                                formData.year ? 'bg-blue-50' : 'bg-white'
+                              }`}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="make" className="text-sm font-medium text-gray-700">
+                              Make *
+                            </Label>
+                            <Input
+                              id="make"
+                              name="make"
+                              type="text"
+                              required
+                              value={formData.make}
+                              onChange={handleInputChange}
+                              placeholder="e.g., Toyota"
+                              className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
+                                formData.make ? 'bg-blue-50' : 'bg-white'
+                              }`}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="model" className="text-sm font-medium text-gray-700">
+                              Model *
+                            </Label>
+                            <Input
+                              id="model"
+                              name="model"
+                              type="text"
+                              required
+                              value={formData.model}
+                              onChange={handleInputChange}
+                              placeholder="e.g., Camry"
+                              className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
+                                formData.model ? 'bg-blue-50' : 'bg-white'
+                              }`}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="trim" className="text-sm font-medium text-gray-700">
+                              Trim *
+                            </Label>
+                            <Input
+                              id="trim"
+                              name="trim"
+                              type="text"
+                              required
+                              value={formData.trim}
+                              onChange={handleInputChange}
+                              placeholder="e.g., SE or I'm not sure"
+                              className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
+                                formData.trim ? 'bg-blue-50' : 'bg-white'
+                              }`}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Third Line: Vehicle Condition, Current Mileage, Zip Code */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="vehicleCondition" className="text-sm font-medium text-gray-700">
+                              Vehicle Condition *
+                            </Label>
+                            <Select 
+                              value={formData.vehicleCondition} 
+                              onValueChange={(value) => handleSelectChange("vehicleCondition", value)}
+                              required
+                            >
+                              <SelectTrigger 
+                                id="vehicleCondition"
+                                className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 ${
+                                  formData.vehicleCondition 
+                                    ? 'bg-blue-50' 
+                                    : 'bg-white [&>span]:text-[0.6875rem] sm:[&>span]:text-sm [&>span]:text-gray-400 sm:[&>span]:text-gray-500'
                                 }`}
-                              />
+                              >
+                                <SelectValue placeholder="Select condition" />
+                              </SelectTrigger>
+                              <SelectContent className="font-sans">
+                                <SelectItem value="excellent" className="text-[0.8125rem] sm:text-base">Excellent</SelectItem>
+                                <SelectItem value="good" className="text-[0.8125rem] sm:text-base">Good</SelectItem>
+                                <SelectItem value="fair" className="text-[0.8125rem] sm:text-base">Fair</SelectItem>
+                                <SelectItem value="poor" className="text-[0.8125rem] sm:text-base">Poor</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="mileage" className="text-sm font-medium text-gray-700">
+                              Current Mileage *
+                            </Label>
+                            <Input
+                              id="mileage"
+                              name="mileage"
+                              type="text"
+                              required
+                              value={formData.mileage}
+                              onChange={handleInputChange}
+                              placeholder="e.g., 25,000"
+                              className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
+                                formData.mileage ? 'bg-blue-50' : 'bg-white'
+                              }`}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="zipCode" className="text-sm font-medium text-gray-700">
+                              ZIP Code *
+                            </Label>
+                            <Input
+                              id="zipCode"
+                              name="zipCode"
+                              type="text"
+                              required
+                              value={formData.zipCode}
+                              onChange={handleInputChange}
+                              placeholder="e.g., 90210"
+                              maxLength={5}
+                              className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
+                                formData.zipCode ? 'bg-blue-50' : 'bg-white'
+                              }`}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Honeypot field - hidden from users and keyboard navigation, catches bots */}
+                        <div style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }} aria-hidden="true">
+                          <Label htmlFor="website">Website (leave blank)</Label>
+                          <Input
+                            id="website"
+                            name="website"
+                            type="text"
+                            value={formData.website}
+                            onChange={handleInputChange}
+                            tabIndex={-1}
+                            autoComplete="off"
+                          />
+                        </div>
+
+                        <Button 
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-base sm:text-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isSubmitting ? "Processing..." : (
+                            <>
+                              Continue
+                              <ArrowRight className="h-5 w-5" />
+                            </>
+                          )}
+                        </Button>
+                      </form>
+                    )}
+
+                    {currentStep === 2 && (
+                      <form ref={step2FormRef} onSubmit={handlePurchase} className="space-y-6">
+                        {/* Order Summary */}
+                        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 space-y-4">
+                          <h3 className="text-base md:text-lg font-bold text-gray-900">Your Information</h3>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Name:</span>
+                              <span className="font-semibold text-gray-900">{formData.firstName}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Goal:</span>
+                              <span className="font-semibold text-gray-900">
+                                {formData.customerGoal === "no-longer-need" && "No Longer Need A Vehicle"}
+                                {formData.customerGoal === "different-vehicle" && "Want A Different Vehicle"}
+                                {formData.customerGoal === "keep-current" && "Want To Keep Current Vehicle"}
+                                {formData.customerGoal === "lower-cost" && "Lower Monthly Cost"}
+                                {formData.customerGoal === "not-sure" && "Not Sure"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Vehicle:</span>
+                              <span className="font-semibold text-gray-900">{formData.year} {formData.make} {formData.model}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Trim:</span>
+                              <span className="font-semibold text-gray-900">{formData.trim}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Condition:</span>
+                              <span className="font-semibold text-gray-900 capitalize">{formData.vehicleCondition}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Mileage:</span>
+                              <span className="font-semibold text-gray-900">{formData.mileage} miles</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Location:</span>
+                              <span className="font-semibold text-gray-900">ZIP {formData.zipCode}</span>
                             </div>
                           </div>
+                        </div>
+
+                        {/* Callout */}
+                        <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                          <p className="text-lg font-bold text-blue-900">
+                            We'll Show You How to End Your Lease Early
+                          </p>
+                        </div>
+
+                        {/* What You'll Receive */}
+                        <div className="space-y-4">
+                          <h3 className="text-lg font-bold text-gray-900">What You'll Receive</h3>
+                          <div className="space-y-3">
+                            <div className="flex items-start gap-3">
+                              <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="font-semibold text-gray-900">Your Vehicle's Estimated Market Value</p>
+                                <p className="text-sm text-gray-600">An estimate based on your vehicle, mileage, condition, and location.</p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="font-semibold text-gray-900">Five Lease-Exit Methods</p>
+                                <p className="text-sm text-gray-600">Dealer sell-back, trade-in, buyout, transfer, and formal early termination—explained step by step.</p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="font-semibold text-gray-900">Scripts, Worksheets and Action Steps</p>
+                                <p className="text-sm text-gray-600">Know who to call, what to ask, which numbers to compare, and what to do next.</p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="font-semibold text-gray-900">Personalized Starting Point</p>
+                                <p className="text-sm text-gray-600">An initial direction based on your vehicle and stated goal.</p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="font-semibold text-gray-900">Complimentary Payoff Review</p>
+                                <p className="text-sm text-gray-600">Send us your dealer payoff after receiving the guide (instructions included) and we'll calculate your estimated equity.</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Preview Your Personalized Reports Section */}
+                        <div className="space-y-6 pt-6 border-t border-gray-200">
+                          <div className="text-center space-y-2">
+                            <h3 className="text-lg md:text-xl font-bold text-gray-900">See What You'll Receive</h3>
+                            <p className="text-sm text-gray-600">Click any image to view it larger</p>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                            {/* Personalized Lease Exit Guide */}
+                            <div 
+                              className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-400 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                              onClick={() => setLightboxImage('/01-personalized-guide.png')}
+                            >
+                              <div className="relative aspect-[8.5/11] bg-gray-50">
+                                <Image 
+                                  src="/01-personalized-guide.png"
+                                  alt="Personalized Lease Exit Guide Preview"
+                                  fill
+                                  className="object-contain p-2"
+                                  sizes="(max-width: 768px) 100vw, 33vw"
+                                />
+                                <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/10 transition-colors duration-300 flex items-center justify-center">
+                                  <ZoomIn className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                </div>
+                              </div>
+                              <div className="p-4 text-center border-t border-gray-200">
+                                <p className="text-sm font-semibold text-gray-900">Personalized Lease Exit Guide</p>
+                                <p className="text-xs text-gray-600 mt-1">Step-by-step instructions for your situation</p>
+                              </div>
+                            </div>
+
+                            {/* Equity Examples */}
+                            <div 
+                              className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-400 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                              onClick={() => setLightboxImage('/03-equity-examples.png')}
+                            >
+                              <div className="relative aspect-[8.5/11] bg-gray-50">
+                                <Image 
+                                  src="/03-equity-examples.png"
+                                  alt="Equity Examples Preview"
+                                  fill
+                                  className="object-contain p-2"
+                                  sizes="(max-width: 768px) 100vw, 33vw"
+                                />
+                                <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/10 transition-colors duration-300 flex items-center justify-center">
+                                  <ZoomIn className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                </div>
+                              </div>
+                              <div className="p-4 text-center border-t border-gray-200">
+                                <p className="text-sm font-semibold text-gray-900">Equity Examples</p>
+                                <p className="text-xs text-gray-600 mt-1">Real scenarios showing positive and negative equity</p>
+                              </div>
+                            </div>
+
+                            {/* Personalized Payoff Review */}
+                            <div 
+                              className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-400 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                              onClick={() => setLightboxImage('/04-personalized-payoff-review.png')}
+                            >
+                              <div className="relative aspect-[8.5/11] bg-gray-50">
+                                <Image 
+                                  src="/04-personalized-payoff-review.png"
+                                  alt="Personalized Payoff Review Preview"
+                                  fill
+                                  className="object-contain p-2"
+                                  sizes="(max-width: 768px) 100vw, 33vw"
+                                />
+                                <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/10 transition-colors duration-300 flex items-center justify-center">
+                                  <ZoomIn className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                </div>
+                              </div>
+                              <div className="p-4 text-center border-t border-gray-200">
+                                <p className="text-sm font-semibold text-gray-900">Personalized Payoff Review</p>
+                                <p className="text-xs text-gray-600 mt-1">Your exact equity calculation and next steps</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                          <Button 
+                            type="submit" 
+                            disabled={isSubmitting}
+                            className="w-full h-12 sm:h-14 sm:flex-[2] sm:order-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          >
+                            {isSubmitting ? (
+                              "Processing..."
+                            ) : (
+                              <>
+                                Buy My Guide — $39
+                              </>
+                            )}
+                          </Button>
 
                           <Button 
-                            type="submit"
-                            className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-base sm:text-lg font-semibold flex items-center justify-center gap-2"
+                            type="button"
+                            onClick={handleBackToStep1}
+                            variant="ghost"
+                            className="w-full h-12 sm:h-14 sm:flex-1 sm:order-1 text-base font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                           >
-                            Continue
-                            <ArrowRight className="h-5 w-5" />
+                            <ArrowLeft className="h-5 w-5 mr-2" />
+                            Back
                           </Button>
-                        </form>
-                      )}
+                        </div>
 
-                      {currentStep === 2 && (
-                        <form ref={step2FormRef} onSubmit={handleSubmit} className="space-y-6">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-1">
-                                <Label htmlFor="licensePlate" className="text-sm font-medium text-gray-700">
-                                  License Plate Number <span className="text-gray-500 font-normal">(optional)</span>
-                                </Label>
-                                <button 
-                                  type="button" 
-                                  onClick={() => setShowLicensePlateInfo(!showLicensePlateInfo)}
-                                  className="inline-flex items-center justify-center touch-manipulation p-1 rounded-full hover:bg-gray-100 active:bg-blue-100 transition-colors"
-                                  aria-label="License plate information"
-                                >
-                                  <Info className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                                </button>
-                              </div>
-                              <Input
-                                id="licensePlate"
-                                name="licensePlate"
-                                type="text"
-                                value={formData.licensePlate}
-                                onChange={handleInputChange}
-                                placeholder="e.g., ABC1234"
-                                className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
-                                  formData.licensePlate ? 'bg-blue-50' : 'bg-white'
-                                }`}
-                              />
-                              {showLicensePlateInfo && (
-                                <div className="text-xs text-gray-600 bg-blue-50 border border-blue-200 rounded-md p-2 mt-1">
-                                  We use plate information for lease payoff calculations. We never share vehicle details without your explicit consent.
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label htmlFor="mileage" className="text-sm font-medium text-gray-700">
-                                Current Mileage *
-                              </Label>
-                              <Input
-                                id="mileage"
-                                name="mileage"
-                                type="text"
-                                required
-                                value={formData.mileage}
-                                onChange={handleInputChange}
-                                placeholder="e.g., 25,000"
-                                className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
-                                  formData.mileage ? 'bg-blue-50' : 'bg-white'
-                                }`}
-                              />
-                            </div>
+                        {/* Trust Indicators */}
+                        <div className="text-center space-y-2 pt-4 border-t border-gray-200">
+                          <div className="flex items-center justify-center gap-2">
+                            <ShieldCheck className="h-4 w-4 text-gray-400" />
+                            <span className="text-xs text-gray-500">Secure SSL encrypted payment</span>
                           </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                                Email Address *
-                              </Label>
-                              <Input
-                                id="email"
-                                name="email"
-                                type="email"
-                                required
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                placeholder="Enter your email"
-                                className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
-                                  formData.email ? 'bg-blue-50' : 'bg-white'
-                                }`}
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
-                                First Name *
-                              </Label>
-                              <Input
-                                id="firstName"
-                                name="firstName"
-                                type="text"
-                                required
-                                value={formData.firstName}
-                                onChange={handleInputChange}
-                                placeholder="Enter your first name"
-                                className={`h-12 text-[0.8125rem] sm:text-base focus:bg-blue-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder:text-[0.6875rem] sm:placeholder:text-sm placeholder:text-gray-400 sm:placeholder:text-gray-500 ${
-                                  formData.firstName ? 'bg-blue-50' : 'bg-white'
-                                }`}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="pt-2 space-y-4">
-                            <div className="flex items-start gap-1.5 p-2 bg-gray-50 rounded-lg border border-gray-200">
-                              <Checkbox
-                                id="consent"
-                                checked={formData.consentGiven}
-                                onCheckedChange={handleConsentChange}
-                                className="mt-0.5 flex-shrink-0"
-                              />
-                              <div className="flex-1">
-                                <Label
-                                  htmlFor="consent"
-                                  className="text-[11px] sm:text-xs text-gray-700 leading-[1.5] cursor-pointer block"
-                                >
-                                  <span className="font-semibold">Consent to Review Your <br className="sm:hidden" />Vehicle Information</span>
-                                  <br />
-                                  <span className="text-gray-600 block mt-1">
-                                    By submitting, you authorize OverLeased to review your lease information to determine your options for ending your lease. You understand that OverLeased is not a dealer, broker, lender, or lessor and does not negotiate or execute any vehicle sale or lease payoff.
-                                  </span>
-                                </Label>
-                              </div>
-                            </div>
-
-                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                              <Button 
-                                type="button"
-                                onClick={handleBackToStep1}
-                                variant="ghost"
-                                className="w-full h-9 sm:h-12 md:h-14 sm:flex-1 text-xs sm:text-base md:text-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 order-2 sm:order-1"
-                              >
-                                <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1 sm:mr-2" />
-                                Back
-                              </Button>
-
-                              <Button 
-                                type="submit" 
-                                disabled={isSubmitting || !formData.consentGiven}
-                                className="w-full h-12 sm:h-14 sm:flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
-                              >
-                                {isSubmitting ? "Submitting..." : "Check If You Qualify"}
-                              </Button>
-                            </div>
-                          </div>
-                        </form>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
+                          <p className="text-xs text-gray-500">
+                            Your information is protected and will never be sold or shared
+                          </p>
+                        </div>
+                      </form>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
             </div>
+          </div>
         </main>
         
         <Footer />
       </div>
+
+      {/* Lightbox Dialog */}
+      <Dialog open={!!lightboxImage} onOpenChange={() => setLightboxImage(null)}>
+        <DialogContent className="max-w-4xl w-[95vw] h-[90vh] p-0 bg-black/95 border-0">
+          <button
+            onClick={() => setLightboxImage(null)}
+            className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          >
+            <X className="h-6 w-6 text-white" />
+          </button>
+          {lightboxImage && (
+            <div className="relative w-full h-full flex items-center justify-center p-8">
+              <Image
+                src={lightboxImage}
+                alt="Report Preview"
+                fill
+                className="object-contain"
+                sizes="95vw"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

@@ -153,7 +153,7 @@ export default function PayoffLookupPage() {
             <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
               <CardTitle className="text-3xl font-bold">Lease Payoff Phone Number Lookup</CardTitle>
               <p className="text-blue-100 mt-2">
-                Find the lease payoff phone number for your auto finance company. 
+                Find the lease payoff phone number for your leasing company. 
                 Search by company name to quickly locate the contact information you need.
               </p>
             </CardHeader>
@@ -161,8 +161,21 @@ export default function PayoffLookupPage() {
               {/* Helpful Note */}
               <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-blue-800 text-sm">
-                  <strong>Note:</strong> You may also contact your auto finance company by searching online for the customer service phone number.
+                  <strong>Note:</strong> You may also contact your leasing company by searching online for the customer service phone number.
                 </p>
+              </div>
+
+              {/* Call Script */}
+              <div className="mb-6 p-5 bg-green-50 border-2 border-green-300 rounded-lg">
+                <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
+                  <Phone className="h-5 w-5" />
+                  What to Say When You Call:
+                </h3>
+                <div className="bg-white p-4 rounded border border-green-200">
+                  <p className="text-gray-800 leading-relaxed">
+                    "I am evaluating whether an authorized dealership can purchase my leased vehicle. Can you provide the current dealer payoff amount, its expiration date, and any restrictions on which dealerships may purchase the vehicle?"
+                  </p>
+                </div>
               </div>
 
               {/* Search Input */}
@@ -171,7 +184,7 @@ export default function PayoffLookupPage() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <Input
                     type="text"
-                    placeholder="Search finance companies..."
+                    placeholder="Search leasing companies..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 text-lg py-3 border-2 border-gray-300 focus:border-blue-500"
@@ -213,7 +226,7 @@ export default function PayoffLookupPage() {
                     <div className="text-center py-12">
                       <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                       <p className="text-gray-500 text-lg">
-                        No finance companies found matching "{searchTerm}"
+                        {searchTerm ? `No leasing companies found matching "${searchTerm}"` : "Start typing the name of your leasing company."}
                       </p>
                     </div>
                   )}

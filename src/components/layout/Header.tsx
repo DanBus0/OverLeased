@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Car, Phone, Mail, Menu, X } from "lucide-react";
+import { Car, Mail, Menu, X } from "lucide-react";
 import Link from "next/link";
 
 export default function Header() {
@@ -38,7 +38,7 @@ export default function Header() {
               </Button>
               <Button 
                 variant="ghost" 
-                onClick={() => scrollToSection('faq-section')}
+                onClick={() => scrollToSection('faq')}
                 className="text-gray-700 hover:text-blue-600 hover:bg-blue-50"
               >
                 FAQ
@@ -46,12 +46,6 @@ export default function Header() {
             </div>
             
             <div className="hidden lg:flex items-center gap-8 text-sm">
-              <div className="flex items-center gap-1 text-gray-700">
-                <Phone className="h-4 w-4" />
-                <a href="tel:+14847029539" className="hover:text-blue-600 transition-colors cursor-pointer">
-                  (484) 702-9539
-                </a>
-              </div>
               <div className="flex items-center gap-1 text-gray-700">
                 <Mail className="h-4 w-4" />
                 <a href="mailto:support@overleased.com" className="hover:text-blue-600 transition-colors cursor-pointer">
@@ -113,18 +107,12 @@ export default function Header() {
             </Button>
             <Button 
               variant="ghost" 
-              onClick={() => scrollToSection('faq-section')}
+              onClick={() => scrollToSection('faq')}
               className="w-full text-left justify-start text-gray-700 hover:text-blue-600 hover:bg-blue-50"
             >
               FAQ
             </Button>
             <div className="pt-2 border-t border-gray-200 space-y-3 px-4">
-              <div className="flex items-center gap-2 text-gray-700">
-                <Phone className="h-4 w-4" />
-                <a href="tel:+14847029539" className="hover:text-blue-600 transition-colors text-sm">
-                  (484) 702-9539
-                </a>
-              </div>
               <div className="flex items-center gap-2 text-gray-700">
                 <Mail className="h-4 w-4" />
                 <a href="mailto:support@overleased.com" className="hover:text-blue-600 transition-colors text-sm">

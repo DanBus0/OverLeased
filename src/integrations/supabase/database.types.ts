@@ -11,145 +11,118 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
-      contact_requests: {
+      dealer_coordination_leads: {
         Row: {
-          created_at: string | null
-          email: string
-          id: string
-          message: string
-          name: string
-        }
-        Insert: {
-          created_at?: string | null
-          email: string
-          id?: string
-          message: string
-          name: string
-        }
-        Update: {
-          created_at?: string | null
-          email?: string
-          id?: string
-          message?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      lease_inquiries: {
-        Row: {
-          created_at: string | null
-          current_mileage: number
+          amount_paid: number | null
+          created_at: string
           email: string
           first_name: string
           id: string
-          license_plate: string | null
-          make: string | null
-          model: string | null
-          updated_at: string | null
-          vehicle_condition: string | null
-          zip_code: string | null
+          last_name: string
+          notes: string | null
+          payment_intent_id: string | null
+          payment_status: string
+          phone: string
+          service_completed: boolean | null
+          service_completed_at: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
-          current_mileage: number
+          amount_paid?: number | null
+          created_at?: string
           email: string
           first_name: string
           id?: string
-          license_plate?: string | null
-          make?: string | null
-          model?: string | null
-          updated_at?: string | null
-          vehicle_condition?: string | null
-          zip_code?: string | null
+          last_name: string
+          notes?: string | null
+          payment_intent_id?: string | null
+          payment_status?: string
+          phone: string
+          service_completed?: boolean | null
+          service_completed_at?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
-          current_mileage?: number
+          amount_paid?: number | null
+          created_at?: string
           email?: string
           first_name?: string
           id?: string
-          license_plate?: string | null
-          make?: string | null
-          model?: string | null
-          updated_at?: string | null
-          vehicle_condition?: string | null
-          zip_code?: string | null
+          last_name?: string
+          notes?: string | null
+          payment_intent_id?: string | null
+          payment_status?: string
+          phone?: string
+          service_completed?: boolean | null
+          service_completed_at?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
-      lease_inquiries_backup: {
+      lease_review_leads: {
         Row: {
-          annual_mileage_allowance: number | null
-          created_at: string | null
-          current_mileage: number | null
-          dealer_interest: string | null
-          email: string | null
-          estimated_equity: number | null
-          first_name: string | null
-          id: string | null
-          is_positive_equity: boolean | null
-          lease_term: number | null
-          license_plate: string | null
-          market_value: number | null
-          months_remaining: number | null
-          payoff_amount: number | null
-          updated_at: string | null
-          vehicle_make: string | null
-          vehicle_model: string | null
-          vehicle_state: string | null
-          vehicle_trim: string | null
-          vehicle_year: number | null
-          zip_code: string | null
+          amount_paid: number | null
+          created_at: string
+          current_mileage: number
+          customer_goal: string | null
+          email: string
+          firstname: string | null
+          id: string
+          make: string
+          model: string
+          payment_intent_id: string | null
+          payment_status: string | null
+          report_delivered: boolean | null
+          report_delivered_at: string | null
+          trim: string | null
+          updated_at: string
+          vehicle_condition: string | null
+          year: string
+          zip_code: string
         }
         Insert: {
-          annual_mileage_allowance?: number | null
-          created_at?: string | null
-          current_mileage?: number | null
-          dealer_interest?: string | null
-          email?: string | null
-          estimated_equity?: number | null
-          first_name?: string | null
-          id?: string | null
-          is_positive_equity?: boolean | null
-          lease_term?: number | null
-          license_plate?: string | null
-          market_value?: number | null
-          months_remaining?: number | null
-          payoff_amount?: number | null
-          updated_at?: string | null
-          vehicle_make?: string | null
-          vehicle_model?: string | null
-          vehicle_state?: string | null
-          vehicle_trim?: string | null
-          vehicle_year?: number | null
-          zip_code?: string | null
+          amount_paid?: number | null
+          created_at?: string
+          current_mileage: number
+          customer_goal?: string | null
+          email: string
+          firstname?: string | null
+          id?: string
+          make: string
+          model: string
+          payment_intent_id?: string | null
+          payment_status?: string | null
+          report_delivered?: boolean | null
+          report_delivered_at?: string | null
+          trim?: string | null
+          updated_at?: string
+          vehicle_condition?: string | null
+          year: string
+          zip_code: string
         }
         Update: {
-          annual_mileage_allowance?: number | null
-          created_at?: string | null
-          current_mileage?: number | null
-          dealer_interest?: string | null
-          email?: string | null
-          estimated_equity?: number | null
-          first_name?: string | null
-          id?: string | null
-          is_positive_equity?: boolean | null
-          lease_term?: number | null
-          license_plate?: string | null
-          market_value?: number | null
-          months_remaining?: number | null
-          payoff_amount?: number | null
-          updated_at?: string | null
-          vehicle_make?: string | null
-          vehicle_model?: string | null
-          vehicle_state?: string | null
-          vehicle_trim?: string | null
-          vehicle_year?: number | null
-          zip_code?: string | null
+          amount_paid?: number | null
+          created_at?: string
+          current_mileage?: number
+          customer_goal?: string | null
+          email?: string
+          firstname?: string | null
+          id?: string
+          make?: string
+          model?: string
+          payment_intent_id?: string | null
+          payment_status?: string | null
+          report_delivered?: boolean | null
+          report_delivered_at?: string | null
+          trim?: string | null
+          updated_at?: string
+          vehicle_condition?: string | null
+          year?: string
+          zip_code?: string
         }
         Relationships: []
       }

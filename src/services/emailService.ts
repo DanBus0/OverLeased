@@ -50,10 +50,11 @@ export const emailService = {
         console.log('IMPORTANT: No from field specified, will use default sender');
       }
 
-      console.log('Calling function URL directly:', 'https://nbxdfscgwnpqxigocgck.supabase.co/functions/v1/send-email');
+      const functionUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-email`;
+      console.log('Calling function URL directly:', functionUrl);
       console.log('Full payload being sent:', JSON.stringify(payload, null, 2));
 
-      const fetchPromise = fetch('https://nbxdfscgwnpqxigocgck.supabase.co/functions/v1/send-email', {
+      const fetchPromise = fetch(functionUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

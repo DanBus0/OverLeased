@@ -1,44 +1,27 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
 
 export interface LeaseInquiry {
-  id: string;
   email: string;
-  first_name: string;
-  license_plate: string;
+  year: string;
+  make: string;
+  model: string;
   current_mileage: number;
-  zip_code?: string;
-  vehicle_condition?: string;
-  created_at: string;
-  updated_at: string;
+  zip_code: string;
+  payment_status?: string;
+  payment_intent_id?: string;
+  amount_paid?: number;
 }
 
-export const leaseInquiryService = {
-  async createLeaseInquiry(inquiry: {
-    first_name: string;
-    email: string;
-    license_plate: string;
-    current_mileage: number;
-    zip_code?: string;
-    vehicle_condition?: string;
-  }) {
-    const { data, error } = await supabase
-      .from('lease_inquiries')
-      .insert([inquiry])
-      .select()
-      .single();
+export const saveLeaseInquiry = async (inquiry: LeaseInquiry) => {
+  const { data, error } = await supabase
+    .from("lease_review_leads")
+    .insert([inquiry])
+    .select();
 
-    if (error) throw error;
-    return data as LeaseInquiry;
-  },
-
-  async getLeaseInquiries() {
-    const { data, error } = await supabase
-      .from('lease_inquiries')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data as LeaseInquiry[];
+  if (error) {
+    console.error("Error saving lease inquiry:", error);
+    throw error;
   }
+
+  return data;
 };

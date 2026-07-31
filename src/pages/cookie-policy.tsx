@@ -40,14 +40,14 @@ export default function CookiePolicyPage() {
     <>
       <Head>
         <title>Cookie Policy | OverLeased</title>
-        <meta name="description" content="Learn about how OverLeased uses cookies to enhance your experience on our early lease termination information service and dealer connection platform." />
+        <meta name="description" content="Learn about how OverLeased uses cookies to enhance your experience on our Personalized Lease Exit Guide service." />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.overleased.com/cookie-policy" />
         <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
         
         {/* Open Graph Tags */}
         <meta property="og:title" content="Cookie Policy | OverLeased" />
-        <meta property="og:description" content="Learn about how OverLeased uses cookies to enhance your experience on our early lease termination information service and dealer connection platform." />
+        <meta property="og:description" content="Learn about how OverLeased uses cookies to enhance your experience on our Personalized Lease Exit Guide service." />
         <meta property="og:url" content="https://www.overleased.com/cookie-policy" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="OverLeased" />
@@ -55,7 +55,7 @@ export default function CookiePolicyPage() {
         {/* Twitter Card Tags */}
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="Cookie Policy | OverLeased" />
-        <meta name="twitter:description" content="Learn about how OverLeased uses cookies to enhance your experience on our early lease termination information service and dealer connection platform." />
+        <meta name="twitter:description" content="Learn about how OverLeased uses cookies to enhance your experience on our Personalized Lease Exit Guide service." />
       </Head>
       
       <div className="min-h-screen bg-gray-50">
@@ -84,19 +84,19 @@ export default function CookiePolicyPage() {
           <Card className="shadow-lg">
             <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
               <CardTitle className="text-3xl font-bold">Cookie Policy</CardTitle>
-              <p className="text-blue-100 mt-2">Last updated: October 2025</p>
+              <p className="text-blue-100 mt-2">Last updated: July 2026</p>
             </CardHeader>
             <CardContent className="p-8 space-y-8">
               <section>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
-                    This Cookie Policy explains how OverLeased uses cookies and similar tracking technologies on our website. By using our early lease termination information service and dealer connection platform, you consent to our use of cookies as described in this policy.
+                    This Cookie Policy explains how OverLeased uses cookies and similar tracking technologies on our website. By using our Personalized Lease Exit Guide service, you consent to our use of cookies as described in this policy.
                   </p>
                   <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mt-4">
                     <p className="text-blue-900 font-semibold mb-2">About OverLeased:</p>
                     <p className="text-blue-800 text-sm">
-                      OverLeased is a marketing and sourcing service that provides information to help consumers end their car lease early by connecting them with dealerships. We are NOT a dealer, broker, lender, or lessor.
+                      OverLeased provides a $39 Personalized Lease Exit Guide that includes a complimentary Payoff Review. We also offer an optional, separately purchased Dealer Coordination Service. We are NOT a dealer, broker, lender, or lessor.
                     </p>
                   </div>
                 </div>
@@ -115,10 +115,16 @@ export default function CookiePolicyPage() {
                     <li>Enhance your browsing experience on our website</li>
                     <li>Analyze website traffic and user behavior</li>
                     <li>Remember your preferences and form submissions</li>
-                    <li>Connect you with relevant dealerships</li>
+                    <li>Process payments for the Lease Exit Guide and optional services</li>
                     <li>Improve our marketing and advertising efforts</li>
                     <li>Provide personalized content and information</li>
                   </ul>
+                  <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mt-4">
+                    <p className="text-yellow-900 font-semibold mb-2">Important:</p>
+                    <p className="text-yellow-800 text-sm">
+                      Information submitted for the Lease Exit Guide is used solely to prepare and deliver your guide and complimentary Payoff Review. OverLeased will NOT share your personal or vehicle information with dealerships unless you separately request and consent to the optional Dealer Coordination Service.
+                    </p>
+                  </div>
                 </div>
               </section>
 
@@ -132,19 +138,20 @@ export default function CookiePolicyPage() {
                     </p>
                     <ul className="list-disc pl-6 mt-2 space-y-1">
                       <li>Session management and security</li>
-                      <li>Form data retention for lease inquiries</li>
+                      <li>Form data retention for Lease Exit Guide purchase</li>
+                      <li>Payment processing through Stripe</li>
                       <li>User authentication (if applicable)</li>
                       <li>Load balancing and performance optimization</li>
                     </ul>
                     <p className="text-sm text-gray-600 mt-2">
-                      <strong>Legal Basis:</strong> These cookies are necessary for the legitimate interests of operating our website and providing our information services.
+                      <strong>Legal Basis:</strong> These cookies are necessary for the legitimate interests of operating our website and providing our Lease Exit Guide service.
                     </p>
                   </div>
 
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Analytics Cookies</h3>
                     <p>
-                      These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously. This helps us improve our website's performance, user experience, and the quality of information we provide about early lease termination options.
+                      These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously. This helps us improve our website's performance, user experience, and the quality of our Lease Exit Guide service.
                     </p>
                     <ul className="list-disc pl-6 mt-2 space-y-1">
                       <li>Google Analytics - Page view tracking and user behavior analysis</li>
@@ -152,6 +159,7 @@ export default function CookiePolicyPage() {
                       <li>Navigation patterns and popular content identification</li>
                       <li>Performance monitoring and error tracking</li>
                       <li>Traffic source analysis (how users find our service)</li>
+                      <li>Conversion tracking for successful guide purchases</li>
                     </ul>
                   </div>
 
@@ -162,25 +170,28 @@ export default function CookiePolicyPage() {
                     </p>
                     <ul className="list-disc pl-6 mt-2 space-y-1">
                       <li>User preferences and settings</li>
-                      <li>Previously submitted vehicle information</li>
+                      <li>Previously submitted vehicle information (for guide preparation)</li>
                       <li>Language and regional settings</li>
-                      <li>Customized content based on your interests</li>
+                      <li>Customized content based on your lease situation</li>
                     </ul>
                   </div>
 
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Marketing and Advertising Cookies</h3>
                     <p>
-                      These cookies are used to track visitors across websites and deliver relevant advertising. They help us understand which marketing efforts are most effective in connecting consumers with dealerships.
+                      These cookies are used to track visitors across websites and deliver relevant advertising. They help us understand which marketing efforts are most effective in reaching consumers interested in ending their lease early.
                     </p>
                     <ul className="list-disc pl-6 mt-2 space-y-1">
                       <li>Google Ads - Advertising targeting and conversion tracking</li>
                       <li>Facebook Pixel - Social media advertising and analytics</li>
                       <li>LinkedIn Insight Tag - Professional network advertising</li>
                       <li>Remarketing campaigns to users who have visited our site</li>
-                      <li>Conversion tracking for successful dealer connections</li>
+                      <li>Conversion tracking for Lease Exit Guide purchases</li>
                       <li>Attribution tracking for marketing performance</li>
                     </ul>
+                    <p className="text-sm text-gray-600 mt-2">
+                      <strong>Note:</strong> Marketing cookies help us reach potential customers but do NOT result in sharing your personal information with dealerships. Such sharing only occurs if you separately purchase the optional Dealer Coordination Service.
+                    </p>
                   </div>
                 </div>
               </section>
@@ -189,7 +200,7 @@ export default function CookiePolicyPage() {
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Third-Party Cookies</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
-                    Some cookies on our website are placed by third-party services that help us operate our marketing and sourcing service. We work with reputable partners who comply with data protection regulations.
+                    Some cookies on our website are placed by third-party services that help us operate our Lease Exit Guide service and website. We work with reputable partners who comply with data protection regulations.
                   </p>
                   <div className="bg-gray-50 p-4 rounded-lg border border-gray-300">
                     <h4 className="font-semibold text-gray-900 mb-2">Third-Party Services We Use:</h4>
@@ -197,12 +208,13 @@ export default function CookiePolicyPage() {
                       <li><strong>Google Analytics:</strong> Website analytics and performance monitoring to improve our service</li>
                       <li><strong>Google Ads:</strong> Advertising and remarketing to reach users interested in ending their lease</li>
                       <li><strong>Facebook Pixel:</strong> Social media advertising and analytics for targeted marketing</li>
-                      <li><strong>LinkedIn Insight Tag:</strong> Professional network advertising and B2B dealer connections</li>
-                      <li><strong>Email Service Providers:</strong> For communication about your lease termination inquiry</li>
+                      <li><strong>LinkedIn Insight Tag:</strong> Professional network advertising</li>
+                      <li><strong>Stripe:</strong> Secure payment processing for guide purchases</li>
+                      <li><strong>Email Service Providers:</strong> For communication about your Lease Exit Guide delivery</li>
                     </ul>
                   </div>
-                  <p>
-                    These third parties may use cookies to collect information about your online activities across different websites. This information may be shared with dealerships and service providers as part of our sourcing service.
+                  <p className="font-medium mt-4">
+                    Important: These third-party services support our website operations and marketing. They do NOT receive your personal or vehicle information for dealership sharing purposes unless you separately request and consent to the optional Dealer Coordination Service.
                   </p>
                 </div>
               </section>
@@ -256,26 +268,32 @@ export default function CookiePolicyPage() {
                   <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mt-4">
                     <p className="text-yellow-900 font-semibold mb-2">Important Note:</p>
                     <p className="text-yellow-800 text-sm">
-                      Disabling certain cookies may affect the functionality of our website and limit our ability to provide you with information about early lease termination options or connect you with dealerships. Essential cookies cannot be disabled as they are necessary for the website to function.
+                      Disabling certain cookies may affect the functionality of our website and limit our ability to process your Lease Exit Guide purchase or deliver your personalized guide. Essential cookies cannot be disabled as they are necessary for the website to function.
                     </p>
                   </div>
                 </div>
               </section>
 
               <section>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Cookie Consent and DDPA Compliance</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Cookie Consent and DPPA Compliance</h2>
                 <div className="space-y-4 text-gray-700">
                   <p>
-                    By continuing to use our website and submitting the lease inquiry form, you consent to our use of cookies as described in this policy. When you check the consent box on our form, you explicitly authorize:
+                    By continuing to use our website and purchasing the Lease Exit Guide, you consent to our use of cookies as described in this policy. Your cookie consent authorizes:
                   </p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li>The use of cookies to track your interaction with our website</li>
-                    <li>Sharing of cookie data with dealerships and service providers</li>
-                    <li>Use of your information for marketing and advertising purposes</li>
-                    <li>Cross-site tracking for remarketing and attribution</li>
+                    <li>Collection of analytics data to improve our service</li>
+                    <li>Use of marketing cookies for targeted advertising</li>
+                    <li>Processing your information to prepare and deliver your Lease Exit Guide</li>
                   </ul>
-                  <p>
-                    You can withdraw your consent at any time by adjusting your browser settings, using opt-out tools, or contacting us directly at support@overleased.com.
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mt-4">
+                    <h4 className="text-blue-900 font-semibold mb-2">Dealer Coordination Service - Separate Consent Required:</h4>
+                    <p className="text-blue-800 text-sm">
+                      If you separately request and purchase the optional Dealer Coordination Service, you will be asked for explicit consent under the Driver's Privacy Protection Act (DPPA) to share your vehicle and personal information with dealerships. This is a separate authorization from cookie consent and is only required if you choose to use that optional service.
+                    </p>
+                  </div>
+                  <p className="mt-4">
+                    You can withdraw your cookie consent at any time by adjusting your browser settings, using opt-out tools, or contacting us directly at support@overleased.com.
                   </p>
                 </div>
               </section>
@@ -324,7 +342,6 @@ export default function CookiePolicyPage() {
                   <p>If you have any questions about our use of cookies or this Cookie Policy, please contact us:</p>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p><strong>Email:</strong> support@overleased.com</p>
-                    <p><strong>Phone:</strong> (484) 702-9539</p>
                     <p><strong>Website:</strong> www.overleased.com</p>
                   </div>
                   <p className="text-sm text-gray-600 mt-4">
