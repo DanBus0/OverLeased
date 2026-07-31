@@ -250,78 +250,125 @@ async function handleDealerCoordinationSuccess(paymentIntent: Stripe.PaymentInte
 }
 
 async function handleLeaseReportSuccess(paymentIntent: Stripe.PaymentIntent) {
-  const metadata = paymentIntent.metadata;
-
-  // Check if already processed (idempotency)
-  const { data: existing } = await supabaseAdmin
-    .from("lease_review_leads")
-    .select("id")
-    .eq("payment_intent_id", paymentIntent.id)
-    .single();
-
-  if (existing) {
-    console.log(`Lease report ${paymentIntent.id} already processed, skipping`);
-    return;
-  }
-
-  // Save to database
-  const { error: dbError } = await supabaseAdmin
-    .from("lease_review_leads")
-    .insert({
-      firstname: metadata.firstName,
-      customer_goal: metadata.customerGoal,
-      email: metadata.customerEmail,
-      year: metadata.vehicleYear,
-      make: metadata.vehicleMake,
-      model: metadata.vehicleModel,
-      trim: metadata.vehicleTrim,
-      vehicle_condition: metadata.vehicleCondition,
-      current_mileage: parseInt(metadata.vehicleMileage || "0"),
-      zip_code: metadata.zipCode,
-      payment_intent_id: paymentIntent.id,
-      payment_status: "paid",
-      amount_paid: paymentIntent.amount,
-    });
-
-  if (dbError) {
-    console.error("Failed to save lease report lead:", dbError);
-    throw new Error("Database save failed");
-  }
-
-  console.log(`Lease report lead saved: ${paymentIntent.id}`);
-
-  // Send confirmation emails
   try {
-    const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/send-confirmation-emails`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: metadata.customerEmail,
-        firstName: metadata.firstName,
-        customerGoal: metadata.customerGoal,
-        vehicle: {
-          year: metadata.vehicleYear,
-          make: metadata.vehicleMake,
-          model: metadata.vehicleModel,
-          trim: metadata.vehicleTrim,
-          condition: metadata.vehicleCondition,
-          mileage: metadata.vehicleMileage,
-        },
-        amount: paymentIntent.amount,
+    const metadata = paymentIntent.metadata;
+    const firstName = metadata.firstName;
+    const customerEmail = metadata.customerEmail;
+    const customerGoal = metadata.customerGoal;
+
+    // Validate required fields
+    if (!firstName || !customerEmail || !customerGoal) {
+      console.error("Lease report failed: Missing required metadata", {
         paymentIntentId: paymentIntent.id,
-      }),
+        hasFirstName: !!firstName,
+        hasEmail: !!customerEmail,
+        hasGoal: !!customerGoal,
+      });
+      throw new Error("Missing required customer information in metadata");
+    }
+
+    // Check if already processed (idempotency)
+    const { data: existing, error: checkError } = await supabaseAdmin
+      .from("lease_review_leads")
+      .select("id")
+      .eq("payment_intent_id", paymentIntent.id)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error("Lease report failed: Database check error", {
+        paymentIntentId: paymentIntent.id,
+        error: checkError,
+      });
+      throw new Error(`Idempotency check failed: ${checkError.message}`);
+    }
+
+    if (existing) {
+      console.log("Lease report already processed (idempotent)", {
+        paymentIntentId: paymentIntent.id,
+      });
+      return;
+    }
+
+    // Save to database
+    const { error: dbError } = await supabaseAdmin
+      .from("lease_review_leads")
+      .insert({
+        firstname: firstName,
+        customer_goal: customerGoal,
+        email: customerEmail,
+        year: metadata.vehicleYear,
+        make: metadata.vehicleMake,
+        model: metadata.vehicleModel,
+        trim: metadata.vehicleTrim,
+        vehicle_condition: metadata.vehicleCondition,
+        current_mileage: parseInt(metadata.vehicleMileage || "0"),
+        zip_code: metadata.zipCode,
+        payment_intent_id: paymentIntent.id,
+        payment_status: "paid",
+        amount_paid: paymentIntent.amount,
+      });
+
+    if (dbError) {
+      console.error("Lease report failed: Database insert error", {
+        paymentIntentId: paymentIntent.id,
+        error: dbError,
+      });
+      throw new Error(`Database save failed: ${dbError.message}`);
+    }
+
+    console.log("Lease report lead saved", {
+      paymentIntentId: paymentIntent.id,
     });
 
-    if (!emailResponse.ok) {
-      console.error("Failed to send lease report confirmation emails");
-    } else {
-      console.log("Lease report confirmation emails sent");
+    // Send confirmation emails
+    try {
+      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/send-confirmation-emails`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: customerEmail,
+          firstName: firstName,
+          customerGoal: customerGoal,
+          vehicle: {
+            year: metadata.vehicleYear,
+            make: metadata.vehicleMake,
+            model: metadata.vehicleModel,
+            trim: metadata.vehicleTrim,
+            condition: metadata.vehicleCondition,
+            mileage: metadata.vehicleMileage,
+          },
+          amount: paymentIntent.amount,
+          paymentIntentId: paymentIntent.id,
+        }),
+      });
+
+      if (!emailResponse.ok) {
+        console.error("Lease report: Email sending failed", {
+          paymentIntentId: paymentIntent.id,
+          status: emailResponse.status,
+        });
+      } else {
+        console.log("Lease report emails sent", {
+          paymentIntentId: paymentIntent.id,
+        });
+      }
+    } catch (emailError: any) {
+      console.error("Lease report: Email exception", {
+        paymentIntentId: paymentIntent.id,
+        error: emailError.message,
+      });
+      // Don't throw - email failure shouldn't block webhook processing
     }
-  } catch (emailError) {
-    console.error("Email sending error:", emailError);
-    // Don't throw - email failure shouldn't block webhook processing
+
+  } catch (handlerError: any) {
+    console.error("Lease report handler error", {
+      paymentIntentId: paymentIntent.id,
+      error: handlerError.message,
+      stack: handlerError.stack,
+    });
+    throw handlerError;
   }
 }
 
