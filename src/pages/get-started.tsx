@@ -654,11 +654,11 @@ export default function GetStartedPage() {
                             {/* Equity Examples */}
                             <div 
                               className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-400 hover:shadow-lg transition-all duration-300 cursor-pointer"
-                              onClick={() => setLightboxImage('/03-equity-examples.png')}
+                              onClick={() => setLightboxImage('/ChatGPT_Image_Aug_3_2026_01_00_32_PM.png')}
                             >
                               <div className="relative aspect-[8.5/11] bg-gray-50">
                                 <Image 
-                                  src="/03-equity-examples.png"
+                                  src="/ChatGPT_Image_Aug_3_2026_01_00_32_PM.png"
                                   alt="Equity Examples Preview"
                                   fill
                                   className="object-contain p-2"
