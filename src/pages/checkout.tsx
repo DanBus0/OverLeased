@@ -188,7 +188,7 @@ function CheckoutForm({ formData, clientSecret }: { formData: FormData; clientSe
         }
 
         sessionStorage.removeItem("leaseFormData");
-        router.push("/report-purchased");
+        router.push(`/report-purchased?payment_intent=${encodeURIComponent(paymentIntent.id)}`);
       }
     } catch (err: any) {
       setErrorMessage(err.message || "An unexpected error occurred");
