@@ -13,6 +13,26 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+// Helper to normalize and validate mileage input
+function validateMileage(mileageInput: string | undefined): number {
+  const normalized = String(mileageInput || "0").replace(/,/g, "").trim();
+  const mileageValue = Number(normalized);
+  
+  if (!Number.isFinite(mileageValue)) {
+    throw new Error(`Invalid mileage value: ${mileageInput}`);
+  }
+  
+  if (mileageValue < 0) {
+    throw new Error(`Mileage cannot be negative: ${mileageValue}`);
+  }
+  
+  if (!Number.isInteger(mileageValue)) {
+    throw new Error(`Mileage must be a whole number: ${mileageValue}`);
+  }
+  
+  return mileageValue;
+}
+
 // Disable body parsing to get raw body for signature verification
 export const config = {
   api: {
@@ -157,7 +177,11 @@ async function handleDealerCoordinationSuccess(paymentIntent: Stripe.PaymentInte
       throw new Error("Missing required customer information in metadata");
     }
 
-    // Check if already processed (idempotency)
+    // STAGE 1: Idempotency check
+    console.log("Dealer coordination: Starting idempotency check", {
+      paymentIntentId: paymentIntent.id,
+    });
+
     const { data: existing, error: checkError } = await supabaseAdmin
       .from("dealer_coordination_leads")
       .select("id")
@@ -179,7 +203,15 @@ async function handleDealerCoordinationSuccess(paymentIntent: Stripe.PaymentInte
       return;
     }
 
-    // Save to database
+    console.log("Dealer coordination: Idempotency check passed - proceeding with insert", {
+      paymentIntentId: paymentIntent.id,
+    });
+
+    // STAGE 2: Database insert
+    console.log("Dealer coordination: Starting database insert", {
+      paymentIntentId: paymentIntent.id,
+    });
+
     const { error: dbError } = await supabaseAdmin
       .from("dealer_coordination_leads")
       .insert({
@@ -193,6 +225,15 @@ async function handleDealerCoordinationSuccess(paymentIntent: Stripe.PaymentInte
       });
 
     if (dbError) {
+      // Handle race condition: if unique constraint violation on payment_intent_id,
+      // another webhook already inserted this record - treat as idempotent success
+      if (dbError.code === "23505" && dbError.message.includes("payment_intent_id")) {
+        console.log("Dealer coordination: Race condition detected - record already inserted by concurrent webhook (idempotent)", {
+          paymentIntentId: paymentIntent.id,
+        });
+        return;
+      }
+      
       console.error("Dealer coordination failed: Database insert error", {
         paymentIntentId: paymentIntent.id,
         error: dbError,
@@ -200,11 +241,16 @@ async function handleDealerCoordinationSuccess(paymentIntent: Stripe.PaymentInte
       throw new Error(`Database save failed: ${dbError.message}`);
     }
 
-    console.log("Dealer coordination lead saved", {
+    console.log("Dealer coordination lead saved successfully", {
       paymentIntentId: paymentIntent.id,
     });
 
-    // Send confirmation emails
+    // STAGE 3: Send confirmation emails
+    console.log("Dealer coordination: Starting email sending", {
+      paymentIntentId: paymentIntent.id,
+      emailEndpoint: `${process.env.NEXT_PUBLIC_SITE_URL}/api/send-dealer-coordination-emails`,
+    });
+
     try {
       const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/send-dealer-coordination-emails`, {
         method: "POST",
@@ -222,19 +268,23 @@ async function handleDealerCoordinationSuccess(paymentIntent: Stripe.PaymentInte
       });
 
       if (!emailResponse.ok) {
-        console.error("Dealer coordination: Email sending failed", {
+        const errorText = await emailResponse.text().catch(() => "Unable to read response");
+        console.error("Dealer coordination: Email API returned error", {
           paymentIntentId: paymentIntent.id,
           status: emailResponse.status,
+          statusText: emailResponse.statusText,
+          errorBody: errorText,
         });
       } else {
-        console.log("Dealer coordination emails sent", {
+        console.log("Dealer coordination emails sent successfully", {
           paymentIntentId: paymentIntent.id,
         });
       }
     } catch (emailError: any) {
-      console.error("Dealer coordination: Email exception", {
+      console.error("Dealer coordination: Email fetch exception", {
         paymentIntentId: paymentIntent.id,
         error: emailError.message,
+        stack: emailError.stack,
       });
       // Don't throw - email failure shouldn't block webhook processing
     }
@@ -267,7 +317,11 @@ async function handleLeaseReportSuccess(paymentIntent: Stripe.PaymentIntent) {
       throw new Error("Missing required customer information in metadata");
     }
 
-    // Check if already processed (idempotency)
+    // STAGE 1: Idempotency check
+    console.log("Lease report: Starting idempotency check", {
+      paymentIntentId: paymentIntent.id,
+    });
+
     const { data: existing, error: checkError } = await supabaseAdmin
       .from("lease_review_leads")
       .select("id")
@@ -289,7 +343,15 @@ async function handleLeaseReportSuccess(paymentIntent: Stripe.PaymentIntent) {
       return;
     }
 
-    // Save to database
+    console.log("Lease report: Idempotency check passed - proceeding with insert", {
+      paymentIntentId: paymentIntent.id,
+    });
+
+    // STAGE 2: Database insert
+    console.log("Lease report: Starting database insert", {
+      paymentIntentId: paymentIntent.id,
+    });
+
     const { error: dbError } = await supabaseAdmin
       .from("lease_review_leads")
       .insert({
@@ -301,7 +363,7 @@ async function handleLeaseReportSuccess(paymentIntent: Stripe.PaymentIntent) {
         model: metadata.vehicleModel,
         trim: metadata.vehicleTrim,
         vehicle_condition: metadata.vehicleCondition,
-        current_mileage: parseInt(metadata.vehicleMileage || "0"),
+        current_mileage: validateMileage(metadata.vehicleMileage),
         zip_code: metadata.zipCode,
         payment_intent_id: paymentIntent.id,
         payment_status: "paid",
@@ -309,6 +371,15 @@ async function handleLeaseReportSuccess(paymentIntent: Stripe.PaymentIntent) {
       });
 
     if (dbError) {
+      // Handle race condition: if unique constraint violation on payment_intent_id,
+      // another webhook already inserted this record - treat as idempotent success
+      if (dbError.code === "23505" && dbError.message.includes("payment_intent_id")) {
+        console.log("Lease report: Race condition detected - record already inserted by concurrent webhook (idempotent)", {
+          paymentIntentId: paymentIntent.id,
+        });
+        return;
+      }
+      
       console.error("Lease report failed: Database insert error", {
         paymentIntentId: paymentIntent.id,
         error: dbError,
@@ -316,11 +387,16 @@ async function handleLeaseReportSuccess(paymentIntent: Stripe.PaymentIntent) {
       throw new Error(`Database save failed: ${dbError.message}`);
     }
 
-    console.log("Lease report lead saved", {
+    console.log("Lease report lead saved successfully", {
       paymentIntentId: paymentIntent.id,
     });
 
-    // Send confirmation emails
+    // STAGE 3: Send confirmation emails
+    console.log("Lease report: Starting email sending", {
+      paymentIntentId: paymentIntent.id,
+      emailEndpoint: `${process.env.NEXT_PUBLIC_SITE_URL}/api/send-confirmation-emails`,
+    });
+
     try {
       const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/send-confirmation-emails`, {
         method: "POST",
@@ -345,19 +421,23 @@ async function handleLeaseReportSuccess(paymentIntent: Stripe.PaymentIntent) {
       });
 
       if (!emailResponse.ok) {
-        console.error("Lease report: Email sending failed", {
+        const errorText = await emailResponse.text().catch(() => "Unable to read response");
+        console.error("Lease report: Email API returned error", {
           paymentIntentId: paymentIntent.id,
           status: emailResponse.status,
+          statusText: emailResponse.statusText,
+          errorBody: errorText,
         });
       } else {
-        console.log("Lease report emails sent", {
+        console.log("Lease report emails sent successfully", {
           paymentIntentId: paymentIntent.id,
         });
       }
     } catch (emailError: any) {
-      console.error("Lease report: Email exception", {
+      console.error("Lease report: Email fetch exception", {
         paymentIntentId: paymentIntent.id,
         error: emailError.message,
+        stack: emailError.stack,
       });
       // Don't throw - email failure shouldn't block webhook processing
     }

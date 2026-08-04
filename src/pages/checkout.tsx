@@ -11,6 +11,26 @@ import { supabase } from "@/integrations/supabase/client";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
+// Helper to normalize and validate mileage input
+function validateMileage(mileageInput: string | undefined): number {
+  const normalized = String(mileageInput || "0").replace(/,/g, "").trim();
+  const mileageValue = Number(normalized);
+  
+  if (!Number.isFinite(mileageValue)) {
+    throw new Error(`Invalid mileage value: ${mileageInput}`);
+  }
+  
+  if (mileageValue < 0) {
+    throw new Error(`Mileage cannot be negative: ${mileageValue}`);
+  }
+  
+  if (!Number.isInteger(mileageValue)) {
+    throw new Error(`Mileage must be a whole number: ${mileageValue}`);
+  }
+  
+  return mileageValue;
+}
+
 interface FormData {
   firstName: string;
   customerGoal: string;
@@ -75,7 +95,7 @@ function CheckoutForm({ formData, clientSecret }: { formData: FormData; clientSe
                   model: formData.model,
                   trim: formData.trim,
                   vehicle_condition: formData.vehicleCondition,
-                  current_mileage: parseInt(formData.mileage.replace(/\D/g, "")) || 0,
+                  current_mileage: validateMileage(formData.mileage),
                   zip_code: formData.zipCode,
                   payment_intent_id: paymentIntent.id,
                   payment_status: "paid",
