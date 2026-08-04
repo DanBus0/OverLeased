@@ -5,8 +5,49 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, Mail, Clock } from "lucide-react";
 import Footer from "@/components/layout/Footer";
 import { Car } from "lucide-react";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function ReportPurchasedPage() {
+  const router = useRouter();
+  
+  useEffect(() => {
+    // Fire GA4 purchase event only once after successful payment
+    const paymentIntentId = router.query.payment_intent as string;
+    
+    if (!paymentIntentId) {
+      return;
+    }
+    
+    // Check if we've already tracked this purchase
+    const trackedKey = `ga4_purchase_tracked_${paymentIntentId}`;
+    const alreadyTracked = sessionStorage.getItem(trackedKey);
+    
+    if (alreadyTracked) {
+      return;
+    }
+    
+    // Fire the GA4 purchase event
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "purchase", {
+        transaction_id: paymentIntentId,
+        value: 39,
+        currency: "USD",
+        items: [
+          {
+            item_id: "lease-exit-guide",
+            item_name: "Personalized Lease Exit Guide",
+            price: 39,
+            quantity: 1
+          }
+        ]
+      });
+      
+      // Mark this purchase as tracked
+      sessionStorage.setItem(trackedKey, "true");
+    }
+  }, [router.query.payment_intent]);
+  
   return (
     <>
       <Head>
