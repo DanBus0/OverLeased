@@ -12,10 +12,18 @@ export default function ReportPurchasedPage() {
   const router = useRouter();
   
   useEffect(() => {
-    // Fire GA4 purchase event only once after successful payment
+    // Wait for router to be ready before accessing query params
+    if (!router.isReady) {
+      console.log('[GA4 Purchase] Router not ready yet');
+      return;
+    }
+
     const paymentIntentId = router.query.payment_intent as string;
     
+    console.log('[GA4 Purchase] PaymentIntent ID:', paymentIntentId || 'NOT FOUND');
+    
     if (!paymentIntentId) {
+      console.log('[GA4 Purchase] No payment_intent in query params');
       return;
     }
     
@@ -24,11 +32,17 @@ export default function ReportPurchasedPage() {
     const alreadyTracked = sessionStorage.getItem(trackedKey);
     
     if (alreadyTracked) {
+      console.log('[GA4 Purchase] Duplicate prevented - already tracked:', paymentIntentId);
       return;
     }
     
+    // Check gtag availability
+    console.log('[GA4 Purchase] typeof window.gtag:', typeof (window as any).gtag);
+    
     // Fire the GA4 purchase event
     if (typeof window !== "undefined" && (window as any).gtag) {
+      console.log('[GA4 Purchase] Attempting to fire purchase event for:', paymentIntentId);
+      
       (window as any).gtag("event", "purchase", {
         transaction_id: paymentIntentId,
         value: 39,
@@ -43,10 +57,15 @@ export default function ReportPurchasedPage() {
         ]
       });
       
+      console.log('[GA4 Purchase] Event fired successfully');
+      
       // Mark this purchase as tracked
       sessionStorage.setItem(trackedKey, "true");
+      console.log('[GA4 Purchase] SessionStorage flag written');
+    } else {
+      console.log('[GA4 Purchase] gtag not available on window object');
     }
-  }, [router.query.payment_intent]);
+  }, [router.isReady, router.query.payment_intent]);
   
   return (
     <>
