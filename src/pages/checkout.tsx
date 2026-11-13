@@ -11,6 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
+const LEASE_EXIT_GUIDE_AMOUNT = 39; // $39 in dollars
+
 // Helper to normalize and validate mileage input
 function validateMileage(mileageInput: string | undefined): number {
   const normalized = String(mileageInput || "0").replace(/,/g, "").trim();
@@ -248,50 +250,61 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const savedData = sessionStorage.getItem("leaseFormData");
-    if (!savedData) {
-      router.push("/get-started");
-      return;
-    }
-
-    const data = JSON.parse(savedData);
-    setFormData(data);
-
-    fetch("/api/create-payment-intent", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        amount: 3900,
-        metadata: {
-          serviceType: "lease-exit-guide",
-          firstName: data.firstName,
-          customerGoal: data.customerGoal,
-          customerEmail: data.email,
-          vehicleYear: data.year,
-          vehicleMake: data.make,
-          vehicleModel: data.model,
-          vehicleTrim: data.trim,
-          vehicleCondition: data.vehicleCondition,
-          vehicleMileage: data.mileage,
-          zipCode: data.zipCode,
-        },
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setClientSecret(data.clientSecret);
+    const initializeCheckout = async () => {
+      try {
+        const savedFormData = sessionStorage.getItem("leaseFormData");
+        if (!savedFormData) {
+          console.error("No form data found");
+          router.push("/get-started");
+          return;
         }
+
+        const parsedFormData = JSON.parse(savedFormData);
+        setFormData(parsedFormData);
+
+        // Get leaseReviewId from sessionStorage
+        const leaseReviewId = sessionStorage.getItem("leaseReviewId");
+
+        // Create payment intent
+        const response = await fetch("/api/create-payment-intent", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: LEASE_EXIT_GUIDE_AMOUNT * 100,
+            email: parsedFormData.email,
+            metadata: {
+              product: "lease_exit_guide",
+              firstName: parsedFormData.firstName,
+              customerGoal: parsedFormData.customerGoal,
+              email: parsedFormData.email,
+              year: parsedFormData.year,
+              make: parsedFormData.make,
+              model: parsedFormData.model,
+              trim: parsedFormData.trim,
+              vehicleCondition: parsedFormData.vehicleCondition,
+              mileage: parsedFormData.mileage,
+              zipCode: parsedFormData.zipCode,
+              leaseReviewId: leaseReviewId || "", // Pass leaseReviewId to Stripe
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to create payment intent");
+        }
+
+        const data = await response.json();
+        setClientSecret(data.clientSecret);
         setIsLoading(false);
-      })
-      .catch((err) => {
+      } catch (err: any) {
         setError("Failed to initialize payment. Please check your Stripe configuration.");
         setIsLoading(false);
-      });
+      }
+    };
+
+    initializeCheckout();
   }, [router]);
 
   if (isLoading) {

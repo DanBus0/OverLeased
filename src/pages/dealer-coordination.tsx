@@ -113,6 +113,8 @@ function DealerCoordinationCheckoutForm({ formData, clientSecret }: { formData: 
           // Don't block redirect if emails fail
         }
 
+        // Store payment intent for GA4 tracking on confirmation page
+        sessionStorage.setItem("dealer_coordination_payment_intent", paymentIntent.id);
         sessionStorage.removeItem("dealerCoordinationFormData");
         router.push("/dealer-coordination-confirmation");
       }
@@ -179,6 +181,12 @@ export default function DealerCoordinationPage() {
   const [clientSecret, setClientSecret] = useState("");
   const [isLoadingPayment, setIsLoadingPayment] = useState(false);
   const [error, setError] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [dealerCoordinationId, setDealerCoordinationId] = useState<string | null>(null);
+
+  const stripe = useStripe();
+  const elements = useElements();
 
   // Page-specific scroll to top (backup to global handler)
   useEffect(() => {
@@ -207,6 +215,18 @@ export default function DealerCoordinationPage() {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, [currentStep]);
+
+  useEffect(() => {
+    // Restore form data and ID from sessionStorage if user navigates back
+    const savedFormData = sessionStorage.getItem("dealerCoordinationFormData");
+    const savedId = sessionStorage.getItem("dealerCoordinationId");
+    if (savedFormData) {
+      setFormData(JSON.parse(savedFormData));
+    }
+    if (savedId) {
+      setDealerCoordinationId(savedId);
+    }
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -249,6 +269,48 @@ export default function DealerCoordinationPage() {
     setError("");
 
     try {
+      // Fire GA4 begin_checkout event for Dealer Coordination
+      if (typeof window !== "undefined" && (window as any).gtag) {
+        (window as any).gtag("event", "begin_checkout", {
+          value: 60,
+          currency: "USD",
+          items: [{
+            item_id: "dealer_coordination",
+            item_name: "Dealer Coordination Service",
+            price: 60
+          }]
+        });
+        console.log("[GA4] begin_checkout event fired for Dealer Coordination Service");
+      }
+
+      // Generate UUID client-side
+      let recordId = dealerCoordinationId;
+      if (!recordId) {
+        recordId = crypto.randomUUID();
+        setDealerCoordinationId(recordId);
+        sessionStorage.setItem("dealerCoordinationId", recordId);
+      }
+
+      // Save to Supabase (non-blocking)
+      try {
+        const { error: dbError } = await supabase
+          .from("dealer_coordination_leads")
+          .insert({
+            id: recordId, // Use client-generated UUID
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            payment_status: "pending",
+          });
+
+        if (dbError) {
+          console.error("Failed to save to Supabase (non-blocking):", dbError);
+        }
+      } catch (err) {
+        console.error("Error saving to Supabase (non-blocking):", err);
+      }
+
       // Send notification to support about the form submission
       try {
         await fetch("/api/send-dealer-coordination-request", {
@@ -269,19 +331,22 @@ export default function DealerCoordinationPage() {
         // Don't block payment flow if notification fails
       }
 
+      // Create payment intent with dealerCoordinationId in metadata
       const response = await fetch("/api/create-payment-intent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: DEALER_COORDINATION_AMOUNT,
+          amount: DEALER_COORDINATION_AMOUNT * 100,
+          email: formData.email,
           metadata: {
-            serviceType: "dealer-coordination",
+            product: "dealer_coordination",
             firstName: formData.firstName,
             lastName: formData.lastName,
-            customerEmail: formData.email,
+            email: formData.email,
             phone: formData.phone,
+            dealerCoordinationId: recordId, // Pass client-generated UUID to Stripe
           },
         }),
       });

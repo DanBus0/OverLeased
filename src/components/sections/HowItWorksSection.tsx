@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { FileText, Calculator, BarChart3, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
-export function HowItWorksSection() {
+interface HowItWorksSectionProps {
+  trackGetStartedClick: (location: string) => void;
+}
+
+export function HowItWorksSection({ trackGetStartedClick }: HowItWorksSectionProps) {
   const steps = [
     {
       step: 1,
@@ -205,6 +209,7 @@ export function HowItWorksSection() {
                   href="/get-started"
                   scroll
                   onClick={() => {
+                    trackGetStartedClick("mid_page");
                     try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                   }}
                 >

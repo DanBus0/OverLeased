@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
       <Head>
         <title>Privacy Policy | OverLeased</title>
         <meta name="description" content="Privacy Policy for OverLeased - Learn how we collect, use, and protect your personal information when using our Personalized Lease Exit Guide and related services." />
-        <meta name="robots" content="index, follow" />
+        <meta name="robots" content="noindex, follow" />
         <link rel="canonical" href="https://www.overleased.com/privacy-policy" />
         <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
         

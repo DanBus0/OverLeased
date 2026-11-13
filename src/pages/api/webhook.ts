@@ -108,52 +108,198 @@ export default async function handler(
 
 async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
   const metadata = paymentIntent.metadata;
-  const serviceType = metadata.serviceType;
-  const amount = paymentIntent.amount;
+  
+  // Update Supabase record to mark payment as succeeded
+  if (metadata.product === "lease_exit_guide") {
+    const leaseReviewId = metadata.leaseReviewId;
+    let recordUpdated = false;
 
-  // Validate metadata exists
-  if (!metadata || Object.keys(metadata).length === 0) {
-    console.error("Payment failed: Empty metadata", {
-      paymentIntentId: paymentIntent.id,
-      amount: amount,
-    });
-    throw new Error("PaymentIntent missing metadata - cannot route payment");
-  }
+    // Try to update existing record by ID if available
+    if (leaseReviewId) {
+      try {
+        const { data: updateData, error: updateError } = await supabaseAdmin
+          .from("lease_review_leads")
+          .update({
+            payment_status: "paid",
+            payment_intent_id: paymentIntent.id,
+            amount_paid: paymentIntent.amount,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", leaseReviewId)
+          .select();
 
-  // Validate service type exists
-  if (!serviceType) {
-    console.error("Payment failed: Missing serviceType", {
-      paymentIntentId: paymentIntent.id,
-      metadataKeys: Object.keys(metadata),
-    });
-    throw new Error("Missing serviceType in payment metadata");
-  }
-
-  // Route based on service type and validate amount
-  if (serviceType === "dealer-coordination") {
-    if (amount !== 6000) {
-      console.error("Payment failed: Amount mismatch for dealer-coordination", {
-        expected: 6000,
-        received: amount,
-      });
-      throw new Error("Payment amount does not match service type");
+        if (updateError) {
+          console.error("[Webhook] Failed to update lease review lead by ID:", updateError);
+        } else if (updateData && updateData.length > 0) {
+          console.log("[Webhook] Updated lease review lead payment status by ID");
+          recordUpdated = true;
+        } else {
+          console.log("[Webhook] No record found with ID:", leaseReviewId);
+        }
+      } catch (updateError) {
+        console.error("[Webhook] Exception updating lease review lead:", updateError);
+      }
     }
-    await handleDealerCoordinationSuccess(paymentIntent);
-  } else if (serviceType === "lease-exit-guide") {
-    if (amount !== 3900) {
-      console.error("Payment failed: Amount mismatch for lease-exit-guide", {
-        expected: 3900,
-        received: amount,
-      });
-      throw new Error("Payment amount does not match service type");
+
+    // If no record was updated (ID missing or record doesn't exist), insert new record
+    if (!recordUpdated) {
+      console.log("[Webhook] Creating new lease_review_leads record from metadata");
+      try {
+        const { error: insertError } = await supabaseAdmin
+          .from("lease_review_leads")
+          .insert({
+            id: leaseReviewId || undefined, // Use provided ID if available, otherwise let DB generate
+            email: metadata.email,
+            firstname: metadata.firstName,
+            customer_goal: metadata.customerGoal,
+            year: metadata.year,
+            make: metadata.make,
+            model: metadata.model,
+            trim: metadata.trim,
+            vehicle_condition: metadata.vehicleCondition,
+            current_mileage: parseInt(metadata.mileage?.replace(/,/g, '') || '0'),
+            zip_code: metadata.zipCode,
+            payment_status: "paid",
+            payment_intent_id: paymentIntent.id,
+            amount_paid: paymentIntent.amount,
+          });
+
+        if (insertError) {
+          // Handle duplicate payment_intent_id (race condition)
+          if (insertError.code === "23505" && insertError.message.includes("payment_intent_id")) {
+            console.log("[Webhook] Record already created by concurrent webhook (idempotent)");
+          } else {
+            console.error("[Webhook] Failed to insert lease review lead:", insertError);
+          }
+        } else {
+          console.log("[Webhook] Lease review lead created successfully from metadata");
+        }
+      } catch (insertError) {
+        console.error("[Webhook] Exception inserting lease review lead:", insertError);
+      }
     }
-    await handleLeaseReportSuccess(paymentIntent);
-  } else {
-    console.error("Payment failed: Unknown service type", {
-      serviceType: serviceType,
-      paymentIntentId: paymentIntent.id,
-    });
-    throw new Error("Unknown service type");
+
+    // Send order notification email to support@overleased.com
+    try {
+      const { sendSupportNotification } = await import("@/services/brevoService");
+      await sendSupportNotification({
+        email: metadata.email,
+        firstName: metadata.firstName,
+        customerGoal: metadata.customerGoal,
+        vehicle: {
+          year: metadata.year,
+          make: metadata.make,
+          model: metadata.model,
+          trim: metadata.trim,
+          condition: metadata.vehicleCondition,
+          mileage: metadata.mileage,
+        },
+        amount: paymentIntent.amount,
+        paymentIntentId: paymentIntent.id,
+      });
+      console.log("[Webhook] Order notification email sent to support@overleased.com");
+    } catch (emailError) {
+      console.error("[Webhook] Failed to send order notification email:", emailError);
+      // Don't throw - email failure shouldn't block webhook
+    }
+
+  } else if (metadata.product === "dealer_coordination") {
+    const dealerCoordinationId = metadata.dealerCoordinationId;
+    let recordUpdated = false;
+
+    // Try to update existing record by ID if available
+    if (dealerCoordinationId) {
+      try {
+        const { data: updateData, error: updateError } = await supabaseAdmin
+          .from("dealer_coordination_leads")
+          .update({
+            payment_status: "paid",
+            payment_intent_id: paymentIntent.id,
+            amount_paid: paymentIntent.amount,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", dealerCoordinationId)
+          .select();
+
+        if (updateError) {
+          console.error("[Webhook] Failed to update dealer coordination lead by ID:", updateError);
+        } else if (updateData && updateData.length > 0) {
+          console.log("[Webhook] Updated dealer coordination lead payment status by ID");
+          recordUpdated = true;
+        } else {
+          console.log("[Webhook] No record found with ID:", dealerCoordinationId);
+        }
+      } catch (updateError) {
+        console.error("[Webhook] Exception updating dealer coordination lead:", updateError);
+      }
+    }
+
+    // If no record was updated, try to find by payment_intent_id or insert new
+    if (!recordUpdated) {
+      const { data: existing } = await supabaseAdmin
+        .from("dealer_coordination_leads")
+        .select("id")
+        .eq("payment_intent_id", paymentIntent.id)
+        .maybeSingle();
+
+      if (existing) {
+        // Update existing record found by payment_intent_id
+        const { error: updateError } = await supabaseAdmin
+          .from("dealer_coordination_leads")
+          .update({
+            payment_status: "paid",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existing.id);
+
+        if (updateError) {
+          console.error("[Webhook] Failed to update dealer coordination lead by payment_intent_id:", updateError);
+        } else {
+          console.log("[Webhook] Updated dealer coordination lead by payment_intent_id");
+        }
+      } else {
+        // Create new record (legacy fallback for old flow)
+        const { error: dbError } = await supabaseAdmin
+          .from("dealer_coordination_leads")
+          .insert({
+            id: dealerCoordinationId || undefined,
+            first_name: metadata.firstName || "",
+            last_name: metadata.lastName || "",
+            email: metadata.email,
+            phone: metadata.phone || "",
+            payment_status: "paid",
+            payment_intent_id: paymentIntent.id,
+            amount_paid: paymentIntent.amount,
+          });
+
+        if (dbError) {
+          if (dbError.code === "23505" && dbError.message.includes("payment_intent_id")) {
+            console.log("[Webhook] Record already created by concurrent webhook (idempotent)");
+          } else {
+            console.error("[Webhook] Failed to save dealer coordination lead:", dbError);
+          }
+        } else {
+          console.log("[Webhook] Dealer coordination lead saved successfully (legacy fallback)");
+        }
+      }
+    }
+
+    // Send order notification email to support@overleased.com
+    try {
+      const { sendDealerCoordinationSupportNotification } = await import("@/services/brevoService");
+      await sendDealerCoordinationSupportNotification({
+        email: metadata.email,
+        firstName: metadata.firstName,
+        lastName: metadata.lastName,
+        phone: metadata.phone,
+        amount: paymentIntent.amount,
+        paymentIntentId: paymentIntent.id,
+      });
+      console.log("[Webhook] Dealer coordination order notification email sent to support@overleased.com");
+    } catch (emailError) {
+      console.error("[Webhook] Failed to send dealer coordination order notification email:", emailError);
+      // Don't throw - email failure shouldn't block webhook
+    }
   }
 }
 

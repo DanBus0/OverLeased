@@ -17,6 +17,15 @@ export default function HomePage() {
     router.prefetch("/get-started");
   }, [router]);
 
+  const trackGetStartedClick = (location: string) => {
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "get_started_click", {
+        location: location
+      });
+      console.log(`[GA4] get_started_click fired with location: ${location}`);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -115,7 +124,7 @@ export default function HomePage() {
         <main className="min-h-screen bg-white">
           <HeroSection />
           
-          <HowItWorksSection />
+          <HowItWorksSection trackGetStartedClick={trackGetStartedClick} />
           
           <FAQSection />
           
@@ -137,6 +146,7 @@ export default function HomePage() {
                     href="/get-started"
                     scroll
                     onClick={() => {
+                      trackGetStartedClick("bottom_cta");
                       try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                     }}
                   >

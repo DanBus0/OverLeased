@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -9,6 +9,7 @@ import { CheckCircle, Car, Mail } from "lucide-react";
 
 export default function DealerCoordinationConfirmationPage() {
   const router = useRouter();
+  const [paymentVerified, setPaymentVerified] = useState(false);
 
   // Page-specific scroll to top (backup to global handler)
   useEffect(() => {
@@ -31,12 +32,81 @@ export default function DealerCoordinationConfirmationPage() {
     setTimeout(forceScrollToTop, 100);
   }, []);
 
+  // Fire GA4 purchase event for Dealer Coordination Service
+  useEffect(() => {
+    if (!router.isReady) {
+      console.log('[GA4 Purchase DC] Router not ready yet');
+      return;
+    }
+
+    const sessionId = router.query.session_id as string;
+    
+    console.log('[GA4 Purchase DC] Session ID:', sessionId || 'NOT FOUND');
+    
+    if (!sessionId) {
+      console.log('[GA4 Purchase DC] No session_id in query params');
+      return;
+    }
+    
+    // Check if we've already tracked this purchase
+    const trackedKey = `ga4_dc_purchase_tracked_${sessionId}`;
+    const alreadyTracked = sessionStorage.getItem(trackedKey);
+    
+    if (alreadyTracked) {
+      console.log('[GA4 Purchase DC] Duplicate prevented - already tracked:', sessionId);
+      return;
+    }
+    
+    // Verify payment status with Stripe session
+    fetch(`/api/verify-payment-status?session_id=${sessionId}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log('[GA4 Purchase DC] Payment verification response:', data);
+        
+        if (data.paymentStatus === 'paid') {
+          setPaymentVerified(true);
+          
+          // Fire the GA4 purchase event
+          if (typeof window !== "undefined" && (window as any).gtag) {
+            console.log('[GA4 Purchase DC] Attempting to fire purchase event for:', sessionId);
+            
+            (window as any).gtag("event", "purchase", {
+              transaction_id: sessionId,
+              value: 60,
+              currency: "USD",
+              items: [
+                {
+                  item_id: "dealer_coordination",
+                  item_name: "Dealer Coordination Service",
+                  price: 60,
+                  quantity: 1
+                }
+              ]
+            });
+            
+            console.log('[GA4 Purchase DC] Event fired successfully');
+            
+            // Mark this purchase as tracked
+            sessionStorage.setItem(trackedKey, "true");
+            console.log('[GA4 Purchase DC] SessionStorage flag written');
+          } else {
+            console.log('[GA4 Purchase DC] gtag not available on window object');
+          }
+        } else {
+          console.log('[GA4 Purchase DC] Payment not verified - status:', data.paymentStatus);
+        }
+      })
+      .catch(err => {
+        console.error('[GA4 Purchase DC] Error verifying payment:', err);
+      });
+  }, [router.isReady, router.query.session_id]);
+
   return (
     <>
       <Head>
         <title>Request Received | OverLeased Dealer Coordination</title>
         <meta name="description" content="Your dealer coordination request has been received. We'll contact you soon." />
-        <meta name="robots" content="noindex, nofollow" />
+        <meta name="robots" content="noindex, follow" />
       </Head>
 
       <div className="min-h-screen bg-white flex flex-col">

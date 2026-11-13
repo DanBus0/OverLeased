@@ -242,149 +242,146 @@ export const sendPurchaseConfirmation = async (params: PurchaseConfirmationParam
   });
 };
 
-export const sendSupportNotification = async (params: SupportNotificationParams) => {
-  const { email, vehicle, amount, paymentIntentId, firstName, customerGoal } = params;
-  
-  // Convert customerGoal value to readable text
-  const goalText = customerGoal ? {
-    "no-longer-need": "No Longer Need A Vehicle",
-    "different-vehicle": "Want A Different Vehicle",
-    "keep-current": "Want To Keep Current Vehicle",
-    "lower-cost": "Lower Monthly Cost",
-    "not-sure": "Not Sure"
-  }[customerGoal] || customerGoal : "Not provided";
-  
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>New Lease Review Purchase</title>
-    </head>
-    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f8fafc; line-height: 1.6;">
-      <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f8fafc;">
-        <tr>
-          <td align="center" style="padding: 40px 20px;">
-            <table role="presentation" style="max-width: 600px; width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-              
-              <!-- Header -->
-              <tr>
-                <td style="padding: 30px 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px 12px 0 0;">
-                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700; text-align: center;">
-                    New Purchase Alert
-                  </h1>
-                  <p style="margin: 8px 0 0; color: #d1fae5; font-size: 14px; text-align: center;">
-                    A customer just purchased a lease exit guide
-                  </p>
-                </td>
-              </tr>
-              
-              <!-- Content -->
-              <tr>
-                <td style="padding: 40px;">
-                  
-                  <!-- Customer Details -->
-                  <div style="background-color: #f1f5f9; border-left: 4px solid #10b981; border-radius: 8px; padding: 20px; margin: 0 0 24px;">
-                    <h2 style="margin: 0 0 16px; color: #1e293b; font-size: 18px; font-weight: 600;">Customer Information</h2>
-                    <table style="width: 100%; border-collapse: collapse;">
-                      ${firstName ? `
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b; font-size: 14px; width: 35%;">Name:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">${firstName}</td>
-                      </tr>
-                      ` : ''}
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b; font-size: 14px; width: 35%;">Email:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">${email}</td>
-                      </tr>
-                      ${customerGoal ? `
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b; font-size: 14px;">Customer Goal:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">${goalText}</td>
-                      </tr>
-                      ` : ''}
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b; font-size: 14px;">Vehicle:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">${vehicle.year} ${vehicle.make} ${vehicle.model}</td>
-                      </tr>
-                      ${vehicle.trim ? `
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b; font-size: 14px;">Trim:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">${vehicle.trim}</td>
-                      </tr>
-                      ` : ''}
-                      ${vehicle.condition ? `
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b; font-size: 14px;">Condition:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600; text-transform: capitalize;">${vehicle.condition}</td>
-                      </tr>
-                      ` : ''}
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b; font-size: 14px;">Mileage:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">${vehicle.mileage} miles</td>
-                      </tr>
-                    </table>
-                  </div>
-                  
-                  <!-- Payment Details -->
-                  <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 0 0 24px;">
-                    <h2 style="margin: 0 0 16px; color: #1e293b; font-size: 18px; font-weight: 600;">Payment Details</h2>
-                    <table style="width: 100%; border-collapse: collapse;">
-                      <tr>
-                        <td style="padding: 6px 0; color: #78350f; font-size: 14px; width: 35%;">Amount:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">$${(amount / 100).toFixed(2)}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; color: #78350f; font-size: 14px;">Status:</td>
-                        <td style="padding: 6px 0; color: #10b981; font-size: 14px; font-weight: 600;">✓ Paid</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; color: #78350f; font-size: 14px;">Transaction ID:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 13px; font-family: 'Courier New', monospace;">${paymentIntentId}</td>
-                      </tr>
-                    </table>
-                  </div>
-                  
-                  <!-- Action Required -->
-                  <div style="background-color: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 20px;">
-                    <h3 style="margin: 0 0 12px; color: #1e40af; font-size: 16px; font-weight: 600;">📝 Action Required</h3>
-                    <p style="margin: 0; color: #1e3a8a; font-size: 14px;">
-                      Please prepare and deliver the comprehensive lease exit guide to <strong>${email}</strong> within 24-48 hours.
-                    </p>
-                  </div>
-                  
-                </td>
-              </tr>
-              
-              <!-- Footer -->
-              <tr>
-                <td style="padding: 24px 40px; background-color: #f8fafc; border-radius: 0 0 12px 12px; text-align: center;">
-                  <p style="margin: 0; color: #64748b; font-size: 12px;">
-                    Automated notification from OverLeased.com
-                  </p>
-                </td>
-              </tr>
-              
-            </table>
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-  `;
+/**
+ * Send order notification to support@overleased.com for Lease Exit Guide purchase
+ */
+export async function sendSupportNotification(data: {
+  email: string;
+  firstName: string;
+  customerGoal: string;
+  vehicle: {
+    year: string;
+    make: string;
+    model: string;
+    trim: string;
+    condition: string;
+    mileage: string;
+  };
+  amount: number;
+  paymentIntentId: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const apiKey = process.env.BREVO_API_KEY;
 
-  console.log("Sending support notification for new purchase");
-  return sendEmail({
-    to: [{ email: "support@overleased.com", name: "OverLeased Support" }],
-    subject: `New Purchase: ${firstName || 'Customer'} - ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
-    htmlContent,
-    sender: {
-      email: "support@overleased.com",
-      name: "OverLeased",
-    },
-  });
-};
+  if (!apiKey) {
+    console.error("BREVO_API_KEY not configured");
+    return { success: false, error: "Email service not configured" };
+  }
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": apiKey,
+      },
+      body: JSON.stringify({
+        sender: {
+          name: "OverLeased System",
+          email: "noreply@overleased.com",
+        },
+        to: [
+          {
+            email: "support@overleased.com",
+            name: "OverLeased Support",
+          },
+        ],
+        subject: `New Lease Exit Guide Order - ${data.firstName}`,
+        htmlContent: `
+          <h2>New Lease Exit Guide Purchase</h2>
+          <p><strong>Customer:</strong> ${data.firstName}<br>
+          <strong>Email:</strong> ${data.email}<br>
+          <strong>Goal:</strong> ${data.customerGoal}</p>
+          
+          <h3>Vehicle Details:</h3>
+          <p><strong>Year:</strong> ${data.vehicle.year}<br>
+          <strong>Make:</strong> ${data.vehicle.make}<br>
+          <strong>Model:</strong> ${data.vehicle.model}<br>
+          <strong>Trim:</strong> ${data.vehicle.trim}<br>
+          <strong>Condition:</strong> ${data.vehicle.condition}<br>
+          <strong>Mileage:</strong> ${data.vehicle.mileage}</p>
+          
+          <h3>Payment Details:</h3>
+          <p><strong>Amount:</strong> $${(data.amount / 100).toFixed(2)}<br>
+          <strong>Payment Intent ID:</strong> ${data.paymentIntentId}</p>
+        `,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Brevo API error:", errorText);
+      return { success: false, error: `Brevo API error: ${response.status}` };
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Failed to send support notification:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Send order notification to support@overleased.com for Dealer Coordination purchase
+ */
+export async function sendDealerCoordinationSupportNotification(data: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  amount: number;
+  paymentIntentId: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const apiKey = process.env.BREVO_API_KEY;
+
+  if (!apiKey) {
+    console.error("BREVO_API_KEY not configured");
+    return { success: false, error: "Email service not configured" };
+  }
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": apiKey,
+      },
+      body: JSON.stringify({
+        sender: {
+          name: "OverLeased System",
+          email: "noreply@overleased.com",
+        },
+        to: [
+          {
+            email: "support@overleased.com",
+            name: "OverLeased Support",
+          },
+        ],
+        subject: `New Dealer Coordination Order - ${data.firstName} ${data.lastName}`,
+        htmlContent: `
+          <h2>New Dealer Coordination Service Purchase</h2>
+          <p><strong>Customer:</strong> ${data.firstName} ${data.lastName}<br>
+          <strong>Email:</strong> ${data.email}<br>
+          <strong>Phone:</strong> ${data.phone}</p>
+          
+          <h3>Payment Details:</h3>
+          <p><strong>Amount:</strong> $${(data.amount / 100).toFixed(2)}<br>
+          <strong>Payment Intent ID:</strong> ${data.paymentIntentId}</p>
+        `,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Brevo API error:", errorText);
+      return { success: false, error: `Brevo API error: ${response.status}` };
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Failed to send dealer coordination support notification:", error);
+    return { success: false, error: error.message };
+  }
+}
 
 interface GetStartedFormData {
   firstName: string;
@@ -828,115 +825,6 @@ export const sendDealerCoordinationConfirmation = async (params: { email: string
   return sendEmail({
     to: [{ email, name: `${firstName} ${lastName}` }],
     subject: "✓ Your Dealer Coordination Request Has Been Received",
-    htmlContent,
-    sender: {
-      email: "support@overleased.com",
-      name: "OverLeased",
-    },
-  });
-};
-
-export const sendDealerCoordinationSupportNotification = async (params: { email: string; firstName: string; lastName: string; phone: string; amount: number; paymentIntentId: string }) => {
-  const { email, firstName, lastName, phone, amount, paymentIntentId } = params;
-  
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>New Dealer Coordination Purchase</title>
-    </head>
-    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f8fafc; line-height: 1.6;">
-      <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f8fafc;">
-        <tr>
-          <td align="center" style="padding: 40px 20px;">
-            <table role="presentation" style="max-width: 600px; width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-              
-              <tr>
-                <td style="padding: 30px 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px 12px 0 0;">
-                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700; text-align: center;">
-                    New Purchase Alert
-                  </h1>
-                  <p style="margin: 8px 0 0; color: #d1fae5; font-size: 14px; text-align: center;">
-                    A customer just purchased Dealer Coordination Service
-                  </p>
-                </td>
-              </tr>
-              
-              <tr>
-                <td style="padding: 40px;">
-                  
-                  <div style="background-color: #f1f5f9; border-left: 4px solid #10b981; border-radius: 8px; padding: 20px; margin: 0 0 24px;">
-                    <h2 style="margin: 0 0 16px; color: #1e293b; font-size: 18px; font-weight: 600;">Customer Information</h2>
-                    <table style="width: 100%; border-collapse: collapse;">
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b; font-size: 14px; width: 35%;">Name:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">${firstName} ${lastName}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b; font-size: 14px;">Email:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">${email}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b; font-size: 14px;">Phone:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">${phone}</td>
-                      </tr>
-                    </table>
-                  </div>
-                  
-                  <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 0 0 24px;">
-                    <h2 style="margin: 0 0 16px; color: #1e293b; font-size: 18px; font-weight: 600;">Payment Details</h2>
-                    <table style="width: 100%; border-collapse: collapse;">
-                      <tr>
-                        <td style="padding: 6px 0; color: #78350f; font-size: 14px; width: 35%;">Service:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">Dealer Coordination</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; color: #78350f; font-size: 14px;">Amount:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 14px; font-weight: 600;">$${(amount / 100).toFixed(2)}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; color: #78350f; font-size: 14px;">Status:</td>
-                        <td style="padding: 6px 0; color: #10b981; font-size: 14px; font-weight: 600;">✓ Paid</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; color: #78350f; font-size: 14px;">Transaction ID:</td>
-                        <td style="padding: 6px 0; color: #1e293b; font-size: 13px; font-family: 'Courier New', monospace;">${paymentIntentId}</td>
-                      </tr>
-                    </table>
-                  </div>
-                  
-                  <div style="background-color: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 20px;">
-                    <h3 style="margin: 0 0 12px; color: #1e40af; font-size: 16px; font-weight: 600;">📝 Action Required</h3>
-                    <p style="margin: 0; color: #1e3a8a; font-size: 14px;">
-                      Begin dealer coordination process for <strong>${firstName} ${lastName}</strong>. Contact at ${phone} or ${email}.
-                    </p>
-                  </div>
-                  
-                </td>
-              </tr>
-              
-              <tr>
-                <td style="padding: 24px 40px; background-color: #f8fafc; border-radius: 0 0 12px 12px; text-align: center;">
-                  <p style="margin: 0; color: #64748b; font-size: 12px;">
-                    Automated notification from OverLeased.com
-                  </p>
-                </td>
-              </tr>
-              
-            </table>
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-  `;
-
-  console.log("Sending dealer coordination support notification");
-  return sendEmail({
-    to: [{ email: "support@overleased.com", name: "OverLeased Support" }],
-    subject: `New Dealer Coordination Purchase: ${firstName} ${lastName}`,
     htmlContent,
     sender: {
       email: "support@overleased.com",

@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, Mail, Clock } from "lucide-react";
 import Footer from "@/components/layout/Footer";
 import { Car } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 export default function ReportPurchasedPage() {
   const router = useRouter();
+  const [paymentVerified, setPaymentVerified] = useState(false);
   
   useEffect(() => {
     // Wait for router to be ready before accessing query params
@@ -18,61 +19,74 @@ export default function ReportPurchasedPage() {
       return;
     }
 
-    const paymentIntentId = router.query.payment_intent as string;
+    const sessionId = router.query.session_id as string;
     
-    console.log('[GA4 Purchase] PaymentIntent ID:', paymentIntentId || 'NOT FOUND');
+    console.log('[GA4 Purchase] Session ID:', sessionId || 'NOT FOUND');
     
-    if (!paymentIntentId) {
-      console.log('[GA4 Purchase] No payment_intent in query params');
+    if (!sessionId) {
+      console.log('[GA4 Purchase] No session_id in query params');
       return;
     }
     
     // Check if we've already tracked this purchase
-    const trackedKey = `ga4_purchase_tracked_${paymentIntentId}`;
+    const trackedKey = `ga4_purchase_tracked_${sessionId}`;
     const alreadyTracked = sessionStorage.getItem(trackedKey);
     
     if (alreadyTracked) {
-      console.log('[GA4 Purchase] Duplicate prevented - already tracked:', paymentIntentId);
+      console.log('[GA4 Purchase] Duplicate prevented - already tracked:', sessionId);
       return;
     }
     
-    // Check gtag availability
-    console.log('[GA4 Purchase] typeof window.gtag:', typeof (window as any).gtag);
-    
-    // Fire the GA4 purchase event
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      console.log('[GA4 Purchase] Attempting to fire purchase event for:', paymentIntentId);
-      
-      (window as any).gtag("event", "purchase", {
-        transaction_id: paymentIntentId,
-        value: 39,
-        currency: "USD",
-        items: [
-          {
-            item_id: "lease-exit-guide",
-            item_name: "Personalized Lease Exit Guide",
-            price: 39,
-            quantity: 1
+    // Verify payment status with Stripe session
+    fetch(`/api/verify-payment-status?session_id=${sessionId}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log('[GA4 Purchase] Payment verification response:', data);
+        
+        if (data.paymentStatus === 'paid') {
+          setPaymentVerified(true);
+          
+          // Fire the GA4 purchase event for Lease Exit Guide
+          if (typeof window !== "undefined" && (window as any).gtag) {
+            console.log('[GA4 Purchase] Attempting to fire purchase event for:', sessionId);
+            
+            (window as any).gtag("event", "purchase", {
+              transaction_id: sessionId,
+              value: 39,
+              currency: "USD",
+              items: [
+                {
+                  item_id: "lease_exit_guide",
+                  item_name: "Personalized Lease Exit Guide",
+                  price: 39,
+                  quantity: 1
+                }
+              ]
+            });
+            
+            console.log('[GA4 Purchase] Event fired successfully');
+            
+            // Mark this purchase as tracked
+            sessionStorage.setItem(trackedKey, "true");
+            console.log('[GA4 Purchase] SessionStorage flag written');
+          } else {
+            console.log('[GA4 Purchase] gtag not available on window object');
           }
-        ]
+        } else {
+          console.log('[GA4 Purchase] Payment not verified - status:', data.paymentStatus);
+        }
+      })
+      .catch(err => {
+        console.error('[GA4 Purchase] Error verifying payment:', err);
       });
-      
-      console.log('[GA4 Purchase] Event fired successfully');
-      
-      // Mark this purchase as tracked
-      sessionStorage.setItem(trackedKey, "true");
-      console.log('[GA4 Purchase] SessionStorage flag written');
-    } else {
-      console.log('[GA4 Purchase] gtag not available on window object');
-    }
-  }, [router.isReady, router.query.payment_intent]);
+  }, [router.isReady, router.query.session_id]);
   
   return (
     <>
       <Head>
         <title>Thank You | OverLeased - Your Guide is Being Prepared</title>
         <meta name="description" content="Thank you for your purchase! Your personalized lease exit guide is being prepared and will be sent to your email shortly." />
-        <meta name="robots" content="noindex, nofollow" />
+        <meta name="robots" content="noindex, follow" />
       </Head>
       <div className="min-h-screen bg-white w-full max-w-full overflow-x-hidden">
         <header className="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-50 w-full">

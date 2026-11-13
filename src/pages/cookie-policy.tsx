@@ -41,7 +41,7 @@ export default function CookiePolicyPage() {
       <Head>
         <title>Cookie Policy | OverLeased</title>
         <meta name="description" content="Learn about how OverLeased uses cookies to enhance your experience on our Personalized Lease Exit Guide service." />
-        <meta name="robots" content="index, follow" />
+        <meta name="robots" content="noindex, follow" />
         <link rel="canonical" href="https://www.overleased.com/cookie-policy" />
         <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
         

@@ -36,7 +36,7 @@ export default function TermsOfServicePage() {
       <Head>
         <title>Terms of Service | OverLeased</title>
         <meta name="description" content="Read OverLeased's terms of service to understand your rights and responsibilities when purchasing our Personalized Lease Exit Guide and using our services." />
-        <meta name="robots" content="index, follow" />
+        <meta name="robots" content="noindex, follow" />
         <link rel="canonical" href="https://www.overleased.com/terms-of-service" />
         <link rel="icon" href="/favicon-mcwi6wvl.ico" type="image/x-icon" />
         
