@@ -19,39 +19,39 @@ export default function ReportPurchasedPage() {
       return;
     }
 
-    const sessionId = router.query.session_id as string;
+    const paymentIntentId = router.query.payment_intent as string;
     
-    console.log('[GA4 Purchase] Session ID:', sessionId || 'NOT FOUND');
+    console.log('[GA4 Purchase] PaymentIntent ID:', paymentIntentId || 'NOT FOUND');
     
-    if (!sessionId) {
-      console.log('[GA4 Purchase] No session_id in query params');
+    if (!paymentIntentId) {
+      console.log('[GA4 Purchase] No payment_intent in query params');
       return;
     }
     
     // Check if we've already tracked this purchase
-    const trackedKey = `ga4_purchase_tracked_${sessionId}`;
+    const trackedKey = `ga4_purchase_tracked_${paymentIntentId}`;
     const alreadyTracked = sessionStorage.getItem(trackedKey);
     
     if (alreadyTracked) {
-      console.log('[GA4 Purchase] Duplicate prevented - already tracked:', sessionId);
+      console.log('[GA4 Purchase] Duplicate prevented - already tracked:', paymentIntentId);
       return;
     }
     
-    // Verify payment status with Stripe session
-    fetch(`/api/verify-payment-status?session_id=${sessionId}`)
+    // Verify payment status with Stripe PaymentIntent
+    fetch(`/api/verify-payment-status?payment_intent=${paymentIntentId}`)
       .then(res => res.json())
       .then(data => {
         console.log('[GA4 Purchase] Payment verification response:', data);
         
-        if (data.paymentStatus === 'paid') {
+        if (data.paymentStatus === 'succeeded') {
           setPaymentVerified(true);
           
           // Fire the GA4 purchase event for Lease Exit Guide
           if (typeof window !== "undefined" && (window as any).gtag) {
-            console.log('[GA4 Purchase] Attempting to fire purchase event for:', sessionId);
+            console.log('[GA4 Purchase] Attempting to fire purchase event for:', paymentIntentId);
             
             (window as any).gtag("event", "purchase", {
-              transaction_id: sessionId,
+              transaction_id: paymentIntentId,
               value: 39,
               currency: "USD",
               items: [
@@ -79,7 +79,7 @@ export default function ReportPurchasedPage() {
       .catch(err => {
         console.error('[GA4 Purchase] Error verifying payment:', err);
       });
-  }, [router.isReady, router.query.session_id]);
+  }, [router.isReady, router.query.payment_intent]);
   
   return (
     <>

@@ -39,39 +39,39 @@ export default function DealerCoordinationConfirmationPage() {
       return;
     }
 
-    const sessionId = router.query.session_id as string;
+    const paymentIntentId = router.query.payment_intent as string;
     
-    console.log('[GA4 Purchase DC] Session ID:', sessionId || 'NOT FOUND');
+    console.log('[GA4 Purchase DC] PaymentIntent ID:', paymentIntentId || 'NOT FOUND');
     
-    if (!sessionId) {
-      console.log('[GA4 Purchase DC] No session_id in query params');
+    if (!paymentIntentId) {
+      console.log('[GA4 Purchase DC] No payment_intent in query params');
       return;
     }
     
     // Check if we've already tracked this purchase
-    const trackedKey = `ga4_dc_purchase_tracked_${sessionId}`;
+    const trackedKey = `ga4_dc_purchase_tracked_${paymentIntentId}`;
     const alreadyTracked = sessionStorage.getItem(trackedKey);
     
     if (alreadyTracked) {
-      console.log('[GA4 Purchase DC] Duplicate prevented - already tracked:', sessionId);
+      console.log('[GA4 Purchase DC] Duplicate prevented - already tracked:', paymentIntentId);
       return;
     }
     
-    // Verify payment status with Stripe session
-    fetch(`/api/verify-payment-status?session_id=${sessionId}`)
+    // Verify payment status with Stripe PaymentIntent
+    fetch(`/api/verify-payment-status?payment_intent=${paymentIntentId}`)
       .then(res => res.json())
       .then(data => {
         console.log('[GA4 Purchase DC] Payment verification response:', data);
         
-        if (data.paymentStatus === 'paid') {
+        if (data.paymentStatus === 'succeeded') {
           setPaymentVerified(true);
           
           // Fire the GA4 purchase event
           if (typeof window !== "undefined" && (window as any).gtag) {
-            console.log('[GA4 Purchase DC] Attempting to fire purchase event for:', sessionId);
+            console.log('[GA4 Purchase DC] Attempting to fire purchase event for:', paymentIntentId);
             
             (window as any).gtag("event", "purchase", {
-              transaction_id: sessionId,
+              transaction_id: paymentIntentId,
               value: 60,
               currency: "USD",
               items: [
@@ -99,7 +99,7 @@ export default function DealerCoordinationConfirmationPage() {
       .catch(err => {
         console.error('[GA4 Purchase DC] Error verifying payment:', err);
       });
-  }, [router.isReady, router.query.session_id]);
+  }, [router.isReady, router.query.payment_intent]);
 
   return (
     <>

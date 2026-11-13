@@ -13,18 +13,18 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { session_id } = req.query;
+  const { payment_intent } = req.query;
 
-  if (!session_id || typeof session_id !== "string") {
-    return res.status(400).json({ error: "Missing session_id parameter" });
+  if (!payment_intent || typeof payment_intent !== "string") {
+    return res.status(400).json({ error: "Missing payment_intent parameter" });
   }
 
   try {
-    const session = await stripe.checkout.sessions.retrieve(session_id);
+    const paymentIntent = await stripe.paymentIntents.retrieve(payment_intent);
     
     return res.status(200).json({
-      paymentStatus: session.payment_status,
-      sessionId: session.id,
+      paymentStatus: paymentIntent.status,
+      paymentIntentId: paymentIntent.id,
     });
   } catch (error) {
     console.error("Error verifying payment status:", error);

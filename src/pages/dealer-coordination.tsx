@@ -116,7 +116,7 @@ function DealerCoordinationCheckoutForm({ formData, clientSecret }: { formData: 
         // Store payment intent for GA4 tracking on confirmation page
         sessionStorage.setItem("dealer_coordination_payment_intent", paymentIntent.id);
         sessionStorage.removeItem("dealerCoordinationFormData");
-        router.push("/dealer-coordination-confirmation");
+        router.push(`/dealer-coordination-confirmation?payment_intent=${encodeURIComponent(paymentIntent.id)}`);
       }
     } catch (err: any) {
       setErrorMessage(err.message || "An unexpected error occurred");
@@ -181,12 +181,7 @@ export default function DealerCoordinationPage() {
   const [clientSecret, setClientSecret] = useState("");
   const [isLoadingPayment, setIsLoadingPayment] = useState(false);
   const [error, setError] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [dealerCoordinationId, setDealerCoordinationId] = useState<string | null>(null);
-
-  const stripe = useStripe();
-  const elements = useElements();
 
   // Page-specific scroll to top (backup to global handler)
   useEffect(() => {
