@@ -116,7 +116,6 @@ function CheckoutForm({ formData, clientSecret }: { formData: FormData; clientSe
 
           // Send confirmation emails via server-side API route (also idempotent via webhook)
           try {
-            console.log("Calling email API to send confirmation emails...");
             const emailResponse = await fetch("/api/send-confirmation-emails", {
               method: "POST",
               headers: {
@@ -141,35 +140,18 @@ function CheckoutForm({ formData, clientSecret }: { formData: FormData; clientSe
 
             const emailResult = await emailResponse.json();
             
-            console.log("Full email API results:", JSON.stringify(emailResult, null, 2));
-            
             if (emailResult.success) {
-              console.log("Email API response:", emailResult);
-              if (emailResult.results.customerEmail.success) {
-                console.log("✅ Customer confirmation email sent successfully");
-              } else {
-                console.error("❌ Customer confirmation email FAILED:", emailResult.results.customerEmail.error);
-                // Try to parse the error if it's a JSON string
-                try {
-                  const errorDetails = JSON.parse(emailResult.results.customerEmail.error);
-                  console.error("🔍 Detailed Brevo Error for Customer Email:", errorDetails);
-                } catch (e) {
-                  // Error is not JSON, just log as-is
-                }
+              if (!emailResult.results.customerEmail.success) {
+                console.error("Customer confirmation email failed");
               }
-              if (emailResult.results.supportEmail.success) {
-                console.log("✅ Support notification email sent successfully");
-              } else {
-                console.error("❌ Support notification email FAILED:", emailResult.results.supportEmail.error);
+              if (!emailResult.results.supportEmail.success) {
+                console.error("Support notification email failed");
               }
             } else {
-              console.error("Email API returned error:", emailResult);
+              console.error("Email delivery failed");
             }
           } catch (emailError: any) {
-            console.error("Failed to call email API:", {
-              error: emailError.message,
-              details: emailError,
-            });
+            console.error("Failed to send confirmation emails");
             // Don't block the flow if email fails - user already paid
           }
         } catch (saveError) {
@@ -292,14 +274,16 @@ export default function CheckoutPage() {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to create payment intent");
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || "Payment initialization failed");
         }
 
         const data = await response.json();
         setClientSecret(data.clientSecret);
         setIsLoading(false);
       } catch (err: any) {
-        setError("Failed to initialize payment. Please check your Stripe configuration.");
+        console.error("Checkout initialization error:", err);
+        setError(err.message || "Unable to initialize payment. Please try again or contact support.");
         setIsLoading(false);
       }
     };
@@ -336,13 +320,6 @@ export default function CheckoutPage() {
               <CardDescription>{error || "Unable to load checkout"}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {error && error.includes("Stripe") && (
-                <Alert>
-                  <AlertDescription>
-                    <strong>Setup Required:</strong> Stripe API keys need to be configured in your environment variables.
-                  </AlertDescription>
-                </Alert>
-              )}
               <Button onClick={() => router.push("/get-started")} className="w-full">
                 Return to Get Started
               </Button>

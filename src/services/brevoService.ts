@@ -33,14 +33,6 @@ export const sendEmail = async (params: SendEmailParams) => {
     throw new Error("Brevo API key is not configured");
   }
 
-  console.log("=== BREVO EMAIL DEBUG ===");
-  console.log("API Key present:", !!BREVO_API_KEY);
-  console.log("API Key length:", BREVO_API_KEY?.length);
-  console.log("API Key prefix:", BREVO_API_KEY?.substring(0, 15) + "...");
-  console.log("Sending email via Brevo to:", params.to.map(t => t.email).join(", "));
-  console.log("Email sender:", params.sender || { email: "support@overleased.com", name: "OverLeased" });
-  console.log("Email subject:", params.subject);
-
   try {
     const response = await axios.post(
       `${BREVO_API_URL}/smtp/email`,
@@ -61,7 +53,6 @@ export const sendEmail = async (params: SendEmailParams) => {
       }
     );
 
-    console.log("Email sent successfully:", response.data);
     return response.data;
   } catch (error: any) {
     console.error("=== BREVO API ERROR ===");
@@ -230,7 +221,6 @@ export const sendPurchaseConfirmation = async (params: PurchaseConfirmationParam
     </html>
   `;
 
-  console.log("Sending purchase confirmation to customer:", email);
   return sendEmail({
     to: [{ email, name: "Customer" }],
     subject: "✓ Your OverLeased Guide is On Its Way! (Delivered in 24-48 Hours)",
@@ -573,7 +563,6 @@ export const sendGetStartedNotificationEmail = async (formData: GetStartedFormDa
     </html>
   `;
 
-  console.log("Sending get-started notification to support");
   return sendEmail({
     to: [{ email: "support@overleased.com", name: "OverLeased Support" }],
     subject: `New Form Submission: ${formData.firstName} - ${formData.year} ${formData.make} ${formData.model}`,
@@ -698,7 +687,6 @@ export const sendDealerCoordinationRequestNotification = async (formData: Dealer
     </html>
   `;
 
-  console.log("Sending dealer coordination request notification to support");
   return sendEmail({
     to: [{ email: "support@overleased.com", name: "OverLeased Support" }],
     subject: `Dealer Coordination Request: ${formData.firstName} ${formData.lastName}`,
@@ -821,7 +809,6 @@ export const sendDealerCoordinationConfirmation = async (params: { email: string
     </html>
   `;
 
-  console.log("Sending dealer coordination confirmation to customer:", email);
   return sendEmail({
     to: [{ email, name: `${firstName} ${lastName}` }],
     subject: "✓ Your Dealer Coordination Request Has Been Received",

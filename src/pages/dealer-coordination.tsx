@@ -333,7 +333,7 @@ export default function DealerCoordinationPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: DEALER_COORDINATION_AMOUNT * 100,
+          amount: DEALER_COORDINATION_AMOUNT, // Already in cents (6000)
           email: formData.email,
           metadata: {
             product: "dealer_coordination",
@@ -358,7 +358,8 @@ export default function DealerCoordinationPage() {
         setIsLoadingPayment(false);
       }
     } catch (err: any) {
-      setError("Failed to initialize payment. Please try again.");
+      console.error("Payment initialization error:", err);
+      setError(err.message || "Unable to initialize payment. Please try again or contact support.");
       setIsLoadingPayment(false);
     }
   };
