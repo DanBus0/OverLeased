@@ -10,6 +10,7 @@ import { AlertCircle, ArrowLeft, ArrowRight, Car, CheckCircle, ShieldCheck, Cloc
 import Link from "next/link";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Image from "next/image";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function GetStartedPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -31,6 +32,8 @@ export default function GetStartedPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [formStartTracked, setFormStartTracked] = useState(false);
+  const [leaseReviewId, setLeaseReviewId] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -49,10 +52,24 @@ export default function GetStartedPage() {
         
         sessionStorage.removeItem("forceScrollTopOnGetStarted");
       }
+
+      // Load existing leaseReviewId if user refreshed or came back
+      const savedId = sessionStorage.getItem("leaseReviewId");
+      if (savedId) {
+        setLeaseReviewId(savedId);
+      }
     } catch (error) {
       // Silent fail for sessionStorage
     }
   }, []);
+
+  const trackFormStart = () => {
+    if (!formStartTracked && typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "form_start", {});
+      console.log("[GA4] form_start event fired");
+      setFormStartTracked(true);
+    }
+  };
 
   const formatNumberWithCommas = (value: string) => {
     const numericValue = value.replace(/\D/g, "");
@@ -64,6 +81,7 @@ export default function GetStartedPage() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    trackFormStart();
     const { name, value } = e.target;
     
     if (name === "mileage") {
@@ -81,6 +99,7 @@ export default function GetStartedPage() {
   };
 
   const handleSelectChange = (name: string, value: string) => {
+    trackFormStart();
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -103,57 +122,105 @@ export default function GetStartedPage() {
     return true;
   };
 
-  const handleContinueToStep2 = (e: React.FormEvent) => {
+  const handleContinueToStep2 = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Prevent double submission
     if (isSubmitting) return;
     
-    if (validateStep1()) {
-      setIsSubmitting(true);
-      
-      // Send notification to support (non-blocking)
-      fetch("/api/send-get-started-notification", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      }).catch(err => {
-        console.error("Failed to send notification:", err);
-        // Don't block the user flow if notification fails
-      });
-      
-      setCurrentStep(2);
-      
+    if (!validateStep1()) {
+      return;
+    }
+
+    // Honeypot validation - if filled, it's a bot
+    if (formData.website) {
+      setError("Invalid submission detected.");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setError("");
+
+    // Generate UUID client-side
+    const recordId = crypto.randomUUID();
+    setLeaseReviewId(recordId);
+    sessionStorage.setItem("leaseReviewId", recordId);
+
+    // Try to save to Supabase but don't block user flow if it fails
+    try {
+      const { error: dbError } = await supabase
+        .from("lease_review_leads")
+        .insert({
+          id: recordId, // Use client-generated UUID
+          email: formData.email,
+          firstname: formData.firstName,
+          customer_goal: formData.customerGoal,
+          year: formData.year,
+          make: formData.make,
+          model: formData.model,
+          trim: formData.trim,
+          vehicle_condition: formData.vehicleCondition,
+          current_mileage: parseInt(parseNumberFromCommas(formData.mileage)),
+          zip_code: formData.zipCode,
+          payment_status: "pending",
+        });
+
+      if (dbError) {
+        console.error("Failed to save to Supabase (non-blocking):", dbError);
+        // Don't stop user flow - they can still proceed with sessionStorage data
+      } else {
+        // Fire GA4 form_submit event only on successful save
+        if (typeof window !== "undefined" && (window as any).gtag) {
+          (window as any).gtag("event", "form_submit", {});
+          console.log("[GA4] form_submit event fired");
+        }
+      }
+    } catch (err) {
+      console.error("Error saving to Supabase (non-blocking):", err);
+      // Don't stop user flow
+    }
+    
+    // Send notification to support (non-blocking)
+    fetch("/api/send-get-started-notification", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    }).catch(err => {
+      console.error("Failed to send notification:", err);
+    });
+    
+    // Always proceed to Step 2
+    setCurrentStep(2);
+    
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
       
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
         
         setTimeout(() => {
-          window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-          document.documentElement.scrollTop = 0;
-          document.body.scrollTop = 0;
-          
-          setTimeout(() => {
-            if (step2FormRef.current) {
-              const formTop = step2FormRef.current.getBoundingClientRect().top + window.pageYOffset;
-              const targetScroll = Math.max(0, formTop - 120);
-              window.scrollTo({ top: targetScroll, behavior: 'smooth' });
-            } else {
-              window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-            }
-            // Re-enable button after navigation completes
-            setIsSubmitting(false);
-          }, 150);
-        }, 50);
-      });
-    }
+          if (step2FormRef.current) {
+            const formTop = step2FormRef.current.getBoundingClientRect().top + window.pageYOffset;
+            const targetScroll = Math.max(0, formTop - 120);
+            window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+          } else {
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+          }
+          // Re-enable button after navigation completes
+          setIsSubmitting(false);
+        }, 150);
+      }, 50);
+    });
   };
 
   const handleBackToStep1 = () => {
@@ -192,16 +259,26 @@ export default function GetStartedPage() {
     setIsSubmitting(true);
     
     try {
-      // Honeypot validation - if filled, it's a bot
-      if (formData.website) {
-        setError("Invalid submission detected.");
-        setIsSubmitting(false);
-        return;
+      // Save form data and leaseReviewId to sessionStorage for checkout page
+      sessionStorage.setItem("leaseFormData", JSON.stringify(formData));
+      if (leaseReviewId) {
+        sessionStorage.setItem("leaseReviewId", leaseReviewId);
+      }
+      
+      // Fire GA4 begin_checkout event for Lease Exit Guide
+      if (typeof window !== "undefined" && (window as any).gtag) {
+        (window as any).gtag("event", "begin_checkout", {
+          value: 39,
+          currency: "USD",
+          items: [{
+            item_id: "lease_exit_guide",
+            item_name: "Personalized Lease Exit Guide",
+            price: 39
+          }]
+        });
+        console.log("[GA4] begin_checkout event fired for Lease Exit Guide");
       }
 
-      // Save form data to sessionStorage for checkout page
-      sessionStorage.setItem("leaseFormData", JSON.stringify(formData));
-      
       // Redirect to checkout page
       window.location.href = "/checkout";
     } catch (err) {

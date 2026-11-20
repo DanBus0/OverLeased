@@ -2,6 +2,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 import { supabase } from "@/integrations/supabase/client";
 import { createClient } from "@supabase/supabase-js";
+import { 
+  sendSupportNotification, 
+  sendPurchaseConfirmation,
+  sendDealerCoordinationSupportNotification,
+  sendDealerCoordinationConfirmation 
+} from "@/services/brevoService";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-06-24.dahlia" as any,
@@ -108,52 +114,208 @@ export default async function handler(
 
 async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
   const metadata = paymentIntent.metadata;
-  const serviceType = metadata.serviceType;
-  const amount = paymentIntent.amount;
+  const email = metadata.email || "";
+  
+  // Update Supabase record to mark payment as succeeded
+  if (metadata.product === "lease_exit_guide") {
+    const leaseReviewId = metadata.leaseReviewId || null;
 
-  // Validate metadata exists
-  if (!metadata || Object.keys(metadata).length === 0) {
-    console.error("Payment failed: Empty metadata", {
-      paymentIntentId: paymentIntent.id,
-      amount: amount,
-    });
-    throw new Error("PaymentIntent missing metadata - cannot route payment");
-  }
-
-  // Validate service type exists
-  if (!serviceType) {
-    console.error("Payment failed: Missing serviceType", {
-      paymentIntentId: paymentIntent.id,
-      metadataKeys: Object.keys(metadata),
-    });
-    throw new Error("Missing serviceType in payment metadata");
-  }
-
-  // Route based on service type and validate amount
-  if (serviceType === "dealer-coordination") {
-    if (amount !== 6000) {
-      console.error("Payment failed: Amount mismatch for dealer-coordination", {
-        expected: 6000,
-        received: amount,
-      });
-      throw new Error("Payment amount does not match service type");
+    if (!leaseReviewId) {
+      console.error("Missing leaseReviewId in PaymentIntent metadata");
+      throw new Error("Missing leaseReviewId in metadata");
     }
-    await handleDealerCoordinationSuccess(paymentIntent);
-  } else if (serviceType === "lease-exit-guide") {
-    if (amount !== 3900) {
-      console.error("Payment failed: Amount mismatch for lease-exit-guide", {
-        expected: 3900,
-        received: amount,
-      });
-      throw new Error("Payment amount does not match service type");
+
+    // Upsert lease review lead with payment information
+    const { data: leaseData, error: leaseError } = await supabaseAdmin
+      .from("lease_review_leads")
+      .upsert(
+        {
+          id: leaseReviewId,
+          firstname: metadata.firstName || "",
+          customer_goal: metadata.customerGoal || "",
+          email,
+          year: metadata.year || "",
+          make: metadata.make || "",
+          model: metadata.model || "",
+          trim: metadata.trim || "",
+          vehicle_condition: metadata.vehicleCondition || "",
+          current_mileage: parseInt(metadata.mileage?.replace(/,/g, '') || '0'),
+          zip_code: metadata.zipCode || "",
+          payment_intent_id: paymentIntent.id,
+          payment_status: "paid",
+          amount_paid: paymentIntent.amount,
+        },
+        { onConflict: "id" }
+      )
+      .select()
+      .single();
+
+    if (leaseError) {
+      console.error("Error upserting lease review lead:", leaseError);
+      throw new Error("Database error");
     }
-    await handleLeaseReportSuccess(paymentIntent);
-  } else {
-    console.error("Payment failed: Unknown service type", {
-      serviceType: serviceType,
-      paymentIntentId: paymentIntent.id,
-    });
-    throw new Error("Unknown service type");
+
+    // Atomically claim and send support notification email
+    const { data: supportClaimData, error: supportClaimError } = await supabaseAdmin
+      .from("lease_review_leads")
+      .update({ support_email_sent_at: new Date().toISOString() })
+      .eq("id", leaseReviewId)
+      .is("support_email_sent_at", null)
+      .select()
+      .maybeSingle();
+
+    if (supportClaimError) {
+      console.error("Error claiming support email:", supportClaimError);
+    } else if (supportClaimData) {
+      // Successfully claimed - send support notification
+      const supportEmailResult = await sendSupportNotification({
+        email,
+        firstName: metadata.firstName || "",
+        customerGoal: metadata.customerGoal || "",
+        vehicle: {
+          year: metadata.year || "",
+          make: metadata.make || "",
+          model: metadata.model || "",
+          trim: metadata.trim || "",
+          condition: metadata.vehicleCondition || "",
+          mileage: metadata.mileage || "",
+        },
+        amount: paymentIntent.amount,
+        paymentIntentId: paymentIntent.id,
+      });
+
+      if (!supportEmailResult.success) {
+        console.error("Failed to send support notification");
+      }
+    } else {
+      console.log("Support email already sent for this payment");
+    }
+
+    // Atomically claim and send customer confirmation email
+    const { data: customerClaimData, error: customerClaimError } = await supabaseAdmin
+      .from("lease_review_leads")
+      .update({ customer_email_sent_at: new Date().toISOString() })
+      .eq("id", leaseReviewId)
+      .is("customer_email_sent_at", null)
+      .select()
+      .maybeSingle();
+
+    if (customerClaimError) {
+      console.error("Error claiming customer email:", customerClaimError);
+    } else if (customerClaimData) {
+      // Successfully claimed - send customer confirmation
+      const customerEmailResult = await sendPurchaseConfirmation({
+        email,
+        vehicle: {
+          year: metadata.year || "",
+          make: metadata.make || "",
+          model: metadata.model || "",
+          trim: metadata.trim || "",
+          condition: metadata.vehicleCondition || "",
+          mileage: metadata.mileage || "",
+        },
+        amount: paymentIntent.amount,
+        paymentIntentId: paymentIntent.id,
+      });
+
+      if (!customerEmailResult.success) {
+        console.error("Failed to send customer confirmation");
+      }
+    } else {
+      console.log("Customer confirmation email already sent for this payment");
+    }
+  } else if (metadata.product === "dealer_coordination") {
+    const firstName = metadata.firstName || "";
+    const lastName = metadata.lastName || "";
+    const phone = metadata.phone || "";
+    const dcId = metadata.dealerCoordinationId || null;
+
+    if (!dcId) {
+      console.error("Missing dealerCoordinationId in PaymentIntent metadata");
+      throw new Error("Missing dealerCoordinationId in metadata");
+    }
+
+    // Upsert dealer coordination lead with payment information
+    const { data: dealerData, error: dealerError } = await supabaseAdmin
+      .from("dealer_coordination_leads")
+      .upsert(
+        {
+          id: dcId,
+          first_name: firstName,
+          last_name: lastName,
+          email,
+          phone,
+          payment_intent_id: paymentIntent.id,
+          payment_status: "succeeded",
+          amount_paid: paymentIntent.amount,
+        },
+        { onConflict: "id" }
+      )
+      .select()
+      .single();
+
+    if (dealerError) {
+      console.error("Error upserting dealer coordination lead:", dealerError);
+      throw new Error("Database error");
+    }
+
+    // Atomically claim and send support notification email
+    const { data: supportClaimData, error: supportClaimError } = await supabaseAdmin
+      .from("dealer_coordination_leads")
+      .update({ support_email_sent_at: new Date().toISOString() })
+      .eq("id", dcId)
+      .is("support_email_sent_at", null)
+      .select()
+      .maybeSingle();
+
+    if (supportClaimError) {
+      console.error("Error claiming support email:", supportClaimError);
+    } else if (supportClaimData) {
+      // Successfully claimed - send support notification
+      const supportEmailResult = await sendDealerCoordinationSupportNotification({
+        email,
+        firstName,
+        lastName,
+        phone,
+        amount: paymentIntent.amount,
+        paymentIntentId: paymentIntent.id,
+      });
+
+      if (!supportEmailResult.success) {
+        console.error("Failed to send dealer coordination support notification");
+      }
+    } else {
+      console.log("Support email already sent for this dealer coordination");
+    }
+
+    // Atomically claim and send customer confirmation email
+    const { data: customerClaimData, error: customerClaimError } = await supabaseAdmin
+      .from("dealer_coordination_leads")
+      .update({ customer_email_sent_at: new Date().toISOString() })
+      .eq("id", dcId)
+      .is("customer_email_sent_at", null)
+      .select()
+      .maybeSingle();
+
+    if (customerClaimError) {
+      console.error("Error claiming customer email:", customerClaimError);
+    } else if (customerClaimData) {
+      // Successfully claimed - send customer confirmation
+      const customerEmailResult = await sendDealerCoordinationConfirmation({
+        email,
+        firstName,
+        lastName,
+        phone,
+        amount: paymentIntent.amount,
+        paymentIntentId: paymentIntent.id,
+      });
+
+      if (!customerEmailResult.success) {
+        console.error("Failed to send dealer coordination customer confirmation");
+      }
+    } else {
+      console.log("Customer confirmation email already sent for this dealer coordination");
+    }
   }
 }
 

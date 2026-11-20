@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FileText, HelpCircle, DollarSign, Clock, ChevronDown, Check, ShieldCheck, ArrowRight, CheckCircle2, Shield } from "lucide-react";
+import { FileText, HelpCircle, DollarSign, Clock, ChevronDown, Check, ShieldCheck, ArrowRight, CheckCircle2, Shield, Star } from "lucide-react";
 import Link from "next/link";
 import {
   Accordion,
@@ -11,6 +11,15 @@ import {
 } from "@/components/ui/accordion";
 
 export default function HeroSection() {
+  const trackGetStartedClick = (location: string) => {
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "get_started_click", {
+        location: location
+      });
+      console.log(`[GA4] get_started_click fired with location: ${location}`);
+    }
+  };
+
   const faqItems = [
     {
       icon: FileText,
@@ -89,6 +98,7 @@ export default function HeroSection() {
                         prefetch={true}
                         scroll
                         onClick={() => {
+                          trackGetStartedClick("hero");
                           try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                         }}
                         className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-base md:text-lg px-8 md:px-10 py-3.5 md:py-3 shadow-lg transition-colors duration-200 font-bold rounded-2xl border-0"
@@ -194,6 +204,7 @@ export default function HeroSection() {
                         prefetch={true}
                         scroll
                         onClick={() => {
+                          trackGetStartedClick("hero");
                           try { sessionStorage.setItem("forceScrollTopOnGetStarted", "1"); } catch {}
                         }}
                         className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-[0.875rem] px-5 py-2.5 shadow-lg transition-colors duration-200 font-bold rounded-xl border-0 w-full max-w-[280px] whitespace-nowrap"

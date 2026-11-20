@@ -11,6 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
+const LEASE_EXIT_GUIDE_AMOUNT = 39; // $39 in dollars
+
 // Helper to normalize and validate mileage input
 function validateMileage(mileageInput: string | undefined): number {
   const normalized = String(mileageInput || "0").replace(/,/g, "").trim();
@@ -111,65 +113,6 @@ function CheckoutForm({ formData, clientSecret }: { formData: FormData; clientSe
           } else {
             console.log("Payment already recorded (webhook processed first)");
           }
-
-          // Send confirmation emails via server-side API route (also idempotent via webhook)
-          try {
-            console.log("Calling email API to send confirmation emails...");
-            const emailResponse = await fetch("/api/send-confirmation-emails", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                email: formData.email,
-                firstName: formData.firstName,
-                customerGoal: formData.customerGoal,
-                vehicle: {
-                  year: formData.year,
-                  make: formData.make,
-                  model: formData.model,
-                  trim: formData.trim,
-                  condition: formData.vehicleCondition,
-                  mileage: formData.mileage,
-                },
-                amount: 3900,
-                paymentIntentId: paymentIntent.id,
-              }),
-            });
-
-            const emailResult = await emailResponse.json();
-            
-            console.log("Full email API results:", JSON.stringify(emailResult, null, 2));
-            
-            if (emailResult.success) {
-              console.log("Email API response:", emailResult);
-              if (emailResult.results.customerEmail.success) {
-                console.log("✅ Customer confirmation email sent successfully");
-              } else {
-                console.error("❌ Customer confirmation email FAILED:", emailResult.results.customerEmail.error);
-                // Try to parse the error if it's a JSON string
-                try {
-                  const errorDetails = JSON.parse(emailResult.results.customerEmail.error);
-                  console.error("🔍 Detailed Brevo Error for Customer Email:", errorDetails);
-                } catch (e) {
-                  // Error is not JSON, just log as-is
-                }
-              }
-              if (emailResult.results.supportEmail.success) {
-                console.log("✅ Support notification email sent successfully");
-              } else {
-                console.error("❌ Support notification email FAILED:", emailResult.results.supportEmail.error);
-              }
-            } else {
-              console.error("Email API returned error:", emailResult);
-            }
-          } catch (emailError: any) {
-            console.error("Failed to call email API:", {
-              error: emailError.message,
-              details: emailError,
-            });
-            // Don't block the flow if email fails - user already paid
-          }
         } catch (saveError) {
           console.error("Error saving to database:", saveError);
         }
@@ -248,50 +191,63 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const savedData = sessionStorage.getItem("leaseFormData");
-    if (!savedData) {
-      router.push("/get-started");
-      return;
-    }
-
-    const data = JSON.parse(savedData);
-    setFormData(data);
-
-    fetch("/api/create-payment-intent", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        amount: 3900,
-        metadata: {
-          serviceType: "lease-exit-guide",
-          firstName: data.firstName,
-          customerGoal: data.customerGoal,
-          customerEmail: data.email,
-          vehicleYear: data.year,
-          vehicleMake: data.make,
-          vehicleModel: data.model,
-          vehicleTrim: data.trim,
-          vehicleCondition: data.vehicleCondition,
-          vehicleMileage: data.mileage,
-          zipCode: data.zipCode,
-        },
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setClientSecret(data.clientSecret);
+    const initializeCheckout = async () => {
+      try {
+        const savedFormData = sessionStorage.getItem("leaseFormData");
+        if (!savedFormData) {
+          console.error("No form data found");
+          router.push("/get-started");
+          return;
         }
+
+        const parsedFormData = JSON.parse(savedFormData);
+        setFormData(parsedFormData);
+
+        // Get leaseReviewId from sessionStorage
+        const leaseReviewId = sessionStorage.getItem("leaseReviewId");
+
+        // Create payment intent
+        const response = await fetch("/api/create-payment-intent", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: LEASE_EXIT_GUIDE_AMOUNT * 100,
+            email: parsedFormData.email,
+            metadata: {
+              product: "lease_exit_guide",
+              firstName: parsedFormData.firstName,
+              customerGoal: parsedFormData.customerGoal,
+              email: parsedFormData.email,
+              year: parsedFormData.year,
+              make: parsedFormData.make,
+              model: parsedFormData.model,
+              trim: parsedFormData.trim,
+              vehicleCondition: parsedFormData.vehicleCondition,
+              mileage: parsedFormData.mileage,
+              zipCode: parsedFormData.zipCode,
+              leaseReviewId: leaseReviewId || "", // Pass leaseReviewId to Stripe
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || "Payment initialization failed");
+        }
+
+        const data = await response.json();
+        setClientSecret(data.clientSecret);
         setIsLoading(false);
-      })
-      .catch((err) => {
-        setError("Failed to initialize payment. Please check your Stripe configuration.");
+      } catch (err: any) {
+        console.error("Checkout initialization error:", err);
+        setError(err.message || "Unable to initialize payment. Please try again or contact support.");
         setIsLoading(false);
-      });
+      }
+    };
+
+    initializeCheckout();
   }, [router]);
 
   if (isLoading) {
@@ -323,13 +279,6 @@ export default function CheckoutPage() {
               <CardDescription>{error || "Unable to load checkout"}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {error && error.includes("Stripe") && (
-                <Alert>
-                  <AlertDescription>
-                    <strong>Setup Required:</strong> Stripe API keys need to be configured in your environment variables.
-                  </AlertDescription>
-                </Alert>
-              )}
               <Button onClick={() => router.push("/get-started")} className="w-full">
                 Return to Get Started
               </Button>
