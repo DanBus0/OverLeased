@@ -27,7 +27,15 @@ interface DealerCoordinationFormData {
   consentGiven: boolean;
 }
 
-function DealerCoordinationCheckoutForm({ formData, clientSecret }: { formData: DealerCoordinationFormData; clientSecret: string }) {
+function DealerCoordinationCheckoutForm({ 
+  formData, 
+  clientSecret, 
+  dealerCoordinationId 
+}: { 
+  formData: DealerCoordinationFormData; 
+  clientSecret: string;
+  dealerCoordinationId: string | null;
+}) {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
@@ -57,41 +65,8 @@ function DealerCoordinationCheckoutForm({ formData, clientSecret }: { formData: 
         setErrorMessage(error.message || "An error occurred during payment");
         setIsProcessing(false);
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
-        // Save to Supabase database (idempotent check)
-        try {
-          const { data: existing } = await supabase
-            .from("dealer_coordination_leads")
-            .select("id")
-            .eq("payment_intent_id", paymentIntent.id)
-            .maybeSingle();
-
-          if (!existing) {
-            const { error: dbError } = await supabase
-              .from("dealer_coordination_leads")
-              .insert({
-                first_name: formData.firstName,
-                last_name: formData.lastName,
-                email: formData.email,
-                phone: formData.phone,
-                payment_status: "succeeded",
-                payment_intent_id: paymentIntent.id,
-                amount_paid: DEALER_COORDINATION_AMOUNT,
-              });
-
-            if (dbError) {
-              console.error("Failed to save to database:", dbError);
-              // Don't block the user flow if database save fails
-            } else {
-              console.log("Successfully saved dealer coordination lead");
-            }
-          } else {
-            console.log("Payment already recorded (webhook processed first)");
-          }
-        } catch (dbErr) {
-          console.error("Database error:", dbErr);
-        }
-
         // Store payment intent for GA4 tracking on confirmation page
+        // Webhook handles all database operations via dealerCoordinationId
         sessionStorage.setItem("dealer_coordination_payment_intent", paymentIntent.id);
         sessionStorage.removeItem("dealerCoordinationFormData");
         router.push(`/dealer-coordination-confirmation?payment_intent=${encodeURIComponent(paymentIntent.id)}`);
@@ -642,7 +617,11 @@ export default function DealerCoordinationPage() {
                     <CardContent>
                       {stripeOptions && clientSecret ? (
                         <Elements stripe={stripePromise} options={stripeOptions}>
-                          <DealerCoordinationCheckoutForm formData={formData} clientSecret={clientSecret} />
+                          <DealerCoordinationCheckoutForm 
+                            formData={formData} 
+                            clientSecret={clientSecret}
+                            dealerCoordinationId={dealerCoordinationId}
+                          />
                         </Elements>
                       ) : (
                         <Alert>

@@ -76,47 +76,8 @@ function CheckoutForm({ formData, clientSecret }: { formData: FormData; clientSe
         setErrorMessage(error.message || "An error occurred during payment");
         setIsProcessing(false);
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
-        try {
-          // Check if already saved (idempotency)
-          const { data: existing } = await supabase
-            .from("lease_review_leads")
-            .select("id")
-            .eq("payment_intent_id", paymentIntent.id)
-            .maybeSingle();
-
-          if (!existing) {
-            const { error: supabaseError } = await supabase
-              .from("lease_review_leads")
-              .insert([
-                {
-                  firstname: formData.firstName,
-                  customer_goal: formData.customerGoal,
-                  email: formData.email,
-                  year: formData.year,
-                  make: formData.make,
-                  model: formData.model,
-                  trim: formData.trim,
-                  vehicle_condition: formData.vehicleCondition,
-                  current_mileage: validateMileage(formData.mileage),
-                  zip_code: formData.zipCode,
-                  payment_intent_id: paymentIntent.id,
-                  payment_status: "paid",
-                  amount_paid: 3900,
-                },
-              ]);
-
-            if (supabaseError) {
-              console.error("Error saving to Supabase:", supabaseError);
-            } else {
-              console.log("Successfully saved to Supabase");
-            }
-          } else {
-            console.log("Payment already recorded (webhook processed first)");
-          }
-        } catch (saveError) {
-          console.error("Error saving to database:", saveError);
-        }
-
+        // Store payment intent for GA4 tracking and localStorage only
+        // Webhook handles all database operations via leaseReviewId
         try {
           const inquiries = JSON.parse(localStorage.getItem("leaseInquiries") || "[]");
           inquiries.push({

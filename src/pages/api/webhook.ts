@@ -116,113 +116,197 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
   const metadata = paymentIntent.metadata;
   const email = metadata.email || "";
   
-  // Update Supabase record to mark payment as succeeded
   if (metadata.product === "lease_exit_guide") {
     const leaseReviewId = metadata.leaseReviewId || null;
 
     if (!leaseReviewId) {
       console.error("Missing leaseReviewId in PaymentIntent metadata");
-      throw new Error("Missing leaseReviewId in metadata");
+      // Don't throw - still try to send emails
     }
 
-    // Upsert lease review lead with payment information
-    const { data: leaseData, error: leaseError } = await supabaseAdmin
-      .from("lease_review_leads")
-      .upsert(
-        {
-          id: leaseReviewId,
-          firstname: metadata.firstName || "",
-          customer_goal: metadata.customerGoal || "",
-          email,
-          year: metadata.year || "",
-          make: metadata.make || "",
-          model: metadata.model || "",
-          trim: metadata.trim || "",
-          vehicle_condition: metadata.vehicleCondition || "",
-          current_mileage: parseInt(metadata.mileage?.replace(/,/g, '') || '0'),
-          zip_code: metadata.zipCode || "",
-          payment_intent_id: paymentIntent.id,
-          payment_status: "paid",
-          amount_paid: paymentIntent.amount,
-        },
-        { onConflict: "id" }
-      )
-      .select()
-      .single();
+    let leadId = leaseReviewId;
 
-    if (leaseError) {
-      console.error("Error upserting lease review lead:", leaseError);
-      throw new Error("Database error");
+    // Try to find or update the lead record (non-fatal)
+    try {
+      // (a) Find by payment_intent_id first
+      const { data: existingByPayment } = await supabaseAdmin
+        .from("lease_review_leads")
+        .select("id")
+        .eq("payment_intent_id", paymentIntent.id)
+        .maybeSingle();
+
+      if (existingByPayment) {
+        // Already exists with this payment_intent_id - update it
+        leadId = existingByPayment.id;
+        const { error: updateError } = await supabaseAdmin
+          .from("lease_review_leads")
+          .update({
+            payment_status: "paid",
+            amount_paid: paymentIntent.amount,
+          })
+          .eq("id", leadId);
+
+        if (updateError) {
+          console.error("Failed to update lead by payment_intent_id:", updateError);
+        } else {
+          console.log("Updated existing lead found by payment_intent_id");
+        }
+      } else if (leaseReviewId) {
+        // (b) Find by leaseReviewId
+        const { data: existingById } = await supabaseAdmin
+          .from("lease_review_leads")
+          .select("id")
+          .eq("id", leaseReviewId)
+          .maybeSingle();
+
+        if (existingById) {
+          // Update existing record with payment info
+          const { error: updateError } = await supabaseAdmin
+            .from("lease_review_leads")
+            .update({
+              payment_intent_id: paymentIntent.id,
+              payment_status: "paid",
+              amount_paid: paymentIntent.amount,
+            })
+            .eq("id", leaseReviewId);
+
+          if (updateError) {
+            console.error("Failed to update lead by leaseReviewId:", updateError);
+          } else {
+            console.log("Updated existing lead found by leaseReviewId");
+          }
+        } else {
+          // (c) Neither exists - insert new row from metadata
+          const { data: newLead, error: insertError } = await supabaseAdmin
+            .from("lease_review_leads")
+            .insert({
+              id: leaseReviewId,
+              firstname: metadata.firstName || "",
+              customer_goal: metadata.customerGoal || "",
+              email,
+              year: metadata.year || "",
+              make: metadata.make || "",
+              model: metadata.model || "",
+              trim: metadata.trim || "",
+              vehicle_condition: metadata.vehicleCondition || "",
+              current_mileage: parseInt(metadata.mileage?.replace(/,/g, '') || '0'),
+              zip_code: metadata.zipCode || "",
+              payment_intent_id: paymentIntent.id,
+              payment_status: "paid",
+              amount_paid: paymentIntent.amount,
+            })
+            .select()
+            .single();
+
+          if (insertError) {
+            // Handle race condition - if 23505, another process inserted it
+            if (insertError.code === "23505") {
+              console.log("Race condition detected - lead already exists, continuing with emails");
+              // Try to fetch the existing record for the ID
+              const { data: raceLead } = await supabaseAdmin
+                .from("lease_review_leads")
+                .select("id")
+                .eq("payment_intent_id", paymentIntent.id)
+                .maybeSingle();
+              if (raceLead) {
+                leadId = raceLead.id;
+              }
+            } else {
+              console.error("Failed to insert new lead:", insertError);
+            }
+          } else if (newLead) {
+            console.log("Inserted new lead from webhook metadata");
+            leadId = newLead.id;
+          }
+        }
+      }
+    } catch (dbError) {
+      console.error("Database error (non-fatal, will still send emails):", dbError);
     }
 
-    // Atomically claim and send support notification email
-    const { data: supportClaimData, error: supportClaimError } = await supabaseAdmin
-      .from("lease_review_leads")
-      .update({ support_email_sent_at: new Date().toISOString() })
-      .eq("id", leaseReviewId)
-      .is("support_email_sent_at", null)
-      .select()
-      .maybeSingle();
+    // Send emails regardless of database outcome (use leadId if available)
+    const emailLeadId = leadId || leaseReviewId;
 
-    if (supportClaimError) {
-      console.error("Error claiming support email:", supportClaimError);
-    } else if (supportClaimData) {
-      // Successfully claimed - send support notification
-      const supportEmailResult = await sendSupportNotification({
-        email,
-        firstName: metadata.firstName || "",
-        customerGoal: metadata.customerGoal || "",
-        vehicle: {
-          year: metadata.year || "",
-          make: metadata.make || "",
-          model: metadata.model || "",
-          trim: metadata.trim || "",
-          condition: metadata.vehicleCondition || "",
-          mileage: metadata.mileage || "",
-        },
-        amount: paymentIntent.amount,
-        paymentIntentId: paymentIntent.id,
-      });
+    if (emailLeadId) {
+      // Atomically claim and send support notification email
+      try {
+        const { data: supportClaimData, error: supportClaimError } = await supabaseAdmin
+          .from("lease_review_leads")
+          .update({ support_email_sent_at: new Date().toISOString() })
+          .eq("id", emailLeadId)
+          .is("support_email_sent_at", null)
+          .select()
+          .maybeSingle();
 
-      if (!supportEmailResult.success) {
-        console.error("Failed to send support notification");
+        if (supportClaimError) {
+          console.error("Error claiming support email:", supportClaimError);
+        } else if (supportClaimData) {
+          // Successfully claimed - send support notification
+          const supportEmailResult = await sendSupportNotification({
+            email,
+            firstName: metadata.firstName || "",
+            customerGoal: metadata.customerGoal || "",
+            vehicle: {
+              year: metadata.year || "",
+              make: metadata.make || "",
+              model: metadata.model || "",
+              trim: metadata.trim || "",
+              condition: metadata.vehicleCondition || "",
+              mileage: metadata.mileage || "",
+            },
+            amount: paymentIntent.amount,
+            paymentIntentId: paymentIntent.id,
+          });
+
+          if (!supportEmailResult.success) {
+            console.error("Failed to send support notification");
+          }
+        } else {
+          console.log("Support email already sent for this payment");
+        }
+      } catch (emailError) {
+        console.error("Support email error:", emailError);
+      }
+
+      // Atomically claim and send customer confirmation email
+      try {
+        const { data: customerClaimData, error: customerClaimError } = await supabaseAdmin
+          .from("lease_review_leads")
+          .update({ customer_email_sent_at: new Date().toISOString() })
+          .eq("id", emailLeadId)
+          .is("customer_email_sent_at", null)
+          .select()
+          .maybeSingle();
+
+        if (customerClaimError) {
+          console.error("Error claiming customer email:", customerClaimError);
+        } else if (customerClaimData) {
+          // Successfully claimed - send customer confirmation
+          const customerEmailResult = await sendPurchaseConfirmation({
+            email,
+            vehicle: {
+              year: metadata.year || "",
+              make: metadata.make || "",
+              model: metadata.model || "",
+              trim: metadata.trim || "",
+              condition: metadata.vehicleCondition || "",
+              mileage: metadata.mileage || "",
+            },
+            amount: paymentIntent.amount,
+            paymentIntentId: paymentIntent.id,
+          });
+
+          if (!customerEmailResult.success) {
+            console.error("Failed to send customer confirmation");
+          }
+        } else {
+          console.log("Customer confirmation email already sent for this payment");
+        }
+      } catch (emailError) {
+        console.error("Customer email error:", emailError);
       }
     } else {
-      console.log("Support email already sent for this payment");
-    }
-
-    // Atomically claim and send customer confirmation email
-    const { data: customerClaimData, error: customerClaimError } = await supabaseAdmin
-      .from("lease_review_leads")
-      .update({ customer_email_sent_at: new Date().toISOString() })
-      .eq("id", leaseReviewId)
-      .is("customer_email_sent_at", null)
-      .select()
-      .maybeSingle();
-
-    if (customerClaimError) {
-      console.error("Error claiming customer email:", customerClaimError);
-    } else if (customerClaimData) {
-      // Successfully claimed - send customer confirmation
-      const customerEmailResult = await sendPurchaseConfirmation({
-        email,
-        vehicle: {
-          year: metadata.year || "",
-          make: metadata.make || "",
-          model: metadata.model || "",
-          trim: metadata.trim || "",
-          condition: metadata.vehicleCondition || "",
-          mileage: metadata.mileage || "",
-        },
-        amount: paymentIntent.amount,
-        paymentIntentId: paymentIntent.id,
-      });
-
-      if (!customerEmailResult.success) {
-        console.error("Failed to send customer confirmation");
-      }
-    } else {
-      console.log("Customer confirmation email already sent for this payment");
+      console.error("No leadId available - cannot send emails");
     }
   } else if (metadata.product === "dealer_coordination") {
     const firstName = metadata.firstName || "";
@@ -232,89 +316,174 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
 
     if (!dcId) {
       console.error("Missing dealerCoordinationId in PaymentIntent metadata");
-      throw new Error("Missing dealerCoordinationId in metadata");
+      // Don't throw - still try to send emails
     }
 
-    // Upsert dealer coordination lead with payment information
-    const { data: dealerData, error: dealerError } = await supabaseAdmin
-      .from("dealer_coordination_leads")
-      .upsert(
-        {
-          id: dcId,
-          first_name: firstName,
-          last_name: lastName,
-          email,
-          phone,
-          payment_intent_id: paymentIntent.id,
-          payment_status: "succeeded",
-          amount_paid: paymentIntent.amount,
-        },
-        { onConflict: "id" }
-      )
-      .select()
-      .single();
+    let coordinationId = dcId;
 
-    if (dealerError) {
-      console.error("Error upserting dealer coordination lead:", dealerError);
-      throw new Error("Database error");
+    // Try to find or update the coordination record (non-fatal)
+    try {
+      // (a) Find by payment_intent_id first
+      const { data: existingByPayment } = await supabaseAdmin
+        .from("dealer_coordination_leads")
+        .select("id")
+        .eq("payment_intent_id", paymentIntent.id)
+        .maybeSingle();
+
+      if (existingByPayment) {
+        // Already exists with this payment_intent_id - update it
+        coordinationId = existingByPayment.id;
+        const { error: updateError } = await supabaseAdmin
+          .from("dealer_coordination_leads")
+          .update({
+            payment_status: "succeeded",
+            amount_paid: paymentIntent.amount,
+          })
+          .eq("id", coordinationId);
+
+        if (updateError) {
+          console.error("Failed to update coordination by payment_intent_id:", updateError);
+        } else {
+          console.log("Updated existing coordination found by payment_intent_id");
+        }
+      } else if (dcId) {
+        // (b) Find by dealerCoordinationId
+        const { data: existingById } = await supabaseAdmin
+          .from("dealer_coordination_leads")
+          .select("id")
+          .eq("id", dcId)
+          .maybeSingle();
+
+        if (existingById) {
+          // Update existing record with payment info
+          const { error: updateError } = await supabaseAdmin
+            .from("dealer_coordination_leads")
+            .update({
+              payment_intent_id: paymentIntent.id,
+              payment_status: "succeeded",
+              amount_paid: paymentIntent.amount,
+            })
+            .eq("id", dcId);
+
+          if (updateError) {
+            console.error("Failed to update coordination by dealerCoordinationId:", updateError);
+          } else {
+            console.log("Updated existing coordination found by dealerCoordinationId");
+          }
+        } else {
+          // (c) Neither exists - insert new row from metadata
+          const { data: newCoordination, error: insertError } = await supabaseAdmin
+            .from("dealer_coordination_leads")
+            .insert({
+              id: dcId,
+              first_name: firstName,
+              last_name: lastName,
+              email,
+              phone,
+              payment_intent_id: paymentIntent.id,
+              payment_status: "succeeded",
+              amount_paid: paymentIntent.amount,
+            })
+            .select()
+            .single();
+
+          if (insertError) {
+            // Handle race condition - if 23505, another process inserted it
+            if (insertError.code === "23505") {
+              console.log("Race condition detected - coordination already exists, continuing with emails");
+              // Try to fetch the existing record for the ID
+              const { data: raceCoordination } = await supabaseAdmin
+                .from("dealer_coordination_leads")
+                .select("id")
+                .eq("payment_intent_id", paymentIntent.id)
+                .maybeSingle();
+              if (raceCoordination) {
+                coordinationId = raceCoordination.id;
+              }
+            } else {
+              console.error("Failed to insert new coordination:", insertError);
+            }
+          } else if (newCoordination) {
+            console.log("Inserted new coordination from webhook metadata");
+            coordinationId = newCoordination.id;
+          }
+        }
+      }
+    } catch (dbError) {
+      console.error("Database error (non-fatal, will still send emails):", dbError);
     }
 
-    // Atomically claim and send support notification email
-    const { data: supportClaimData, error: supportClaimError } = await supabaseAdmin
-      .from("dealer_coordination_leads")
-      .update({ support_email_sent_at: new Date().toISOString() })
-      .eq("id", dcId)
-      .is("support_email_sent_at", null)
-      .select()
-      .maybeSingle();
+    // Send emails regardless of database outcome (use coordinationId if available)
+    const emailCoordinationId = coordinationId || dcId;
 
-    if (supportClaimError) {
-      console.error("Error claiming support email:", supportClaimError);
-    } else if (supportClaimData) {
-      // Successfully claimed - send support notification
-      const supportEmailResult = await sendDealerCoordinationSupportNotification({
-        email,
-        firstName,
-        lastName,
-        phone,
-        amount: paymentIntent.amount,
-        paymentIntentId: paymentIntent.id,
-      });
+    if (emailCoordinationId) {
+      // Atomically claim and send support notification email
+      try {
+        const { data: supportClaimData, error: supportClaimError } = await supabaseAdmin
+          .from("dealer_coordination_leads")
+          .update({ support_email_sent_at: new Date().toISOString() })
+          .eq("id", emailCoordinationId)
+          .is("support_email_sent_at", null)
+          .select()
+          .maybeSingle();
 
-      if (!supportEmailResult.success) {
-        console.error("Failed to send dealer coordination support notification");
+        if (supportClaimError) {
+          console.error("Error claiming support email:", supportClaimError);
+        } else if (supportClaimData) {
+          // Successfully claimed - send support notification
+          const supportEmailResult = await sendDealerCoordinationSupportNotification({
+            email,
+            firstName,
+            lastName,
+            phone,
+            amount: paymentIntent.amount,
+            paymentIntentId: paymentIntent.id,
+          });
+
+          if (!supportEmailResult.success) {
+            console.error("Failed to send dealer coordination support notification");
+          }
+        } else {
+          console.log("Support email already sent for this dealer coordination");
+        }
+      } catch (emailError) {
+        console.error("Support email error:", emailError);
+      }
+
+      // Atomically claim and send customer confirmation email
+      try {
+        const { data: customerClaimData, error: customerClaimError } = await supabaseAdmin
+          .from("dealer_coordination_leads")
+          .update({ customer_email_sent_at: new Date().toISOString() })
+          .eq("id", emailCoordinationId)
+          .is("customer_email_sent_at", null)
+          .select()
+          .maybeSingle();
+
+        if (customerClaimError) {
+          console.error("Error claiming customer email:", customerClaimError);
+        } else if (customerClaimData) {
+          // Successfully claimed - send customer confirmation
+          const customerEmailResult = await sendDealerCoordinationConfirmation({
+            email,
+            firstName,
+            lastName,
+            phone,
+            amount: paymentIntent.amount,
+            paymentIntentId: paymentIntent.id,
+          });
+
+          if (!customerEmailResult.success) {
+            console.error("Failed to send dealer coordination customer confirmation");
+          }
+        } else {
+          console.log("Customer confirmation email already sent for this dealer coordination");
+        }
+      } catch (emailError) {
+        console.error("Customer email error:", emailError);
       }
     } else {
-      console.log("Support email already sent for this dealer coordination");
-    }
-
-    // Atomically claim and send customer confirmation email
-    const { data: customerClaimData, error: customerClaimError } = await supabaseAdmin
-      .from("dealer_coordination_leads")
-      .update({ customer_email_sent_at: new Date().toISOString() })
-      .eq("id", dcId)
-      .is("customer_email_sent_at", null)
-      .select()
-      .maybeSingle();
-
-    if (customerClaimError) {
-      console.error("Error claiming customer email:", customerClaimError);
-    } else if (customerClaimData) {
-      // Successfully claimed - send customer confirmation
-      const customerEmailResult = await sendDealerCoordinationConfirmation({
-        email,
-        firstName,
-        lastName,
-        phone,
-        amount: paymentIntent.amount,
-        paymentIntentId: paymentIntent.id,
-      });
-
-      if (!customerEmailResult.success) {
-        console.error("Failed to send dealer coordination customer confirmation");
-      }
-    } else {
-      console.log("Customer confirmation email already sent for this dealer coordination");
+      console.error("No coordinationId available - cannot send emails");
     }
   }
 }

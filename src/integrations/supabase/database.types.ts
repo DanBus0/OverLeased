@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 export type Json =
   | string
   | number
@@ -19,6 +19,7 @@ export type Database = {
         Row: {
           amount_paid: number | null
           created_at: string
+          customer_email_sent_at: string | null
           email: string
           first_name: string
           id: string
@@ -29,11 +30,13 @@ export type Database = {
           phone: string
           service_completed: boolean | null
           service_completed_at: string | null
+          support_email_sent_at: string | null
           updated_at: string
         }
         Insert: {
           amount_paid?: number | null
           created_at?: string
+          customer_email_sent_at?: string | null
           email: string
           first_name: string
           id?: string
@@ -44,11 +47,13 @@ export type Database = {
           phone: string
           service_completed?: boolean | null
           service_completed_at?: string | null
+          support_email_sent_at?: string | null
           updated_at?: string
         }
         Update: {
           amount_paid?: number | null
           created_at?: string
+          customer_email_sent_at?: string | null
           email?: string
           first_name?: string
           id?: string
@@ -59,6 +64,7 @@ export type Database = {
           phone?: string
           service_completed?: boolean | null
           service_completed_at?: string | null
+          support_email_sent_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -68,6 +74,7 @@ export type Database = {
           amount_paid: number | null
           created_at: string
           current_mileage: number
+          customer_email_sent_at: string | null
           customer_goal: string | null
           email: string
           firstname: string | null
@@ -78,6 +85,7 @@ export type Database = {
           payment_status: string | null
           report_delivered: boolean | null
           report_delivered_at: string | null
+          support_email_sent_at: string | null
           trim: string | null
           updated_at: string
           vehicle_condition: string | null
@@ -88,6 +96,7 @@ export type Database = {
           amount_paid?: number | null
           created_at?: string
           current_mileage: number
+          customer_email_sent_at?: string | null
           customer_goal?: string | null
           email: string
           firstname?: string | null
@@ -98,6 +107,7 @@ export type Database = {
           payment_status?: string | null
           report_delivered?: boolean | null
           report_delivered_at?: string | null
+          support_email_sent_at?: string | null
           trim?: string | null
           updated_at?: string
           vehicle_condition?: string | null
@@ -108,6 +118,7 @@ export type Database = {
           amount_paid?: number | null
           created_at?: string
           current_mileage?: number
+          customer_email_sent_at?: string | null
           customer_goal?: string | null
           email?: string
           firstname?: string | null
@@ -118,6 +129,7 @@ export type Database = {
           payment_status?: string | null
           report_delivered?: boolean | null
           report_delivered_at?: string | null
+          support_email_sent_at?: string | null
           trim?: string | null
           updated_at?: string
           vehicle_condition?: string | null
