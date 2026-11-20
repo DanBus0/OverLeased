@@ -257,6 +257,191 @@ export async function sendSupportNotification(data: {
     return { success: false, error: "Email service not configured" };
   }
 
+  const submissionTime = new Date().toLocaleString("en-US", {
+    timeZone: "America/New_York",
+    dateStyle: "full",
+    timeStyle: "long"
+  });
+
+  // Convert customerGoal value to readable text
+  const goalText = {
+    "no-longer-need": "No Longer Need A Vehicle",
+    "different-vehicle": "Want A Different Vehicle",
+    "keep-current": "Want To Keep Current Vehicle",
+    "lower-cost": "Lower Monthly Cost",
+    "not-sure": "Not Sure"
+  }[data.customerGoal] || data.customerGoal;
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Lease Exit Guide Purchase</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+        <table role="presentation" style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td align="center" style="padding: 40px 20px;">
+              <table role="presentation" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                
+              <tr>
+                <td style="padding: 30px 40px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border-radius: 12px 12px 0 0;">
+                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700; text-align: center;">
+                    💰 New Lease Exit Guide Purchase
+                  </h1>
+                  <p style="margin: 8px 0 0; color: #bfdbfe; font-size: 14px; text-align: center;">
+                    Payment received - customer awaiting guide delivery
+                  </p>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 32px 40px 16px;">
+                  <h2 style="margin: 0 0 20px; color: #1f2937; font-size: 18px; font-weight: 600;">
+                    Customer Details
+                  </h2>
+                  
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">First Name</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${data.firstName}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Customer Goal</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${goalText}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0;">
+                        <span style="color: #6b7280; font-size: 14px;">Email</span>
+                      </td>
+                      <td style="padding: 12px 0; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${data.email}</span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 16px 40px 16px;">
+                  <h2 style="margin: 0 0 20px; color: #1f2937; font-size: 18px; font-weight: 600;">
+                    Vehicle Details
+                  </h2>
+                  
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Year</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${data.vehicle.year}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Make</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${data.vehicle.make}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Model</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${data.vehicle.model}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Trim</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${data.vehicle.trim}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Condition</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600; text-transform: capitalize;">${data.vehicle.condition}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0;">
+                        <span style="color: #6b7280; font-size: 14px;">Mileage</span>
+                      </td>
+                      <td style="padding: 12px 0; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${data.vehicle.mileage} miles</span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 16px 40px 32px;">
+                  <h2 style="margin: 0 0 20px; color: #1f2937; font-size: 18px; font-weight: 600;">
+                    Payment Information
+                  </h2>
+                  
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Amount Paid</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">$${(data.amount / 100).toFixed(2)}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Transaction ID</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 400; font-family: 'Courier New', monospace; font-size: 13px;">${data.paymentIntentId}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0;">
+                        <span style="color: #6b7280; font-size: 14px;">Purchase Time</span>
+                      </td>
+                      <td style="padding: 12px 0; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${submissionTime}</span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 24px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
+                  <p style="margin: 0; color: #6b7280; font-size: 12px; text-align: center;">
+                    This is an automated notification from OverLeased
+                  </p>
+                </td>
+              </tr>
+
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+
   try {
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
@@ -275,25 +460,8 @@ export async function sendSupportNotification(data: {
             name: "OverLeased Support",
           },
         ],
-        subject: `New Lease Exit Guide Order - ${data.firstName}`,
-        htmlContent: `
-          <h2>New Lease Exit Guide Purchase</h2>
-          <p><strong>Customer:</strong> ${data.firstName}<br>
-          <strong>Email:</strong> ${data.email}<br>
-          <strong>Goal:</strong> ${data.customerGoal}</p>
-          
-          <h3>Vehicle Details:</h3>
-          <p><strong>Year:</strong> ${data.vehicle.year}<br>
-          <strong>Make:</strong> ${data.vehicle.make}<br>
-          <strong>Model:</strong> ${data.vehicle.model}<br>
-          <strong>Trim:</strong> ${data.vehicle.trim}<br>
-          <strong>Condition:</strong> ${data.vehicle.condition}<br>
-          <strong>Mileage:</strong> ${data.vehicle.mileage}</p>
-          
-          <h3>Payment Details:</h3>
-          <p><strong>Amount:</strong> $${(data.amount / 100).toFixed(2)}<br>
-          <strong>Payment Intent ID:</strong> ${data.paymentIntentId}</p>
-        `,
+        subject: `💰 New Purchase: ${data.firstName} - ${data.vehicle.year} ${data.vehicle.make} ${data.vehicle.model}`,
+        htmlContent,
       }),
     });
 
@@ -328,6 +496,123 @@ export async function sendDealerCoordinationSupportNotification(data: {
     return { success: false, error: "Email service not configured" };
   }
 
+  const submissionTime = new Date().toLocaleString("en-US", {
+    timeZone: "America/New_York",
+    dateStyle: "full",
+    timeStyle: "long"
+  });
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Dealer Coordination Purchase</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+        <table role="presentation" style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td align="center" style="padding: 40px 20px;">
+              <table role="presentation" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                
+              <tr>
+                <td style="padding: 30px 40px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border-radius: 12px 12px 0 0;">
+                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700; text-align: center;">
+                    💰 New Dealer Coordination Purchase
+                  </h1>
+                  <p style="margin: 8px 0 0; color: #bfdbfe; font-size: 14px; text-align: center;">
+                    Payment received - begin coordination process
+                  </p>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 32px 40px 16px;">
+                  <h2 style="margin: 0 0 20px; color: #1f2937; font-size: 18px; font-weight: 600;">
+                    Customer Information
+                  </h2>
+                  
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Name</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${data.firstName} ${data.lastName}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Email</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${data.email}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0;">
+                        <span style="color: #6b7280; font-size: 14px;">Phone</span>
+                      </td>
+                      <td style="padding: 12px 0; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${data.phone}</span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 16px 40px 32px;">
+                  <h2 style="margin: 0 0 20px; color: #1f2937; font-size: 18px; font-weight: 600;">
+                    Payment Information
+                  </h2>
+                  
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Amount Paid</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">$${(data.amount / 100).toFixed(2)}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 14px;">Transaction ID</span>
+                      </td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 400; font-family: 'Courier New', monospace; font-size: 13px;">${data.paymentIntentId}</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0;">
+                        <span style="color: #6b7280; font-size: 14px;">Purchase Time</span>
+                      </td>
+                      <td style="padding: 12px 0; text-align: right;">
+                        <span style="color: #111827; font-size: 14px; font-weight: 600;">${submissionTime}</span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding: 24px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
+                  <p style="margin: 0; color: #6b7280; font-size: 12px; text-align: center;">
+                    This is an automated notification from OverLeased
+                  </p>
+                </td>
+              </tr>
+
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+
   try {
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
@@ -346,17 +631,8 @@ export async function sendDealerCoordinationSupportNotification(data: {
             name: "OverLeased Support",
           },
         ],
-        subject: `New Dealer Coordination Order - ${data.firstName} ${data.lastName}`,
-        htmlContent: `
-          <h2>New Dealer Coordination Service Purchase</h2>
-          <p><strong>Customer:</strong> ${data.firstName} ${data.lastName}<br>
-          <strong>Email:</strong> ${data.email}<br>
-          <strong>Phone:</strong> ${data.phone}</p>
-          
-          <h3>Payment Details:</h3>
-          <p><strong>Amount:</strong> $${(data.amount / 100).toFixed(2)}<br>
-          <strong>Payment Intent ID:</strong> ${data.paymentIntentId}</p>
-        `,
+        subject: `💰 New Dealer Coordination: ${data.firstName} ${data.lastName}`,
+        htmlContent,
       }),
     });
 

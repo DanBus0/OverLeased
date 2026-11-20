@@ -91,28 +91,6 @@ function DealerCoordinationCheckoutForm({ formData, clientSecret }: { formData: 
           console.error("Database error:", dbErr);
         }
 
-        // Send confirmation emails after successful payment (webhook will also send, but emails are idempotent)
-        try {
-          await fetch("/api/send-dealer-coordination-emails", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: formData.email,
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-              phone: formData.phone,
-              amount: DEALER_COORDINATION_AMOUNT,
-              paymentIntentId: paymentIntent.id,
-            }),
-          });
-          console.log("Confirmation emails sent successfully");
-        } catch (emailError) {
-          console.error("Failed to send confirmation emails:", emailError);
-          // Don't block redirect if emails fail
-        }
-
         // Store payment intent for GA4 tracking on confirmation page
         sessionStorage.setItem("dealer_coordination_payment_intent", paymentIntent.id);
         sessionStorage.removeItem("dealerCoordinationFormData");

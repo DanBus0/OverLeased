@@ -113,47 +113,6 @@ function CheckoutForm({ formData, clientSecret }: { formData: FormData; clientSe
           } else {
             console.log("Payment already recorded (webhook processed first)");
           }
-
-          // Send confirmation emails via server-side API route (also idempotent via webhook)
-          try {
-            const emailResponse = await fetch("/api/send-confirmation-emails", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                email: formData.email,
-                firstName: formData.firstName,
-                customerGoal: formData.customerGoal,
-                vehicle: {
-                  year: formData.year,
-                  make: formData.make,
-                  model: formData.model,
-                  trim: formData.trim,
-                  condition: formData.vehicleCondition,
-                  mileage: formData.mileage,
-                },
-                amount: 3900,
-                paymentIntentId: paymentIntent.id,
-              }),
-            });
-
-            const emailResult = await emailResponse.json();
-            
-            if (emailResult.success) {
-              if (!emailResult.results.customerEmail.success) {
-                console.error("Customer confirmation email failed");
-              }
-              if (!emailResult.results.supportEmail.success) {
-                console.error("Support notification email failed");
-              }
-            } else {
-              console.error("Email delivery failed");
-            }
-          } catch (emailError: any) {
-            console.error("Failed to send confirmation emails");
-            // Don't block the flow if email fails - user already paid
-          }
         } catch (saveError) {
           console.error("Error saving to database:", saveError);
         }
